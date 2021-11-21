@@ -25,7 +25,7 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
     midiBrain.reset(new MidiBrain());
 
 #if JUCE_DEBUG
-    logger.reset(new MultimapperLog([&](juce::StringRef msg) { dbgLog += msg; }));
+    logger.reset(new MultimapperLog([&](juce::StringRef msg) { dbgLog += msg + '\n'; }));
     juce::Logger::setCurrentLogger(logger.get());
 
     juce::Timer::callAfterDelay(500, [&]() { this->testMidi(); });

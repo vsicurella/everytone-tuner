@@ -9,6 +9,7 @@
 */
 
 #include "MidiBrain.h"
+#include "../../Keytographer/Source/tests/TestCommon.h"
 
 MidiBrain::MidiBrain()
 {
@@ -55,6 +56,15 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
             auto oldCents = oldTuning->getNoteInCents(oldNote);
             auto pitchbend = MidiNoteTuner::pitchbendAmount(pitchbendRange, oldCents / 100.0, newCents / 100.0);
 
+#if JUCE_DEBUG
+        if (msg.isNoteOn())
+        {
+            juce::String dbmsg = msg.getDescription();
+            dbmsg += '\t' + KeytographerTest::MappedNoteToString(mapped);
+            juce::Logger::writeToLog(dbmsg);
+        }
+#endif
+
             if (pitchbend != 8192)
             {
                 // Create and add pitchbend message
@@ -62,16 +72,12 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
                 auto sample = (metadata.samplePosition == 0) ? 0 : metadata.samplePosition - 1;
 
 #if JUCE_DEBUG
-                juce::Logger::writeToLog(pbmsg.getDescription());
+                //juce::Logger::writeToLog(pbmsg.getDescription());
 #endif
 
                 processedBuffer.addEvent(msg, sample);
             }
         }
-
-#if JUCE_DEBUG
-        juce::Logger::writeToLog(msg.getDescription());
-#endif
         
         processedBuffer.addEvent(msg, metadata.samplePosition);
     }
