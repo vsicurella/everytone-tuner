@@ -45,9 +45,11 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
 
     setSize (1024, 768);
 
-    logger.reset(new LogWindow());
+#if JUCE_DEBUG
+    logger.reset(new LogWindow([&]() -> juce::StringRef { return audioProcessor.getLog(); }));
     logger->setSize(800, 600);
     logger->setVisible(true);
+#endif
 }
 
 MultimapperAudioProcessorEditor::~MultimapperAudioProcessorEditor()

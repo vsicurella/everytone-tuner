@@ -11,16 +11,16 @@
 #pragma once
 #include <JuceHeader.h>
 
-class LogWindow : public juce::Logger, public juce::DocumentWindow
+class LogWindow : public juce::DocumentWindow, private juce::Timer
 {
-    
-    //std::unique_ptr<juce::TextEditor> textBox;
     juce::TextEditor* textBox;
+    std::function<juce::String(void)> callback;
 
 public:
 
-    LogWindow()
-        : juce::DocumentWindow("Multimapper Log", 
+    LogWindow(std::function<juce::String(void)> getLogCallback)
+        : callback(getLogCallback),
+          juce::DocumentWindow("Multimapper Log", 
             juce::Colours::black, 
             juce::DocumentWindow::TitleBarButtons::minimiseButton,
             true)
@@ -30,6 +30,10 @@ public:
         textBox->setReadOnly(true);
         textBox->setSize(800, 600);
         setContentOwned(textBox, true);
+
+        setSize(800, 600);
+
+        startTimer(50);
     }
 
     ~LogWindow()
@@ -37,15 +41,8 @@ public:
         
     }
 
-    void resized() override
+    void timerCallback() override
     {
-        juce::ResizableWindow::resized();
-        textBox->setBounds(getLocalBounds());
+        textBox->setText(callback(), false);
     }
-
-    void logMessage(const juce::String& msg) override
-    {
-        textBox->insertTextAtCaret(msg + '\n');
-    }
-
 };

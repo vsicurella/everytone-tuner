@@ -22,6 +22,14 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
                        )
 #endif
 {
+    midiBrain.reset(new MidiBrain());
+
+#if JUCE_DEBUG
+    logger.reset(new MultimapperLog([&](juce::StringRef msg) { dbgLog += msg; }));
+    juce::Logger::setCurrentLogger(logger.get());
+
+    juce::Timer::callAfterDelay(500, [&]() { this->testMidi(); });
+#endif
 }
 
 MultimapperAudioProcessor::~MultimapperAudioProcessor()
@@ -190,4 +198,26 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new MultimapperAudioProcessor();
+}
+
+juce::String MultimapperAudioProcessor::getLog() const
+{
+    return dbgLog;
+}
+
+void MultimapperAudioProcessor::testMidi()
+{
+    juce::MidiBuffer buffer;
+    int sample = 0;
+    // Note on + off for each note in channel
+    for (int ch = 1; ch <= 1; ch++)
+        for (int n = 0; n < 128; n++)
+        {
+            auto msg = juce::MidiMessage::noteOn(ch, n, (juce::uint8)100);
+            buffer.addEvent(msg, sample++);
+            msg = juce::MidiMessage::noteOff(ch, n);
+            buffer.addEvent(msg, sample++);
+        }
+
+    midiBrain->processMidi(buffer);
 }

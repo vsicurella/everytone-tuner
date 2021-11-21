@@ -11,6 +11,20 @@
 #include <JuceHeader.h>
 #include "MidiBrain.h"
 
+class MultimapperLog : public juce::Logger
+{
+    std::function<void(juce::StringRef msg)> callback;
+
+public:
+    MultimapperLog(std::function<void(juce::StringRef msg)> logCallback)
+        : callback(logCallback) {}
+
+    void logMessage(const juce::String& msg) override
+    {
+        callback(msg);
+    }
+};
+
 //==============================================================================
 /**
 */
@@ -54,9 +68,20 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    juce::String getLog() const;
+
+private:
+
+    void testMidi();
+
 private:
 
     std::unique_ptr<MidiBrain> midiBrain;
+    
+#if JUCE_DEBUG
+    juce::String dbgLog;
+    std::unique_ptr<MultimapperLog> logger;
+#endif
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultimapperAudioProcessor)
