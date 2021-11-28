@@ -11,7 +11,7 @@
 #pragma once
 
 #include "TuningMath.h"
-#include "../../Keytographer/Source/Map.h"
+#include "Map.h"
 
 class Tuning
 {

@@ -9,7 +9,8 @@
 */
 
 #include "MidiBrain.h"
-#include "../../Keytographer/Source/tests/TestCommon.h"
+
+#include "tests/TestCommon.h"
 
 MidiBrain::MidiBrain()
 {
@@ -46,14 +47,16 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
 
             // Get new note pitch from tuning index
             auto newCents = newTuning->getNoteInCents(mapped.index);
-            auto newNote = newTuning->closestNoteToCents(newCents);            
+            juce::Logger::writeToLog("Tuning Table " + juce::String(mapped.index) + ": " + juce::String(newCents));
             
-            // Apply changes
-            msg.setNoteNumber(newNote);
-
             // Get note to tune from old tuning, and pitchbend amount to adjust by
             auto oldNote = oldTuning->closestNoteToCents(newCents);
+
+            msg.setNoteNumber(oldNote);
+
             auto oldCents = oldTuning->getNoteInCents(oldNote);
+            juce::Logger::writeToLog("\tclosest: " + juce::String(oldNote) + ", " + juce::String(oldCents));
+
             auto pitchbend = MidiNoteTuner::pitchbendAmount(pitchbendRange, oldCents / 100.0, newCents / 100.0);
 
 #if JUCE_DEBUG

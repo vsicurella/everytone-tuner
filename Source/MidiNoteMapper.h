@@ -14,7 +14,7 @@
 
 #include <JuceHeader.h>
 
-#include "../../Keytographer/Source/MultichannelMap.h"
+#include "MultichannelMap.h"
 
 class MidiNoteMapper
 {

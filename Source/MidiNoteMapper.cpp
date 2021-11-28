@@ -12,7 +12,7 @@
 
 MidiNoteMapper::MidiNoteMapper()
 {
-    map.reset(new Keytographer::MultichannelMap(Keytographer::StandardMapping()));
+    map.reset(new Keytographer::MultichannelMap(Keytographer::MultichannelMap::StandardMapping()));
 }
 
 MidiNoteMapper::~MidiNoteMapper()

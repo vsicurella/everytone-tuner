@@ -1,19 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="dQHHPS" name="Multimapper" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" headerPath="../../../Keytographer/Source/">
   <MAINGROUP id="H8zE4n" name="Multimapper">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
-      <FILE id="wyXPRk" name="LogWindow.h" compile="0" resource="0" file="Source/LogWindow.h"/>
-      <GROUP id="{634C4FBB-D2F9-F4DB-774A-40E17418F9FB}" name="Keytographer">
-        <FILE id="ermBSP" name="Map.h" compile="0" resource="0" file="../Keytographer/Source/Map.h"/>
-        <FILE id="H6RoNo" name="MultichannelMap.cpp" compile="1" resource="0"
-              file="../Keytographer/Source/MultichannelMap.cpp"/>
-        <FILE id="U2RiFE" name="MultichannelMap.h" compile="0" resource="0"
-              file="../Keytographer/Source/MultichannelMap.h"/>
-        <FILE id="nzx9nX" name="TuningTableMap.h" compile="0" resource="0"
-              file="../Keytographer/Source/TuningTableMap.h"/>
+      <GROUP id="{B28A3B7A-D56B-1E69-5B28-B1F138349D16}" name="Keytographer">
+        <GROUP id="{D707B0D2-5268-602B-ADCB-B03FC0F30F26}" name="Source">
+          <GROUP id="{D997B268-0F5D-792A-3073-C6CAF328CD64}" name="tests">
+            <FILE id="GDG9V2" name="Map_Test.h" compile="0" resource="0" file="../Keytographer/Source/tests/Map_Test.h"/>
+            <FILE id="fYDpGG" name="MultichannelMap_Test.h" compile="0" resource="0"
+                  file="../Keytographer/Source/tests/MultichannelMap_Test.h"/>
+            <FILE id="BzgxPl" name="SingleChannelMap_Test.h" compile="0" resource="0"
+                  file="../Keytographer/Source/tests/SingleChannelMap_Test.h"/>
+            <FILE id="nQIOGd" name="TestCommon.h" compile="0" resource="0" file="../Keytographer/Source/tests/TestCommon.h"/>
+          </GROUP>
+          <FILE id="KR77tV" name="Atlas.h" compile="0" resource="0" file="../Keytographer/Source/Atlas.h"/>
+          <FILE id="cKqequ" name="Map.h" compile="0" resource="0" file="../Keytographer/Source/Map.h"/>
+          <FILE id="YFnwjH" name="MultichannelMap.cpp" compile="1" resource="0"
+                file="../Keytographer/Source/MultichannelMap.cpp"/>
+          <FILE id="XffmqS" name="MultichannelMap.h" compile="0" resource="0"
+                file="../Keytographer/Source/MultichannelMap.h"/>
+          <FILE id="ydbpSw" name="NoteMapper.cpp" compile="0" resource="0" file="../Keytographer/Source/NoteMapper.cpp"/>
+          <FILE id="DZodht" name="NoteMapper.h" compile="0" resource="0" file="../Keytographer/Source/NoteMapper.h"/>
+          <FILE id="WQjvVT" name="PluginEditor.cpp" compile="0" resource="0"
+                file="../Keytographer/Source/PluginEditor.cpp"/>
+          <FILE id="l86vbK" name="PluginEditor.h" compile="0" resource="0" file="../Keytographer/Source/PluginEditor.h"/>
+          <FILE id="fintYP" name="PluginProcessor.cpp" compile="0" resource="0"
+                file="../Keytographer/Source/PluginProcessor.cpp"/>
+          <FILE id="o7DM7C" name="PluginProcessor.h" compile="0" resource="0"
+                file="../Keytographer/Source/PluginProcessor.h"/>
+          <FILE id="qp7EyQ" name="Rule.h" compile="0" resource="0" file="../Keytographer/Source/Rule.h"/>
+          <FILE id="DRB4Zu" name="SingleChannelMap.cpp" compile="0" resource="0"
+                file="../Keytographer/Source/SingleChannelMap.cpp"/>
+          <FILE id="zIJeYM" name="SingleChannelMap.h" compile="0" resource="0"
+                file="../Keytographer/Source/SingleChannelMap.h"/>
+          <FILE id="KFozT0" name="TuningTableMap.cpp" compile="1" resource="0"
+                file="../Keytographer/Source/TuningTableMap.cpp"/>
+          <FILE id="aRz980" name="TuningTableMap.h" compile="0" resource="0"
+                file="../Keytographer/Source/TuningTableMap.h"/>
+        </GROUP>
       </GROUP>
+      <FILE id="wyXPRk" name="LogWindow.h" compile="0" resource="0" file="Source/LogWindow.h"/>
       <FILE id="D6lL0f" name="MidiNoteMapper.cpp" compile="1" resource="0"
             file="Source/MidiNoteMapper.cpp"/>
       <FILE id="JpXDOy" name="MidiNoteMapper.h" compile="0" resource="0"
