@@ -113,6 +113,39 @@ static double ratioToSemitones(double ratioIn)
 	return log2(ratioIn) * 12.0;
 }
 
+static double mtsToFrequency(double mts)
+{
+	return pow(2, (mts - 69) / 12.0) * 440.0;
+}
+
+static double mtsDataToFrequency(double mtsData)
+{
+
+}
+
+static double frequencyToMTS(double freqIn)
+{
+	return 69 + 12 * log2(freqIn / 440.0);
+}
+
+//// Returns the 16-bit 
+//static frequencyToMTSDifference(double freqIn)
+//{
+//	auto mts = frequencyToMTS(freqIn);
+//	if (mts < 0)
+//		return 0;
+//
+//	auto stdNote = trunc(mts);
+//	juce::uint8 byte1 = (juce::uint8)stdNote;
+//
+//	// this can be improved
+//	auto stdFreq = mtsToFrequency(stdNote);
+//
+//	double remainder = freqIn - stdFreq;
+//	juce::uint8 byte2 = trunc(remainder / )
+//	
+//}
+
 static double parseRatio(juce::String ratioIn)
 {
 	juce::StringRef separator = ratioIn.containsChar(':') ? ":" : "/";

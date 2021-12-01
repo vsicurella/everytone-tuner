@@ -16,26 +16,47 @@
 class Tuning
 {
     std::unique_ptr<Keytographer::Map<double>> tuningMap;
-
-    void setupTuning(const juce::Array<double>& cents);
-
-protected:
+	
+	juce::Array<double> centsTable;
 
 	double periodCents;
-	double periodSemitones;
-
 	int tuningSize;
-    int rootMidiNote; // note tuning is centered on
+
+    int rootMidiNote;
+	int rootMidiChannel;
+	double rootFrequency;
 
 	juce::String name;
 	juce::String description;
+
+private:
+
+	void setupTuning(const juce::Array<double>& cents);
+
+	void rebuildTable();
+
+public:
+
+	struct Definition
+	{
+		juce::String name = "";
+		juce::String description = "";
+	};
+
+	struct IntervalDefinition : Definition
+	{
+		juce::Array<double> intervalCents = { 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200 };
+		int rootMidiNote = 60;
+		int rootMidiChannel = 1;
+		double rootFrequency = 261.6255653;
+	};
 
 public:
 
 	/*
 		Expects a full interval table in cents, ending with period. May or may not include unison.
 	*/
-	Tuning(const juce::Array<double>& intervalCentsIn, int rootMidiNoteIn = 60, juce::String nameIn = "", juce::String descriptionIn = "");
+	Tuning(IntervalDefinition definition=IntervalDefinition());
 
     Tuning(const Tuning&);
 
@@ -47,11 +68,10 @@ public:
 	double getPeriodCents() const;
 	double getPeriodSemitones() const;
 	
-    juce::Array<double> getIntervalCents() const;
-    juce::Array<double> getIntervalSemitones() const;
-    
-    virtual double getNoteInSemitones(int noteNumber) const;
-    virtual double getNoteInCents(int noteNumber) const;
+    virtual double getNoteInCents(int noteNumber, int tableIndex = 0) const;
+    virtual double getNoteInSemitones(int noteNumber, int tableIndex = 0) const;
+
+	//virtual double getNoteInMTS(int noteNumber, int tableIndex = 0) const;
     
     int getRootNote() const;
 
@@ -72,12 +92,11 @@ public:
 
 public:
 
-    static Tuning StandardTuning(int rootNote=60)
-    {
-    juce::Array<double> table;
-        for (int i = 100; i <= 1200; i+=100)
-            table.add(i);
-
-        return Tuning(table, 60, "12edo");
-    }
+	static Tuning StandardTuning()
+	{
+		IntervalDefinition definition;
+		definition.name = "12-edo";
+		definition.description = "Octave divided in 12 equal steps";
+		return Tuning(definition);
+	}
 };

@@ -10,19 +10,22 @@
 
 #include "Tuning.h"
 
-Tuning::Tuning(const juce::Array<double>& centsTable, int rootMidiNoteIn, juce::String nameIn, juce::String descriptionIn)
-    : tuningSize(centsTable.size()),
-      rootMidiNote(rootMidiNoteIn),
-      periodCents(centsTable.getLast()),
-      name(nameIn),
-      description(descriptionIn)
+Tuning::Tuning(IntervalDefinition definition)
+    : tuningSize(definition.intervalCents.size()),
+      rootMidiNote(definition.rootMidiNote),
+      rootMidiChannel(definition.rootMidiChannel),
+      periodCents(definition.intervalCents.getLast()),
+      name(definition.name),
+      description(definition.description)
 {
-	setupTuning(centsTable);
+	setupTuning(definition.intervalCents);
 }
 
 Tuning::Tuning(const Tuning& tuning)
     : tuningSize(tuning.tuningSize),
       rootMidiNote(tuning.rootMidiNote),
+      rootMidiChannel(tuning.rootMidiChannel),
+      rootFrequency(tuning.rootFrequency),
       periodCents(tuning.periodCents),
       name(tuning.name),
       description(tuning.description)
@@ -81,15 +84,21 @@ int Tuning::getRootNote() const
     return rootMidiNote;
 }
 
-double Tuning::getNoteInSemitones(int noteNumber) const
+double Tuning::getNoteInCents(int noteNumber, int tableIndex = 0) const
 {
-    return tuningMap->at(noteNumber) * 0.01;
+	return tuningMap->at(tableIndex * 128 + noteNumber);
 }
 
-double Tuning::getNoteInCents(int noteNumber) const
+double Tuning::getNoteInSemitones(int noteNumber, int tableIndex = 0) const
 {
-	return tuningMap->at(noteNumber);
+    return getNoteInCents(noteNumber, tableIndex) * 0.01;
 }
+
+//double Tuning::getNoteInMTS(int noteNumber, int tableIndex = 0) const
+//{
+//    auto cents = getNoteInCents(noteNumber, tableIndex);
+//    auto 
+//}
 
 juce::String Tuning::getName() const
 {
