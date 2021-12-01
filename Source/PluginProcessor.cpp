@@ -34,6 +34,8 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
 
 MultimapperAudioProcessor::~MultimapperAudioProcessor()
 {
+    juce::Logger::setCurrentLogger(nullptr);
+    logger = nullptr;
 }
 
 //==============================================================================
