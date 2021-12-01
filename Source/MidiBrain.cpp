@@ -57,7 +57,7 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
             auto oldCents = oldTuning->getNoteInCents(oldNote);
             juce::Logger::writeToLog("\tclosest: " + juce::String(oldNote) + ", " + juce::String(oldCents));
 
-            auto pitchbend = MidiNoteTuner::pitchbendAmount(pitchbendRange, oldCents / 100.0, newCents / 100.0);
+            //auto pitchbend = MidiNoteTuner::pitchbendAmount(pitchbendRange, oldCents / 100.0, newCents / 100.0);
 
 #if JUCE_DEBUG
         if (msg.isNoteOn())
@@ -68,18 +68,18 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
         }
 #endif
 
-            if (pitchbend != 8192)
-            {
-                // Create and add pitchbend message
-                auto pbmsg = juce::MidiMessage::pitchWheel(ch, pitchbend);
-                auto sample = (metadata.samplePosition == 0) ? 0 : metadata.samplePosition - 1;
-
-#if JUCE_DEBUG
-                //juce::Logger::writeToLog(pbmsg.getDescription());
-#endif
-
-                processedBuffer.addEvent(msg, sample);
-            }
+//            if (pitchbend != 8192)
+//            {
+//                // Create and add pitchbend message
+//                auto pbmsg = juce::MidiMessage::pitchWheel(ch, pitchbend);
+//                auto sample = (metadata.samplePosition == 0) ? 0 : metadata.samplePosition - 1;
+//
+//#if JUCE_DEBUG
+//                //juce::Logger::writeToLog(pbmsg.getDescription());
+//#endif
+//
+//                processedBuffer.addEvent(msg, sample);
+//            }
         }
         
         processedBuffer.addEvent(msg, metadata.samplePosition);
