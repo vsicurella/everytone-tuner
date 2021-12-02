@@ -30,6 +30,14 @@ enum IntervalType
 	NofEDO = 4
 };
 
+
+struct MTSTriplet
+{
+    juce::uint8 coarse    = (juce::uint8)0xf7;
+    juce::uint8 fineUpper = (juce::uint8)0xf7;
+    juce::uint8 fineLower = (juce::uint8)0xf7;
+};
+
 static IntervalType getIntervalType(juce::String lineIn)
 {
 	bool hasDecimal = false;
@@ -100,12 +108,12 @@ static IntervalType getIntervalType(juce::String lineIn)
 
 static double centsToRatio(double centsIn)
 {
-	return pow(2, centsIn / 1200);
+	return pow(2, centsIn / 1200.0);
 }
 
 static double ratioToCents(double ratioIn)
 {
-	return log2(ratioIn) * 1200;
+	return log2(ratioIn) * 1200.0;
 }
 
 static double ratioToSemitones(double ratioIn)
@@ -118,9 +126,10 @@ static double mtsToFrequency(double mts)
 	return pow(2, (mts - 69) / 12.0) * 440.0;
 }
 
-static double mtsDataToFrequency(double mtsData)
+static double mtsTripletToFrequency(MTSTriplet mts)
 {
-
+    double fine = mts.fineUpper / (1 << 7) + mts.fineLower / (1 << 14);
+    return mtsToFrequency(mts.coarse + fine);
 }
 
 static double frequencyToMTS(double freqIn)
@@ -128,23 +137,27 @@ static double frequencyToMTS(double freqIn)
 	return 69 + 12 * log2(freqIn / 440.0);
 }
 
-//// Returns the 16-bit 
-//static frequencyToMTSDifference(double freqIn)
-//{
-//	auto mts = frequencyToMTS(freqIn);
-//	if (mts < 0)
-//		return 0;
-//
-//	auto stdNote = trunc(mts);
-//	juce::uint8 byte1 = (juce::uint8)stdNote;
-//
-//	// this can be improved
-//	auto stdFreq = mtsToFrequency(stdNote);
-//
-//	double remainder = freqIn - stdFreq;
-//	juce::uint8 byte2 = trunc(remainder / )
-//	
-//}
+static MTSTriplet mtsNoteToTriplet(double mts)
+{
+    int coarse = floor(mts);
+    MTSTriplet triplet;
+	triplet.coarse = (juce::uint8)coarse;
+
+    double leftover = mts - coarse;
+    triplet.fineUpper = (juce::uint8)(leftover * (1 << 7));
+    triplet.fineLower = (juce::uint8)(leftover * (1 << 14)) & 127;
+
+    return triplet;
+}
+
+static MTSTriplet frequencyToMTSTriplet(double freqIn)
+{
+	auto mts = frequencyToMTS(freqIn);
+	if (mts < 0 || mts > 127)
+		return {};
+
+    return mtsNoteToTriplet(mts);
+}
 
 static double parseRatio(juce::String ratioIn)
 {
