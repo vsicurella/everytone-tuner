@@ -19,14 +19,19 @@ class Tuning
 {
     std::unique_ptr<Keytographer::Map<double>> tuningMap;
 	
-	juce::Array<double> centsTable;
+	juce::Array<double> ratioTable;
+
+    juce::Array<double> freqTable;
+    juce::Array<double> mtsTable;
 
 	double periodCents;
 	int tuningSize;
 
     int rootMidiNote;
-	int rootMidiChannel;
+	int rootMidiChannelIndex;
 	double rootFrequency;
+
+    int transpose;
 
 	juce::String name;
 	juce::String description;
@@ -35,9 +40,10 @@ private:
 
 	void setupTuning(const juce::Array<double>& cents);
 
-	void rebuildTable();
+	void rebuildTables();
 
-	int midiIndex(int midiNote, int midiChannel) const { return modulo(midiChannel << 7 + midiNote, TUNING_TABLE_SIZE); }
+	static int midiIndex(int midiNote, int midiChannelIndex) { return modulo(midiChannelIndex << 7 + midiNote, TUNING_TABLE_SIZE); }
+    int rootMidiIndex() const { return midiIndex(rootMidiNote, rootMidiChannelIndex); }
 
 	template<typename U>
 	juce::String tableToString(const juce::Array<U>& table, int startChannel, int endChannel) const;
@@ -54,6 +60,7 @@ public:
 	struct Definition
 	{
 		Reference reference;
+        int transpose = 0;
 		juce::String name = "";
 		juce::String description = "";
 	};
@@ -74,9 +81,9 @@ public:
 
     Tuning(const Tuning&);
     
-	virtual int getRootIndex() const { return midiIndex(rootMidiNote, rootMidiChannel); }
+	virtual int getRootIndex() const { return midiIndex(rootMidiNote, rootMidiChannelIndex); }
 	virtual int getRootMidiNote() const { return rootMidiNote; }
-	virtual int getRootMidiChannel() const { return rootMidiChannel; }
+	virtual int getRootMidiChannel() const { return rootMidiChannelIndex + 1; }
 
 	virtual double getRootFrequency() const { return rootFrequency; }
 	virtual Reference getReference() const;
@@ -100,14 +107,13 @@ public:
 	virtual double getPeriodCents() const;
 	virtual double getPeriodSemitones() const;
 	
-    virtual double getNoteInCents(int noteNumber, int tableIndex = 0) const;
-    virtual double getNoteInSemitones(int noteNumber, int tableIndex = 0) const;
+    virtual double getNoteInCents(int noteNumber, int channel = 1) const;
+    virtual double getNoteInSemitones(int noteNumber, int channel = 1) const;
 
-	//virtual double getNoteInMTS(int noteNumber, int tableIndex = 0) const;
+	virtual double getNoteInMTS(int noteNumber, int channel = 1) const;
 
+    virtual juce::Array<MTSNote> getMTSDataTable() const;
 
-	virtual juce::String centsTableToString(int startMidiChannel, int endMidiChannel) const;
-	virtual juce::String semitoneTableToString(int startMidiChannel, int endMidiChannel) const;
 	virtual juce::String mtsTableToString(int startMidiChannel, int endMidiChannel) const;
 
 
