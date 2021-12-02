@@ -114,12 +114,12 @@ double Tuning::getPeriodSemitones() const
 	return periodCents * 0.01;
 }
 
-double Tuning::getNoteInCents(int noteNumber, int tableIndex = 0) const
+double Tuning::getNoteInCents(int noteNumber, int tableIndex) const
 {
 	return centsTable[midiIndex(noteNumber, tableIndex)];
 }
 
-double Tuning::getNoteInSemitones(int noteNumber, int tableIndex = 0) const
+double Tuning::getNoteInSemitones(int noteNumber, int tableIndex) const
 {
     return getNoteInCents(noteNumber, tableIndex) * 0.01;
 }
@@ -155,10 +155,10 @@ Tuning::Definition Tuning::getDefinition() const
 }
 
 template <typename U>
-juce::String Tuning::tableToString(const juce::Array<U>& table, int startChannel, int endChannel) const
+juce::String Tuning::tableToString(const juce::Array<U>& table, int startMidiChannel, int endMidiChannel) const
 {
     juce::String tableStr = "";
-    for (int ch = startMidiChannel - 1; ch < endMidiChannel - 1; modulo(ch, 16))
+    for (int ch = startMidiChannel - 1; ch < endMidiChannel - 1; modulo(ch + 1, 16))
     {
         int offset = midiIndex(0, ch);
         tableStr << "Channel " << juce::String(ch + 1) << ":" << juce::newLine;

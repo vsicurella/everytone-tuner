@@ -61,6 +61,8 @@ public:
 	struct IntervalDefinition : Definition
 	{
 		juce::Array<double> intervalCents = { 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200 };
+
+        IntervalDefinition() {}
 	};
 
 public:
