@@ -12,8 +12,9 @@
 
 Tuning::Tuning(IntervalDefinition definition)
     : tuningSize(definition.intervalCents.size()),
-      rootMidiNote(definition.rootMidiNote),
-      rootMidiChannel(definition.rootMidiChannel),
+      rootMidiNote(definition.reference.rootMidiNote),
+      rootMidiChannel(definition.reference.rootMidiChannel),
+      rootFrequency(definition.reference.rootFrequency),
       periodCents(definition.intervalCents.getLast()),
       name(definition.name),
       description(definition.description)
@@ -52,16 +53,55 @@ void Tuning::setupTuning(const juce::Array<double>& cents)
     tuningMap.reset(new Keytographer::Map<double>(definition));
 }
 
-void Tuning::setRootNote(int rootNoteIn)
+void Tuning::rebuildTable()
 {
-	rootMidiNote = rootNoteIn;
-    tuningMap->setMapRoot(rootMidiNote);
-    tuningMap->setTranspose(rootMidiNote);
+    int midiIndex = rootMidiChannel * 128 + rootMidiNote;
+    tuningMap->setMapRoot(midiIndex);
+    tuningMap->setTranspose(midiIndex);
+
+    for (int i = 0; i < TUNING_TABLE_SIZE; i++)
+    {
+        centsTable.set(i, tuningMap->at(i));
+    }
+}
+
+void Tuning::setName(juce::String nameIn)
+{
+    name = nameIn;
 }
 
 void Tuning::setDescription(juce::String descIn)
 {
 	description = descIn;
+}
+
+void Tuning::setFrequency(double frequency)
+{
+    // TODO check mts limits?
+    rootFrequency = frequency;
+    rebuildTable();
+}
+
+void Tuning::setRootMidiNote(int midiNote)
+{
+    // check midi limits?
+    rootMidiNote = midiNote;
+    rebuildTable();
+}
+
+void Tuning::setRootMidiChannel(int midiChannel)
+{
+    // check midi limits?
+    rootMidiChannel = midiChannel;
+    rebuildTable();
+}
+
+void Tuning::setReference(Reference reference)
+{
+    rootMidiNote = reference.rootMidiNote;
+    rootMidiChannel = reference.rootMidiChannel;
+    rootFrequency = reference.rootFrequency;
+    rebuildTable();
 }
 
 double Tuning::getPeriodCents() const
@@ -71,22 +111,12 @@ double Tuning::getPeriodCents() const
 
 double Tuning::getPeriodSemitones() const
 {
-	return periodCents / 100.0;
-}
-
-int Tuning::getTuningSize() const
-{
-	return tuningSize;
-}
-
-int Tuning::getRootNote() const
-{
-    return rootMidiNote;
+	return periodCents * 0.01;
 }
 
 double Tuning::getNoteInCents(int noteNumber, int tableIndex = 0) const
 {
-	return tuningMap->at(tableIndex * 128 + noteNumber);
+	return centsTable[midiIndex(noteNumber, tableIndex)];
 }
 
 double Tuning::getNoteInSemitones(int noteNumber, int tableIndex = 0) const
@@ -100,23 +130,64 @@ double Tuning::getNoteInSemitones(int noteNumber, int tableIndex = 0) const
 //    auto 
 //}
 
-juce::String Tuning::getName() const
+Tuning::Reference Tuning::getReference() const
 {
-	return name;
+    Reference r =
+    {
+        rootMidiNote,
+        rootMidiChannel,
+        rootFrequency
+    };
+
+    return r;
 }
 
-juce::String Tuning::getDescription() const
+Tuning::Definition Tuning::getDefinition() const
 {
-	return description;
+    Definition d =
+    {
+        getReference(),
+        name,
+        description
+    };
+
+    return d;
 }
 
-juce::String Tuning::toString() const
+template <typename U>
+juce::String Tuning::tableToString(const juce::Array<U>& table, int startChannel, int endChannel) const
 {
-	juce::String tableStr = "";
-    for (int i = 0; i < 128; i++)
-		tableStr << juce::String(tuningMap->at(i)) << juce::newLine;
+    juce::String tableStr = "";
+    for (int ch = startMidiChannel - 1; ch < endMidiChannel - 1; modulo(ch, 16))
+    {
+        int offset = midiIndex(0, ch);
+        tableStr << "Channel " << juce::String(ch + 1) << ":" << juce::newLine;
 
-	return tableStr;
+        for (int i = 0; i < 128; i++)
+            tableStr << juce::String(table[offset + i]) << juce::newLine;
+    }
+    return tableStr;
+}
+
+juce::String Tuning::centsTableToString(int startMidiChannel, int endMidiChannel) const
+{
+    return tableToString<double>(centsTable, startMidiChannel, endMidiChannel);
+}
+
+juce::String Tuning::semitoneTableToString(int startMidiChannel, int endMidiChannel) const
+{
+    juce::Array<double> semitoneTable(TUNING_TABLE_SIZE);
+    for (int i = 0; i < TUNING_TABLE_SIZE; i++)
+        semitoneTable.set(i, centsTable[i] * 0.01);
+    return tableToString<double>(semitoneTable, startMidiChannel, endMidiChannel);
+}
+
+juce::String Tuning::mtsTableToString(int startMidiChannel, int endMidiChannel) const
+{
+    juce::Array<double> semitoneTable(TUNING_TABLE_SIZE);
+    for (int i = 0; i < TUNING_TABLE_SIZE; i++)
+        semitoneTable.set(i, centsTable[i] * 0.01);
+    return tableToString<double>(semitoneTable, startMidiChannel, endMidiChannel);
 }
 
 int Tuning::getScaleDegree(int noteNumber) const
