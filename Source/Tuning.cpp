@@ -16,6 +16,7 @@ Tuning::Tuning(IntervalDefinition definition)
       rootMidiChannelIndex(definition.reference.rootMidiChannel - 1),
       rootFrequency(definition.reference.rootFrequency),
       periodCents(definition.intervalCents.getLast()),
+      transpose(definition.transpose),
       name(definition.name),
       description(definition.description)
 {
@@ -28,10 +29,11 @@ Tuning::Tuning(const Tuning& tuning)
       rootMidiChannelIndex(tuning.rootMidiChannelIndex),
       rootFrequency(tuning.rootFrequency),
       periodCents(tuning.periodCents),
+      transpose(tuning.transpose),
       name(tuning.name),
       description(tuning.description)
 {
-    tuningMap.reset(new Keytographer::Map<double>(*tuning.tuningMap.get()));
+    setupTuning(tuning.getIntervalCentsTable());
 }
 
 void Tuning::setupTuning(const juce::Array<double>& cents)
@@ -50,6 +52,8 @@ void Tuning::setupTuning(const juce::Array<double>& cents)
     };
 
     tuningMap.reset(new Keytographer::Map<double>(definition));
+
+    rebuildTables();
 }
 
 void Tuning::rebuildTables()
@@ -63,7 +67,7 @@ void Tuning::rebuildTables()
     int end = i + tuningSize;
     double firstCents = tuningMap->at(i);
     double cents, ratio;
-    while (i < end)
+    while (i <= end)
     {
         cents = tuningMap->at(i) - firstCents;
         ratio = centsToRatio(cents);
@@ -81,7 +85,7 @@ void Tuning::rebuildTables()
         degree = modulo(offset, tuningSize);
         intervalRatio = ratioTable[degree];
         offset = t - root;
-        periods = floor(offset / periods);
+        periods = floor(offset / tuningSize);
         frequency = periods * periodRatio * intervalRatio * rootFrequency;
         
         frequencyTable.set(t, frequency);
@@ -181,7 +185,7 @@ juce::Array<double> Tuning::getIntervalCentsTable() const
 {
     juce::Array<double> cents;
     int index;
-    for (int i = 0; i < tuningSize; i++)
+    for (int i = 0; i <= tuningSize; i++)
     {
         index = i + rootMidiIndex();
         cents.set(i, tuningMap->at(index));

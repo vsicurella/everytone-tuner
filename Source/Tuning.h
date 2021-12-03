@@ -42,7 +42,7 @@ private:
 
 	void rebuildTables();
 
-	static int midiIndex(int midiNote, int midiChannelIndex) { return modulo(midiChannelIndex << 7 + midiNote, TUNING_TABLE_SIZE); }
+	static int midiIndex(int midiNote, int midiChannelIndex) { return modulo((midiChannelIndex << 7) + midiNote, TUNING_TABLE_SIZE); }
     int rootMidiIndex() const { return midiIndex(rootMidiNote, rootMidiChannelIndex); }
 
 	template<typename U>

@@ -12,8 +12,11 @@
 #include <JuceHeader.h>
 #include "../Tuning.h"
 
+#define ROUND_N 10
+
 class Tuning_Test : public juce::UnitTest
 {
+
 private:
 
     static juce::String testErrorMessage(juce::String keyName, juce::var expected, juce::var actual)
@@ -41,9 +44,13 @@ private:
 
     void test_table(const juce::Array<double>& expected, const juce::Array<double>& table, juce::String tableName)
     {
+        int roundProduct = pow(10, ROUND_N);
+        double roundQuotient = 1.0 / roundProduct;
         for (int i = 0; i < TUNING_TABLE_SIZE; i++)
         {
-            expect(expected[i] == table[i], testErrorMessage(tableName + " at " + juce::String(i), expected[i], table[i]));
+            auto e = round(expected[i] * roundProduct) * roundQuotient;
+            auto t = round(table[i] * roundProduct) * roundQuotient;
+            expect(e == t, testErrorMessage(tableName + " at " + juce::String(i), e, t));
         }
     }
 
@@ -71,20 +78,14 @@ private:
         Tuning tuning;
 
         auto definition = tuning.getDefinition();
-        // expect(definition.transpose == 0,    testErrorMessage("definition.transpose", 0, definition.transpose));
-        // expect(definition.name == "",        testErrorMessage("definition.name", "", definition.name));
-        // expect(definition.description == "", testErrorMessage("definition.description", "", definition.description));
         expect_test(0, definition.transpose, "definition.transpose");
         expect_test(juce::String(), definition.name, "definition.name");
         expect_test(juce::String(), definition.description, "definition.description");
 
         auto reference = definition.reference;
-        // expect(reference.rootMidiNote == 60, testErrorMessage("reference.rootMidiNote", 60, reference.rootMidiNote));
-        // expect(reference.rootMidiChannel == 1, testErrorMessage("reference.rootMidiChannel", 1, reference.rootMidiChannel));
-        // expect(reference.rootFrequency == 440.0, testErrorMessage("reference.rootFrequency", 440, reference.rootFrequency))
         expect_test(60, reference.rootMidiNote, "reference.rootMidiNote");
         expect_test(1, reference.rootMidiChannel, "reference.rootMidiChannel");
-        expect_test(440.0, reference.rootFrequency, "reference.rootFrequency");
+        expect_test(261.6255653, reference.rootFrequency, "reference.rootFrequency");
         DBG(reference.toString());
 
         auto getReference = tuning.getReference();
@@ -94,7 +95,7 @@ private:
         expect_test(60, tuning.getRootIndex(), "getRootIndex()");
         expect_test(60, tuning.getRootMidiNote(), "getRootMidiNote()");
         expect_test(1, tuning.getRootMidiChannel(), "getRootMidiChannel()");
-        expect_test(440.0, tuning.getRootFrequency(), "getRootFrequency()");
+        expect_test(261.6255653, tuning.getRootFrequency(), "getRootFrequency()");
 
         expect_test(12, tuning.getTuningSize(), "getTuningSize()");
         expect_test(juce::String(), tuning.getName(), "getName()");
