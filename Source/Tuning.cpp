@@ -84,7 +84,7 @@ void Tuning::rebuildTables()
         periods = floor(offset / periods);
         frequency = periods * periodRatio * intervalRatio * rootFrequency;
         
-        freqTable.set(t, frequency);
+        frequencyTable.set(t, frequency);
         mtsTable.set(t, frequencyToMTS(frequency));
     }
 }
@@ -99,24 +99,24 @@ void Tuning::setDescription(juce::String descIn)
 	description = descIn;
 }
 
-void Tuning::setFrequency(double frequency)
+void Tuning::setRootFrequency(double frequency)
 {
     // TODO check mts limits?
     rootFrequency = frequency;
-    rebuildTable();
+    rebuildTables();
 }
 
 void Tuning::setRootMidiNote(int midiNote)
 {
     // check midi limits?
     rootMidiNote = midiNote;
-    rebuildTable();
+    rebuildTables();
 }
 
 void Tuning::setRootMidiChannel(int midiChannel)
 {
     rootMidiChannelIndex = modulo(midiChannel - 1, 16);
-    rebuildTable();
+    rebuildTables();
 }
 
 void Tuning::setReference(Reference reference)
@@ -124,7 +124,7 @@ void Tuning::setReference(Reference reference)
     rootMidiNote = reference.rootMidiNote;
     rootMidiChannelIndex = reference.rootMidiChannel - 1;
     rootFrequency = reference.rootFrequency;
-    rebuildTable();
+    rebuildTables();
 }
 
 double Tuning::getPeriodCents() const
@@ -139,25 +139,17 @@ double Tuning::getPeriodSemitones() const
 
 double Tuning::getNoteInCents(int noteNumber, int channel) const
 {
-	return tuningMap->at(midiIndex(noteNumber, tableIndex);
+	return tuningMap->at(midiIndex(noteNumber, channel - 1));
 }
 
-double Tuning::getNoteInSemitones(int noteNumber, int tableIndex) const
+double Tuning::getNoteInSemitones(int noteNumber, int channel) const
 {
-    return getNoteInCents(noteNumber, tableIndex) * 0.01;
+    return getNoteInCents(noteNumber, channel - 1) * 0.01;
 }
 
-double Tuning::getNoteInMTS(int noteNumber, int tableIndex = 0) const
+double Tuning::getNoteInMTS(int noteNumber, int channel) const
 {
-   return mtsTable[midiIndex(noteNumber, tableIndex)];
-}
-
-juce::Array<MTSNote> Tuning::getMTSDataTable() const
-{
-    juce::Array<MTSNote> table;
-    for (int i = 0; i < TUNING_TABLE_SIZE; i++)
-        table.set(i, mtsNoteToTriplet(mtsTable[i]));
-    return table;
+   return mtsTable[midiIndex(noteNumber, channel - 1)];
 }
 
 Tuning::Reference Tuning::getReference() const
@@ -185,6 +177,39 @@ Tuning::Definition Tuning::getDefinition() const
     return d;
 }
 
+juce::Array<double> Tuning::getIntervalCentsTable() const
+{
+    juce::Array<double> cents;
+    int index;
+    for (int i = 0; i < tuningSize; i++)
+    {
+        index = i + rootMidiIndex();
+        cents.set(i, tuningMap->at(index));
+    }
+
+    return cents;
+}
+juce::Array<double> Tuning::getIntervalRatioTable() const
+{
+    return ratioTable;
+}
+juce::Array<double> Tuning::getFrequencyTable() const
+{
+    return frequencyTable;
+}
+juce::Array<double> Tuning::getMTSTable() const
+{
+    return mtsTable;
+}
+
+juce::Array<MTSTriplet> Tuning::getMTSDataTable() const
+{
+    juce::Array<MTSTriplet> table;
+    for (int i = 0; i < TUNING_TABLE_SIZE; i++)
+        table.set(i, mtsNoteToTriplet(mtsTable[i]));
+    return table;
+}
+
 template <typename U>
 juce::String Tuning::tableToString(const juce::Array<U>& table, int startMidiChannel, int endMidiChannel) const
 {
@@ -202,10 +227,7 @@ juce::String Tuning::tableToString(const juce::Array<U>& table, int startMidiCha
 
 juce::String Tuning::mtsTableToString(int startMidiChannel, int endMidiChannel) const
 {
-    juce::Array<double> semitoneTable(TUNING_TABLE_SIZE);
-    for (int i = 0; i < TUNING_TABLE_SIZE; i++)
-        semitoneTable.set(i, centsTable[i] * 0.01);
-    return tableToString<double>(semitoneTable, startMidiChannel, endMidiChannel);
+    return tableToString<double>(mtsTable, startMidiChannel, endMidiChannel);
 }
 
 int Tuning::getScaleDegree(int noteNumber) const

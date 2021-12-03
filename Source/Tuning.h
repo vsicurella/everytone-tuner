@@ -21,7 +21,7 @@ class Tuning
 	
 	juce::Array<double> ratioTable;
 
-    juce::Array<double> freqTable;
+    juce::Array<double> frequencyTable;
     juce::Array<double> mtsTable;
 
 	double periodCents;
@@ -55,6 +55,18 @@ public:
 		int rootMidiNote = 60;
 		int rootMidiChannel = 1;
 		double rootFrequency = 261.6255653;
+
+        juce::String toString() const 
+        {
+            juce::StringArray arr =
+            {
+                "note: " + juce::String(rootMidiNote),
+                "channel: " + juce::String(rootMidiChannel),
+                "frequency: " + juce::String(rootFrequency)
+            };
+            
+            return "{ " + arr.joinIntoString(", ") + " }";
+        }
 	};
 
 	struct Definition
@@ -63,6 +75,21 @@ public:
         int transpose = 0;
 		juce::String name = "";
 		juce::String description = "";
+
+        juce::String toString() const 
+        {
+            juce::StringArray arr =
+            {
+                "name: " + name,
+                "description: " + description,
+                "note: " + juce::String(reference.rootMidiNote),
+                "channel: " + juce::String(reference.rootMidiChannel),
+                "frequency: " + juce::String(reference.rootFrequency),
+                "transpose: " + juce::String(transpose),
+            };
+            
+            return "{ " + arr.joinIntoString(", ") + " }";
+        }
 	};
 
 	struct IntervalDefinition : Definition
@@ -99,7 +126,7 @@ public:
 	virtual void setName(juce::String nameIn);
 	virtual void setDescription(juce::String descIn);
 	
-	virtual void setFrequency(double frequency);
+	virtual void setRootFrequency(double frequency);
 	virtual void setRootMidiNote(int midiNote);
 	virtual void setRootMidiChannel(int rootMidiChannel);
 	virtual void setReference(Reference reference);
@@ -111,8 +138,13 @@ public:
     virtual double getNoteInSemitones(int noteNumber, int channel = 1) const;
 
 	virtual double getNoteInMTS(int noteNumber, int channel = 1) const;
+ 
+    virtual juce::Array<double> getIntervalCentsTable() const;
+    virtual juce::Array<double> getIntervalRatioTable() const;
 
-    virtual juce::Array<MTSNote> getMTSDataTable() const;
+    virtual juce::Array<double> getFrequencyTable() const;
+    virtual juce::Array<double> getMTSTable() const;
+    virtual juce::Array<MTSTriplet> getMTSDataTable() const;
 
 	virtual juce::String mtsTableToString(int startMidiChannel, int endMidiChannel) const;
 
