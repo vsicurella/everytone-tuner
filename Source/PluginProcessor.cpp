@@ -28,7 +28,19 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
     logger.reset(new MultimapperLog([&](juce::StringRef msg) { dbgLog += msg + '\n'; }));
     juce::Logger::setCurrentLogger(logger.get());
 
-    juce::Timer::callAfterDelay(500, [&]() { this->testMidi(); });
+    // juce::Timer::callAfterDelay(500, [&]() { this->testMidi(); });
+
+    #if RUN_MULTIMAPPER_TESTS
+    DBG("Running tests...");
+
+    Tuning_Test tuningTest;
+
+    auto tests = juce::Array<juce::UnitTest*>();
+    tests.add(&tuningTest);
+
+    juce::UnitTestRunner tester;
+    tester.runTests(tests);
+    #endif
 #endif
 }
 

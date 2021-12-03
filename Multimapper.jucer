@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="dQHHPS" name="Multimapper" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" headerPath="../../../Keytographer/Source/">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" headerPath="../../../Keytographer/Source/"
+              defines="RUN_MULTIMAPPER_TESTS=1">
   <MAINGROUP id="H8zE4n" name="Multimapper">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
+      <GROUP id="{79A5D062-8ED3-30D7-15DF-F01D07F22E53}" name="tests">
+        <FILE id="P6b0jk" name="Tuning_tests.h" compile="0" resource="0" file="Source/tests/Tuning_tests.h"/>
+      </GROUP>
       <GROUP id="{B28A3B7A-D56B-1E69-5B28-B1F138349D16}" name="Keytographer">
         <GROUP id="{D707B0D2-5268-602B-ADCB-B03FC0F30F26}" name="Source">
           <GROUP id="{D997B268-0F5D-792A-3073-C6CAF328CD64}" name="tests">

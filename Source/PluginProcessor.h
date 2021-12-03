@@ -11,6 +11,10 @@
 #include <JuceHeader.h>
 #include "MidiBrain.h"
 
+#if RUN_MULTIMAPPER_TESTS
+    #include "./tests/Tuning_tests.h"
+#endif
+
 class MultimapperLog : public juce::Logger
 {
     std::function<void(juce::StringRef msg)> callback;
