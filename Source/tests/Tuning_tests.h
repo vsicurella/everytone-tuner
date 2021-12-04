@@ -12,7 +12,7 @@
 #include <JuceHeader.h>
 #include "../Tuning.h"
 
-#define ROUND_N 10
+#define ROUND_N 6
 
 class Tuning_Test : public juce::UnitTest
 {
@@ -46,7 +46,7 @@ private:
     {
         int roundProduct = pow(10, ROUND_N);
         double roundQuotient = 1.0 / roundProduct;
-        for (int i = 0; i < TUNING_TABLE_SIZE; i++)
+        for (int i = 0; i < expected.size(); i++)
         {
             auto e = round(expected[i] * roundProduct) * roundQuotient;
             auto t = round(table[i] * roundProduct) * roundQuotient;

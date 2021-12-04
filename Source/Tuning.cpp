@@ -79,14 +79,14 @@ void Tuning::rebuildTables()
     
     // Build Frequency and MTS note tables
     int offset, periods, degree;
-    double intervalRatio, frequency;
+    double intervalRatio, frequency, size = tuningSize;
     for (int t = 0; t < TUNING_TABLE_SIZE; t++)
     {
+        offset = t - root;
         degree = modulo(offset, tuningSize);
         intervalRatio = ratioTable[degree];
-        offset = t - root;
-        periods = floor(offset / tuningSize);
-        frequency = periods * periodRatio * intervalRatio * rootFrequency;
+        periods = floor((double)offset / size);
+        frequency = pow(periodRatio, periods) * intervalRatio * rootFrequency;
         
         frequencyTable.set(t, frequency);
         mtsTable.set(t, frequencyToMTS(frequency));
