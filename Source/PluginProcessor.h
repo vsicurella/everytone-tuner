@@ -25,6 +25,7 @@ public:
 
     void logMessage(const juce::String& msg) override
     {
+        DBG(msg);
         callback(msg);
     }
 };
