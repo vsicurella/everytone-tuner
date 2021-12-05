@@ -36,9 +36,16 @@ private:
     }
 
     template <typename T>
-    void expect_test(T expected, T actual, juce::String keyName)
+    void expect_exact(T expected, T actual, juce::String keyName)
     {
         expect(expected == actual, testErrorMessage(keyName, expected, actual));
+    }
+
+    template <typename T>
+    void expect_equals(T expected, T actual, juce::String keyName)
+    {
+        auto dif = abs(actual - expected);
+        expect(dif < TABLE_EPSILON, testErrorMessage(keyName, expected, actual));
     }
 
     void test_tuningMap(int expectedSize, const double* expected, const Keytographer::Map<double>* map, int start = 0)
@@ -149,14 +156,14 @@ private:
         auto tuning = params.tuning;
 
         auto definition = tuning->getDefinition();
-        expect_test(params.expectedDefinition.transpose, definition.transpose, "definition.transpose");
-        expect_test(params.expectedDefinition.name, definition.name, "definition.name");
-        expect_test(params.expectedDefinition.description, definition.description, "definition.description");
+        expect_equals(params.expectedDefinition.transpose, definition.transpose, "definition.transpose");
+        expect_exact(params.expectedDefinition.name, definition.name, "definition.name");
+        expect_exact(params.expectedDefinition.description, definition.description, "definition.description");
 
         auto reference = definition.reference;
-        expect_test(params.expectedDefinition.reference.rootMidiNote, reference.rootMidiNote, "reference.rootMidiNote");
-        expect_test(params.expectedDefinition.reference.rootMidiChannel, reference.rootMidiChannel, "reference.rootMidiChannel");
-        expect_test(params.expectedDefinition.reference.rootFrequency, reference.rootFrequency, "reference.rootFrequency");
+        expect_exact(params.expectedDefinition.reference.rootMidiNote, reference.rootMidiNote, "reference.rootMidiNote");
+        expect_exact(params.expectedDefinition.reference.rootMidiChannel, reference.rootMidiChannel, "reference.rootMidiChannel");
+        expect_equals(params.expectedDefinition.reference.rootFrequency, reference.rootFrequency, "reference.rootFrequency");
         DBG(reference.toString());
 
         auto getReference = tuning->getReference();
@@ -164,19 +171,19 @@ private:
         test_reference(getReference, reference);
 
         int expectedRoot = modulo(128 * (tuning->getRootMidiChannel() - 1) + tuning->getRootMidiNote(), TUNING_TABLE_SIZE);
-        expect_test(expectedRoot, tuning->getRootIndex(), "getRootIndex()");
-        expect_test(params.expectedDefinition.reference.rootMidiNote, tuning->getRootMidiNote(), "getRootMidiNote()");
-        expect_test(params.expectedDefinition.reference.rootMidiChannel, tuning->getRootMidiChannel(), "getRootMidiChannel()");
-        expect_test(params.expectedDefinition.reference.rootFrequency, tuning->getRootFrequency(), "getRootFrequency()");
+        expect_exact(expectedRoot, tuning->getRootIndex(), "getRootIndex()");
+        expect_exact(params.expectedDefinition.reference.rootMidiNote, tuning->getRootMidiNote(), "getRootMidiNote()");
+        expect_exact(params.expectedDefinition.reference.rootMidiChannel, tuning->getRootMidiChannel(), "getRootMidiChannel()");
+        expect_equals(params.expectedDefinition.reference.rootFrequency, tuning->getRootFrequency(), "getRootFrequency()");
 
-        expect_test(params.expectedSize, tuning->getTuningSize(), "getTuningSize()");
-        expect_test(params.expectedDefinition.name, tuning->getName(), "getName()");
-        expect_test(params.expectedDefinition.description, tuning->getDescription(), "getDescription()");
+        expect_exact(params.expectedSize, tuning->getTuningSize(), "getTuningSize()");
+        expect_exact(params.expectedDefinition.name, tuning->getName(), "getName()");
+        expect_exact(params.expectedDefinition.description, tuning->getDescription(), "getDescription()");
 
         beginTest(name + " Tuning Tables");
 
         double expectedPeriod = params.expectedIntervalCentsTable[params.expectedSize - 1];
-        expect_test(expectedPeriod, tuning->getPeriodCents(), "getPeriodCents()");
+        expect_equals(expectedPeriod, tuning->getPeriodCents(), "getPeriodCents()");
         
         test_table(params.expectedSize, params.expectedIntervalCentsTable, tuning->getIntervalCentsTable(), "getIntervalCentsTable()");
         test_table(params.expectedSize, params.expectedRatioTable, tuning->getIntervalRatioTable(), "getIntervalRatioTable");
@@ -195,13 +202,13 @@ private:
         };
 
         tuning->setRootFrequency(setTestReference.rootFrequency);
-        expect_test(setTestReference.rootFrequency, tuning->getRootFrequency(), "test setRootFrequency()");
+        expect_equals(setTestReference.rootFrequency, tuning->getRootFrequency(), "test setRootFrequency()");
 
         tuning->setRootMidiNote(setTestReference.rootMidiNote);
-        expect_test(setTestReference.rootMidiNote, tuning->getRootMidiNote(), "test setRootMidiNote()");
+        expect_exact(setTestReference.rootMidiNote, tuning->getRootMidiNote(), "test setRootMidiNote()");
 
         tuning->setRootMidiChannel(setTestReference.rootMidiChannel);
-        expect_test(setTestReference.rootMidiChannel, tuning->getRootMidiChannel(), "test setRootMidiChannel");
+        expect_exact(setTestReference.rootMidiChannel, tuning->getRootMidiChannel(), "test setRootMidiChannel");
 
         auto changedReference = tuning->getReference();
         test_reference(setTestReference, changedReference);
@@ -223,17 +230,17 @@ private:
         };
 
         tuning->setName(newDefinition.name);
-        expect_test(newDefinition.name, tuning->getName(), "new setName()");
+        expect_exact(newDefinition.name, tuning->getName(), "new setName()");
 
         tuning->setDescription(newDefinition.description);
-        expect_test(newDefinition.description, tuning->getDescription(), "new setDescription()");
+        expect_exact(newDefinition.description, tuning->getDescription(), "new setDescription()");
 
         tuning->setReference(newReference);
         int newExpectedRootIndex = modulo(128 * (newReference.rootMidiChannel - 1) + newReference.rootMidiNote, TUNING_TABLE_SIZE); 
-        expect_test(newExpectedRootIndex, tuning->getRootIndex(), "new getRootIndex()");
-        expect_test(newReference.rootMidiNote, tuning->getRootMidiNote(), "new getRootMidiNote()");
-        expect_test(newReference.rootMidiChannel, tuning->getRootMidiChannel(), "new getRootMidiChannel()");
-        expect_test(newReference.rootFrequency, tuning->getRootFrequency(), "new getRootFrequency()");
+        expect_exact(newExpectedRootIndex, tuning->getRootIndex(), "new getRootIndex()");
+        expect_exact(newReference.rootMidiNote, tuning->getRootMidiNote(), "new getRootMidiNote()");
+        expect_exact(newReference.rootMidiChannel, tuning->getRootMidiChannel(), "new getRootMidiChannel()");
+        expect_equals(newReference.rootFrequency, tuning->getRootFrequency(), "new getRootFrequency()");
 
         test_table(params.tableSize, params.newExpectedFrequencyTable, tuning->getFrequencyTable(), "new getFrequencyTable");
         test_table(params.tableSize, params.newExpectedMtsTable, tuning->getMTSTable(), "new getMtsTable()");
@@ -419,10 +426,14 @@ private:
     void test34edoR1()
     {
         const int size = 1;
-        const double expectedIntervalCentsTable[size] = { 35.294117647 };
+        const double expectedIntervalCentsTable[size] = { 35.29411764705883 };
 
-        Tuning::IntervalDefinition definition;
-        definition.intervalCents = { 35.294117647 };
+        Tuning::EqualTemperamentDefinition definition;
+        definition.divisions = 34;
+
+        //Tuning::IntervalDefinition definition;
+        //definition.intervalCents = { 35.294117647 };
+
         definition.name = "35.294 cET aka 34edo";
         definition.description = "Octave divided in 34 equal steps";
         definition.reference.rootMidiChannel = 5;
@@ -495,28 +506,28 @@ private:
     //     Tuning tuning;
 
     //     auto definition = tuning.getDefinition();
-    //     expect_test(0, definition.transpose, "definition.transpose");
-    //     expect_test(juce::String(), definition.name, "definition.name");
-    //     expect_test(juce::String(), definition.description, "definition.description");
+    //     expect_exact(0, definition.transpose, "definition.transpose");
+    //     expect_exact(juce::String(), definition.name, "definition.name");
+    //     expect_exact(juce::String(), definition.description, "definition.description");
 
     //     auto reference = definition.reference;
-    //     expect_test(60, reference.rootMidiNote, "reference.rootMidiNote");
-    //     expect_test(1, reference.rootMidiChannel, "reference.rootMidiChannel");
-    //     expect_test(261.6255653, reference.rootFrequency, "reference.rootFrequency");
+    //     expect_exact(60, reference.rootMidiNote, "reference.rootMidiNote");
+    //     expect_exact(1, reference.rootMidiChannel, "reference.rootMidiChannel");
+    //     expect_exact(261.6255653, reference.rootFrequency, "reference.rootFrequency");
     //     DBG(reference.toString());
 
     //     auto getReference = tuning.getReference();
     //     DBG("testing Tuning.getReference()");
     //     test_reference(getReference, reference);
 
-    //     expect_test(60, tuning.getRootIndex(), "getRootIndex()");
-    //     expect_test(60, tuning.getRootMidiNote(), "getRootMidiNote()");
-    //     expect_test(1, tuning.getRootMidiChannel(), "getRootMidiChannel()");
-    //     expect_test(261.6255653, tuning.getRootFrequency(), "getRootFrequency()");
+    //     expect_exact(60, tuning.getRootIndex(), "getRootIndex()");
+    //     expect_exact(60, tuning.getRootMidiNote(), "getRootMidiNote()");
+    //     expect_exact(1, tuning.getRootMidiChannel(), "getRootMidiChannel()");
+    //     expect_exact(261.6255653, tuning.getRootFrequency(), "getRootFrequency()");
 
-    //     expect_test(12, tuning.getTuningSize(), "getTuningSize()");
-    //     expect_test(juce::String(), tuning.getName(), "getName()");
-    //     expect_test(juce::String(), tuning.getDescription(), "getDescription()");
+    //     expect_exact(12, tuning.getTuningSize(), "getTuningSize()");
+    //     expect_exact(juce::String(), tuning.getName(), "getName()");
+    //     expect_exact(juce::String(), tuning.getDescription(), "getDescription()");
 
 
     //     beginTest("Default Tuning Tables");
@@ -540,23 +551,23 @@ private:
         
     //     juce::String newName = "12edo";
     //     tuning.setName(newName);
-    //     expect_test(newName, tuning.getName(), "setName()");
+    //     expect_exact(newName, tuning.getName(), "setName()");
 
     //     juce::String newDescription = "Default tuning";
     //     tuning.setDescription(newDescription);
-    //     expect_test(newDescription, tuning.getDescription(), "setDescription()");
+    //     expect_exact(newDescription, tuning.getDescription(), "setDescription()");
 
     //     double newRootFrequency = 442.0;
     //     tuning.setRootFrequency(newRootFrequency);
-    //     expect_test(newRootFrequency, tuning.getRootFrequency(), "setRootFrequency()");
+    //     expect_exact(newRootFrequency, tuning.getRootFrequency(), "setRootFrequency()");
 
     //     int newRootNote = 48;
     //     tuning.setRootMidiNote(newRootNote);
-    //     expect_test(newRootNote, tuning.getRootMidiNote(), "setRootMidiNote()");
+    //     expect_exact(newRootNote, tuning.getRootMidiNote(), "setRootMidiNote()");
 
     //     int newRootChannel = 4;
     //     tuning.setRootMidiChannel(newRootChannel);
-    //     expect_test(newRootChannel, tuning.getRootMidiChannel(), "setRootMidiChannel");
+    //     expect_exact(newRootChannel, tuning.getRootMidiChannel(), "setRootMidiChannel");
 
     //     auto changedReference = tuning.getReference();
     //     Tuning::Reference newReference = 
@@ -575,10 +586,10 @@ private:
     //         432.0
     //     };
     //     tuning.setReference(brandNewReference);
-    //     expect_test(1096, tuning.getRootIndex(), "getRootIndex()");
-    //     expect_test(72, tuning.getRootMidiNote(), "getRootMidiNote()");
-    //     expect_test(9, tuning.getRootMidiChannel(), "getRootMidiChannel()");
-    //     expect_test(432.0, tuning.getRootFrequency(), "getRootFrequency()");
+    //     expect_exact(1096, tuning.getRootIndex(), "getRootIndex()");
+    //     expect_exact(72, tuning.getRootMidiNote(), "getRootMidiNote()");
+    //     expect_exact(9, tuning.getRootMidiChannel(), "getRootMidiChannel()");
+    //     expect_exact(432.0, tuning.getRootFrequency(), "getRootFrequency()");
 
 
     // }
