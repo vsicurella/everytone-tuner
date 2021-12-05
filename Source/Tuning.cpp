@@ -68,11 +68,10 @@ void Tuning::rebuildTables()
     // Build ratio table
     int i = root;
     int end = i + tuningSize;
-    double firstCents = tuningMap->at(i);
     double cents, ratio;
     while (i <= end)
     {
-        cents = tuningMap->at(i) - firstCents;
+        cents = tuningMap->at(i);
         ratio = centsToRatio(cents);
         ratioTable.set(i, ratio);
         i++;
@@ -93,8 +92,10 @@ void Tuning::rebuildTables()
         frequency = pow(periodRatio, periods) * intervalRatio * rootFrequency;
         
         frequencyTable.set(t, frequency);
+        dbgFreq[t] = frequency;
         double mts = roundN(10, frequencyToMTS(frequency));
         mtsTable.set(t, mts);
+        dbgMts[t] = mts;
     }
 }
 
@@ -203,11 +204,12 @@ Tuning::Definition Tuning::getDefinition() const
 
 juce::Array<double> Tuning::getIntervalCentsTable() const
 {
+    // Don't include unison
     juce::Array<double> cents;
-    int index;
-    for (int i = 0; i <= tuningSize; i++)
+    int index, root = rootMidiIndex();
+    for (int i = 0; i < tuningSize; i++)
     {
-        index = i + rootMidiIndex();
+        index = i + root + 1;
         cents.set(i, tuningMap->at(index));
     }
 
@@ -215,7 +217,15 @@ juce::Array<double> Tuning::getIntervalCentsTable() const
 }
 juce::Array<double> Tuning::getIntervalRatioTable() const
 {
-    return ratioTable;
+    // Don't include unison
+    juce::Array<double> ratios;
+    for (int i = 1; i < tuningSize; i++)
+    {
+        ratios.set(i - 1, ratioTable[i]);
+    }
+    ratios.set(tuningSize - 1, periodRatio);
+    
+    return ratios;
 }
 juce::Array<double> Tuning::getFrequencyTable() const
 {
@@ -267,37 +277,6 @@ int Tuning::closestNoteIndex(double mts) const
     {
         return root + (int)round((mts - rootMts) / (periodCents * 0.01));
     }
-
-    //mts = roundN(6, mts);
-
-    //// Reduce into the first period
-    //auto reduced = modulo(mts, periodMts);
-    //
-    //// Find index it's closest to
-    //int closestDegree = 0;
-    //int root = rootMidiIndex();
-    //double difference = periodCents;
-    //for (int i = 0; i <= tuningSize; i++)
-    //{
-    //    auto note = tuningMap->at(root + i) * 0.01;
-    //    auto dif = abs(note - reduced);
-    //    if (dif < difference)
-    //    {
-    //        difference = dif;
-    //        closestDegree = i;
-    //    }
-
-    //    if (difference == 0)
-    //        break;
-    //}
-
-    //int rootPeriods = floor((mts - rootMts) / 12.0);
-    //int rootOffset = rootPeriods * tuningSize + closestDegree;
-    //    /*if (rootPeriods < 0)
-    //        rootOffset += closestDegree;
-    //    else
-    //        rootOffset += (tuningSize - closestDegree);*/
-
     
     // This assumes the scale pattern doesn't have intervals that jump beyond the period
 

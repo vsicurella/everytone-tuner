@@ -66,14 +66,18 @@ void MidiNoteTuner::setTuningTableMap(Keytographer::TuningTableMap* mapIn)
 
 int MidiNoteTuner::tuneNoteAndGetPitchbend(juce::MidiMessage& msg)
 {
-	juce::String dbgmsg = "Input Ch " + juce::String(msg.getChannel()) + ", " + juce::String(msg.getNoteNumber());
+	auto ch = msg.getChannel();
+	auto note = msg.getNoteNumber();
+	auto isnoteon = msg.isNoteOn();
 
-	auto mapped = tuningTableMap->getMappedNote(msg.getChannel(), msg.getNoteNumber());
+	juce::String dbgmsg = "In. (Ch: " + juce::String(ch) + ", N: " + juce::String(note);
+
+	auto mapped = tuningTableMap->getMappedNote(ch, note);
 	
 	// First get target MTS note
 	auto targetMts = targetTuning->mtsTableAt(mapped.index);
 
-	dbgmsg += " -> " + juce::String(mapped.index) + " = " + juce::String(roundN(3, targetMts));
+	dbgmsg += ") -> tI: " + juce::String(mapped.index) + " (" + juce::String(roundN(3, targetMts));
 
 	// Then find closest source note
 	auto sourceNote = sourceTuning->closestNoteIndex(targetMts);
@@ -87,7 +91,7 @@ int MidiNoteTuner::tuneNoteAndGetPitchbend(juce::MidiMessage& msg)
 	auto sourceMts = sourceTuning->mtsTableAt(sourceNote);
 	double difference = targetMts - sourceMts;
 
-	dbgmsg += ", from " + juce::String(sourceNote) + " = " + juce::String(roundN(3, sourceMts));
+	dbgmsg += ") from sI: " + juce::String(sourceNote) + " (" + juce::String(roundN(3, sourceMts)) + ")";
 	if (msg.isNoteOn())
 		juce::Logger::writeToLog(dbgmsg);
 

@@ -25,6 +25,9 @@ class Tuning
     juce::Array<double> frequencyTable;
     juce::Array<double> mtsTable;
 
+	double dbgFreq[TUNING_TABLE_SIZE];
+	double dbgMts[TUNING_TABLE_SIZE];
+
 	double periodCents;
 	double periodRatio;
 	double periodMts;
