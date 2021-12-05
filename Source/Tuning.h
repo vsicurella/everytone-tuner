@@ -107,12 +107,22 @@ public:
         IntervalDefinition() {}
 	};
 
+	struct EqualTemperamentDefinition : Definition
+	{
+		double divisions = 1;
+
+		double periodCents = -1;
+		double periodRatio = -1;
+	};
+
 public:
 
 	/*
 		Expects a full interval table in cents, ending with period. May or may not include unison.
 	*/
 	Tuning(IntervalDefinition definition=IntervalDefinition());
+
+	Tuning(EqualTemperamentDefinition definition);
 
     Tuning(const Tuning&);
     
