@@ -235,22 +235,22 @@ void MultimapperAudioProcessor::testMidi()
 
     midiBrain->processMidi(buffer);
 
-    int ch = 1;
-    int n = 0;
-    for (auto metadata : buffer)
-    {
-        auto msg = metadata.getMessage();
-        if (msg.isNoteOn())
-        {
-            jassert(msg.getChannel() == ch);
-            jassert(msg.getNoteNumber() == n);
+    //int ch = 1;
+    //int n = 0;
+    //for (auto metadata : buffer)
+    //{
+    //    auto msg = metadata.getMessage();
+    //    if (msg.isNoteOn())
+    //    {
+    //        jassert(msg.getChannel() == ch);
+    //        jassert(msg.getNoteNumber() == n);
 
-            n++;
-            if (n == 128)
-            {
-                ch++;
-                n = 0;
-            }
-        }
-    }
+    //        n++;
+    //        if (n == 128)
+    //        {
+    //            ch++;
+    //            n = 0;
+    //        }
+    //    }
+    //}
 }

@@ -16,7 +16,11 @@ MidiBrain::MidiBrain()
 {
     auto standardTuning = Tuning::StandardTuning();
     oldTuning.reset(new Tuning(standardTuning));
-    newTuning.reset(new Tuning(standardTuning));
+
+    Tuning::EqualTemperamentDefinition def31;
+    def31.divisions = 31;
+
+    newTuning.reset(new Tuning(def31));
     tuner.reset(new MidiNoteTuner(oldTuning.get(), newTuning.get()));
 }
 
@@ -38,24 +42,18 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
         {
             int pitchbend = tuner->tuneNoteAndGetPitchbend(msg);
 
-//#if JUCE_DEBUG
-//            juce::String dbmsg = msg.getDescription();
-//            dbmsg += "\t+ PB " + juce::String(pitchbend);
-//            juce::Logger::writeToLog(dbmsg);
-//#endif
+            if (pitchbend != 8192)
+            {
+                // Create and add pitchbend message
+                auto pbmsg = juce::MidiMessage::pitchWheel(msg.getChannel(), pitchbend);
+                auto sample = (metadata.samplePosition == 0) ? 0 : metadata.samplePosition - 1;
 
-//            if (pitchbend != 8192)
-//            {
-//                // Create and add pitchbend message
-//                auto pbmsg = juce::MidiMessage::pitchWheel(ch, pitchbend);
-//                auto sample = (metadata.samplePosition == 0) ? 0 : metadata.samplePosition - 1;
-//
-//#if JUCE_DEBUG
-//                //juce::Logger::writeToLog(pbmsg.getDescription());
-//#endif
-//
-//                processedBuffer.addEvent(msg, sample);
-//            }
+#if JUCE_DEBUG
+                juce::Logger::writeToLog(pbmsg.getDescription());
+#endif
+
+                processedBuffer.addEvent(msg, sample);
+            }
         }
         
         processedBuffer.addEvent(msg, metadata.samplePosition);
