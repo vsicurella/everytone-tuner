@@ -45,10 +45,6 @@
         </GROUP>
       </GROUP>
       <FILE id="wyXPRk" name="LogWindow.h" compile="0" resource="0" file="Source/LogWindow.h"/>
-      <FILE id="D6lL0f" name="MidiNoteMapper.cpp" compile="1" resource="0"
-            file="Source/MidiNoteMapper.cpp"/>
-      <FILE id="JpXDOy" name="MidiNoteMapper.h" compile="0" resource="0"
-            file="Source/MidiNoteMapper.h"/>
       <FILE id="lloha5" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="VdXzpb" name="PluginProcessor.h" compile="0" resource="0"

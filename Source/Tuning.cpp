@@ -15,7 +15,6 @@ Tuning::Tuning(IntervalDefinition definition)
       rootMidiNote(definition.reference.rootMidiNote),
       rootMidiChannelIndex(definition.reference.rootMidiChannel - 1),
       rootFrequency(definition.reference.rootFrequency),
-      periodCents(definition.intervalCents.getLast()),
       transpose(definition.transpose),
       name(definition.name),
       description(definition.description)
@@ -38,9 +37,13 @@ Tuning::Tuning(const Tuning& tuning)
 
 void Tuning::setupTuning(const juce::Array<double>& cents)
 {
+    periodCents = cents.getLast();
+    periodRatio = centsToRatio(periodCents);
+    periodMts = periodCents / 100.0;
+
     auto tuningShifted = juce::Array<double>(cents);
     tuningShifted.remove(tuningShifted.getLast());
-    tuningShifted.insert(0, 0);
+    tuningShifted.insert(0, 0);    
 
     Keytographer::Map<double>::Definition definition =
     {
@@ -151,9 +154,24 @@ double Tuning::getNoteInSemitones(int noteNumber, int channel) const
     return getNoteInCents(noteNumber, channel - 1) * 0.01;
 }
 
+double Tuning::getNoteFrequency(int noteNumber, int channel) const
+{
+    return frequencyTable[midiIndex(noteNumber, channel)];
+}
+
+double Tuning::frequencyTableAt(int tableIndex) const
+{
+    return frequencyTable[modulo(tableIndex, TUNING_TABLE_SIZE)];
+}
+
 double Tuning::getNoteInMTS(int noteNumber, int channel) const
 {
    return mtsTable[midiIndex(noteNumber, channel - 1)];
+}
+
+double Tuning::mtsTableAt(int tableIndex) const
+{
+    return mtsTable[modulo(tableIndex, TUNING_TABLE_SIZE)];
 }
 
 Tuning::Reference Tuning::getReference() const
@@ -239,29 +257,44 @@ int Tuning::getScaleDegree(int noteNumber) const
 	return tuningMap->patternAt(noteNumber);
 }
 
-int Tuning::closestNoteToCents(double cents) const
+int Tuning::closestNoteIndex(double mts) const
 {
+    mts = roundN(6, mts);
+
+    double periods = mts / periodMts;
     if (tuningSize == 1)
     {
-        return round(cents / periodCents) + rootMidiNote;
+        return round(periods) + rootMidiNote;
     }
 
+    // This assumes the scale pattern doesn't have intervals that jump beyond the period
+
     // Reduce into the first period
-    auto reduced = modulo(cents, periodCents);
+    auto reduced = modulo(mts, periodMts);
     
     // Find degree it's closest to
     int closestDegree = 0;
+    int root = rootMidiIndex();
     double difference = periodCents;
     for (int i = 0; i < tuningSize; i++)
     {
-        auto dif = abs(tuningMap->patternAt(i) - cents);
+        auto note = tuningMap->at(root + i) * 0.01;
+        auto dif = abs(note - mts);
         if (dif < difference)
         {
             difference = dif;
             closestDegree = i;
         }
+
+        if (difference == 0)
+            break;
     }
 
-    int closestNote = closestDegree + floor(cents / periodCents) * tuningSize + rootMidiNote;
+    int closestNote = modulo(closestDegree + (int)floor(periods) * tuningSize, TUNING_TABLE_SIZE);
     return  closestNote;
+}
+
+int Tuning::closestMtsNote(double mtsIn) const
+{
+    return mtsTable[closestNoteIndex(mtsIn)];
 }

@@ -21,6 +21,12 @@ static double modulo(double num, double mod)
     return num - (floor(num / mod) * mod);
 }
 
+static double roundN(int n, double number)
+{
+	const double scalar = pow(10, n - 1);
+	return round(number * scalar) / scalar;
+}
+
 enum IntervalType
 {
 	Invalid = 0,

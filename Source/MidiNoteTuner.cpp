@@ -10,25 +10,38 @@
 
 #include "MidiNoteTuner.h"
 
-MidiNoteTuner::MidiNoteTuner(const Tuning& defaultTuning, const Tuning& newTuningIn)
-	: originTuning(&defaultTuning), newTuning(&newTuningIn)
+
+MidiNoteTuner::MidiNoteTuner(const Tuning* targetTuningIn)
 {
-    
+	sourceTuning = &standard;
+
+	if (targetTuningIn == nullptr)
+		targetTuning = &standard;
+	else
+		targetTuning = targetTuningIn;
+
+	tuningTableMap = std::make_unique<Keytographer::TuningTableMap>(Keytographer::MultichannelMap::CreatePeriodicMapping(12, 60));
+}
+
+MidiNoteTuner::MidiNoteTuner(const Tuning* sourceTuningIn, const Tuning* targetTuningIn)
+	: sourceTuning(sourceTuningIn), targetTuning(targetTuningIn)
+{
+	tuningTableMap = std::make_unique<Keytographer::TuningTableMap>(Keytographer::MultichannelMap::CreatePeriodicMapping(12, 60));
 }
 
 MidiNoteTuner::~MidiNoteTuner()
 {
-
+	tuningTableMap = nullptr;
 }
 
-void MidiNoteTuner::setOriginTuning(const Tuning& originTuningIn)
+void MidiNoteTuner::setSourceTuning(const Tuning& sourceTuningIn)
 {
-	originTuning = &originTuningIn;
+	sourceTuning = &sourceTuningIn;
 }
 
-void MidiNoteTuner::setNewTuning(const Tuning& newTuningIn)
+void MidiNoteTuner::setTargetTuning(const Tuning& newTuningIn)
 {
-	newTuning = &newTuningIn;
+	targetTuning = &newTuningIn;
 }
 
 juce::Array<int> MidiNoteTuner::getPitchbendTable() const
@@ -41,80 +54,52 @@ int MidiNoteTuner::getPitchbendMax() const
     return pitchbendRange;
 }
 
-int MidiNoteTuner::getOriginRootNote() const
-{
-	return destinationRootNote;
-}
-
-double MidiNoteTuner::getOriginRootFreq() const
-{
-	return destinationRootFreq;
-}
-
-int MidiNoteTuner::getDestinationRootNote() const
-{
-    return destinationRootNote;
-}
-
-double MidiNoteTuner::getDestinationRootFreq() const
-{
-    return destinationRootFreq;
-}
-
 void MidiNoteTuner::setPitchbendRange(int pitchbendMaxIn)
 {
     pitchbendRange = pitchbendMaxIn;
 }
 
-void MidiNoteTuner::setOriginRootNote(int rootNoteIn)
+void MidiNoteTuner::setTuningTableMap(Keytographer::TuningTableMap* mapIn)
 {
-	originRootNote = rootNoteIn;
+	tuningTableMap.reset(new Keytographer::TuningTableMap(*mapIn));
 }
 
-void MidiNoteTuner::setOriginRootFreq(double freqIn)
+int MidiNoteTuner::tuneNoteAndGetPitchbend(juce::MidiMessage& msg)
 {
-	originRootFreq = freqIn;
-}
+	juce::String dbgmsg = "Input Ch " + juce::String(msg.getChannel()) + ", " + juce::String(msg.getNoteNumber());
 
-void MidiNoteTuner::setDestinationRootNote(int rootNoteIn)
-{
-	destinationRootNote = rootNoteIn;
-}
+	auto mapped = tuningTableMap->getMappedNote(msg.getChannel(), msg.getNoteNumber());
+	
+	// First get target MTS note
+	auto targetMts = targetTuning->mtsTableAt(mapped.index);
 
-void MidiNoteTuner::setDestinationRootFrequency(double freqIn)
-{
-    destinationRootFreq = freqIn;
-}
+	dbgmsg += " -> " + juce::String(mapped.index) + " = " + juce::String(roundN(3, targetMts));
 
-void MidiNoteTuner::closestNote(int midiNoteIn, int& closestNoteOut, int& pitchbendOut)
-{
-	closestNoteOut = -1;
+	// Then find closest source note
+	auto sourceNote = sourceTuning->closestNoteIndex(targetMts);
 
-	double newCents = newTuning->getNoteInCents(midiNoteIn);
-	int newMidiNote = originTuning->closestNoteToCents(newCents);
-	double difference = newCents - originTuning->getNoteInSemitones(newMidiNote);
+	int newNote = sourceNote % 128;
+	int newChannel = (sourceNote / 128) + 1; // Unsure about channel re-mapping
+	msg.setNoteNumber(newNote);
+	msg.setChannel(newChannel);
 
+	// Lastly find pitchbend amount
+	auto sourceMts = sourceTuning->mtsTableAt(sourceNote);
+	double difference = targetMts - sourceMts;
+
+	dbgmsg += ", from " + juce::String(sourceNote) + " = " + juce::String(roundN(3, sourceMts));
+	if (msg.isNoteOn())
+		juce::Logger::writeToLog(dbgmsg);
+
+	int pitchbendOut = 8192;
 	if (abs(difference) <= pitchbendRange)
 	{
-		closestNoteOut = newMidiNote;
 		pitchbendOut = semitonesToPitchbend(difference / 100.0);
 	}
+
+	return pitchbendOut;
 }
 
-int MidiNoteTuner::pitchbendFromNote(int midiNoteIn) const
-{
-    return semitonesToPitchbend(pitchbendRange, semitonesFromNote(midiNoteIn));
-} 
-
-int MidiNoteTuner::pitchbendFromNote(int oldTuningNote, int newTuningNote) const
-{
-	return semitonesToPitchbend(pitchbendRange, newTuning->getNoteInSemitones(newTuningNote) - originTuning->getNoteInSemitones(oldTuningNote));
-}
-
-double MidiNoteTuner::semitonesFromNote(int midiNoteIn) const
-{
-	return newTuning->getNoteInSemitones(midiNoteIn) - originTuning->getNoteInSemitones(midiNoteIn);
-}
 int MidiNoteTuner::semitonesToPitchbend(double semitonesIn) const
 {
 	return semitonesToPitchbend(pitchbendRange, semitonesIn);

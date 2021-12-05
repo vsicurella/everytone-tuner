@@ -13,53 +13,47 @@
 // #include "CommonFunctions.h"
 #include "TuningMath.h"
 #include "Tuning.h"
+#include "TuningTableMap.h"
+#include "MultichannelMap.h"
 
 class MidiNoteTuner
 {
 	int pitchbendRange = 2; // total range of pitchbend in semitones
 
-	// Origin Tuning Parameters
-	int originRootNote = 69;
-	double originRootFreq = 440;
-	Tuning const* originTuning;
+	// Source Tuning Parameters
+	const Tuning* sourceTuning;
 
-	// Destination Tuning Parameters
-	int destinationRootNote = 69;
-	double destinationRootFreq = 440;
-	Tuning const* newTuning;
+	// Target Tuning Parameters
+	const Tuning* targetTuning;
 
 	bool cached = false;
     juce::Array<int> pitchbendTable;
 
-	Tuning* standard;
+	const Tuning standard;
+
+	std::unique_ptr<Keytographer::TuningTableMap> tuningTableMap;
 
 public:
     
-	MidiNoteTuner(const Tuning& defaultTuning, const Tuning& newTuning);
-    //MidiNoteTuner(const Tuning* tuningToUse=nullptr);
+    MidiNoteTuner(const Tuning* targetTuningIn = nullptr);
+	MidiNoteTuner(const Tuning* sourceTuningIn, const Tuning* targetTuningIn);
     ~MidiNoteTuner();
 
-	void setOriginTuning(const Tuning& newOriginTuning);
-    
-    void setNewTuning(const Tuning& newTuningIn);
+	const Tuning* getSourceTuning() { return sourceTuning; }
+	const Tuning* getTargetTuning() { return targetTuning; }
     
     juce::Array<int> getPitchbendTable() const;
 
     int getPitchbendMax() const;
-    
-    int getOriginRootNote() const;
-	double getOriginRootFreq() const;
-    
-    int getDestinationRootNote() const;
-    double getDestinationRootFreq() const;
+
+	void setSourceTuning(const Tuning& newSourceTuning);
+	void setTargetTuning(const Tuning& newTuningIn);
     
     void setPitchbendRange(int pitchBendMaxIn);
 
-	void setOriginRootNote(int rootNoteIn);
-	void setOriginRootFreq(double freqIn);
-    
-    void setDestinationRootNote(int rootNoteIn);
-    void setDestinationRootFrequency(double freqIn);
+	void setTuningTableMap(Keytographer::TuningTableMap* mapIn);
+
+	int tuneNoteAndGetPitchbend(juce::MidiMessage& msg);
 
 	/******************
 
@@ -73,28 +67,7 @@ public:
 	
 	int	ratioToPitchbend(double ratioIn) const;
 
-    /*
-        Returns a note struct with the note number that needs the least amount of pitchbend to sound like the destination note
-    */
-    void closestNote(int midiNoteIn, int& closestNoteOut, int& pitchbendOut);
 
-	/*
-		Returns the difference between input note and destination note in semitones
-	*/
-	double semitonesFromNote(int midiNoteIn) const;
-    
-	/*
-		Returns the total amount of pitchbend needed to make the input midi note sound like the destination note.
-		Be careful, as this can be beyond the range of valid pitchbend (< 0 or >= 16384)
-	*/
-
-	int pitchbendFromNote(int midiNoteIn) const;
-
-	/*
-		Returns the total amount of pitchbend to get from one note in the original tuning
-		to a different note in the new tuning
-	*/
-	int pitchbendFromNote(int oldTuningNote, int newTuningNote) const;
 
 
 	/******************

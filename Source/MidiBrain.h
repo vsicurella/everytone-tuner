@@ -11,7 +11,6 @@
 #pragma once
 #include <JuceHeader.h>
 #include "MidiNoteTuner.h"
-#include "MidiNoteMapper.h"
 
 class MidiBrain
 {
@@ -32,8 +31,7 @@ private:
     std::unique_ptr<Tuning> oldTuning;
     std::unique_ptr<Tuning> newTuning;
 
-    std::unique_ptr<MidiNoteMapper> mapper;
-    // std::unique_ptr<MidiNoteTuner>  tuner;
+    std::unique_ptr<MidiNoteTuner> tuner;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiBrain)

@@ -19,12 +19,16 @@ class Tuning
 {
     std::unique_ptr<Keytographer::Map<double>> tuningMap;
 	
+	juce::Array<double> centsTable;
 	juce::Array<double> ratioTable;
 
     juce::Array<double> frequencyTable;
     juce::Array<double> mtsTable;
 
 	double periodCents;
+	double periodRatio;
+	double periodMts;
+
 	int tuningSize;
 
     int rootMidiNote;
@@ -137,7 +141,11 @@ public:
     virtual double getNoteInCents(int noteNumber, int channel = 1) const;
     virtual double getNoteInSemitones(int noteNumber, int channel = 1) const;
 
+	virtual double getNoteFrequency(int noteNumber, int channel = 1) const;
+	virtual double frequencyTableAt(int tableIndex) const;
+
 	virtual double getNoteInMTS(int noteNumber, int channel = 1) const;
+	virtual double mtsTableAt(int tableIndex) const;
  
     virtual juce::Array<double> getIntervalCentsTable() const;
     virtual juce::Array<double> getIntervalRatioTable() const;
@@ -155,10 +163,10 @@ public:
 	int getScaleDegree(int noteNumber) const;
 
 	/*
-		Returns the closest note number to the cents value passed in, 
-		from reference of the root note
+		Returns the closest MTS note to the one passed in
 	*/
-	int closestNoteToCents(double cents) const;
+	int closestNoteIndex(double mtsIn) const;
+	int closestMtsNote(double mtsIn) const;
 
 public:
 
