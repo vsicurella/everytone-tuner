@@ -79,6 +79,7 @@ void Tuning::rebuildTables()
     }
 
     double periodRatio = centsToRatio(periodCents);
+    rootMts = roundN(10, frequencyToMTS(rootFrequency));
     
     // Build Frequency and MTS note tables
     int offset, periods, degree;
@@ -92,7 +93,8 @@ void Tuning::rebuildTables()
         frequency = pow(periodRatio, periods) * intervalRatio * rootFrequency;
         
         frequencyTable.set(t, frequency);
-        mtsTable.set(t, frequencyToMTS(frequency));
+        double mts = roundN(10, frequencyToMTS(frequency));
+        mtsTable.set(t, mts);
     }
 }
 
@@ -259,42 +261,72 @@ int Tuning::getScaleDegree(int noteNumber) const
 
 int Tuning::closestNoteIndex(double mts) const
 {
-    mts = roundN(6, mts);
+    int root = rootMidiIndex();
 
-    double periods = mts / periodMts;
     if (tuningSize == 1)
     {
-        return round(periods) + rootMidiNote;
+        return root + (int)round((mts - rootMts) / (periodCents * 0.01));
     }
 
+    //mts = roundN(6, mts);
+
+    //// Reduce into the first period
+    //auto reduced = modulo(mts, periodMts);
+    //
+    //// Find index it's closest to
+    //int closestDegree = 0;
+    //int root = rootMidiIndex();
+    //double difference = periodCents;
+    //for (int i = 0; i <= tuningSize; i++)
+    //{
+    //    auto note = tuningMap->at(root + i) * 0.01;
+    //    auto dif = abs(note - reduced);
+    //    if (dif < difference)
+    //    {
+    //        difference = dif;
+    //        closestDegree = i;
+    //    }
+
+    //    if (difference == 0)
+    //        break;
+    //}
+
+    //int rootPeriods = floor((mts - rootMts) / 12.0);
+    //int rootOffset = rootPeriods * tuningSize + closestDegree;
+    //    /*if (rootPeriods < 0)
+    //        rootOffset += closestDegree;
+    //    else
+    //        rootOffset += (tuningSize - closestDegree);*/
+
+    
     // This assumes the scale pattern doesn't have intervals that jump beyond the period
 
-    // Reduce into the first period
-    auto reduced = modulo(mts, periodMts);
-    
-    // Find degree it's closest to
-    int closestDegree = 0;
-    int root = rootMidiIndex();
+    int rootPeriods = floor((mts - rootMts) / 12.0);
+    int rootOffset = rootPeriods * tuningSize;
+
+    int closestIndex = root + rootOffset;
     double difference = periodCents;
-    for (int i = 0; i < tuningSize; i++)
+    for (int i = 0; i <= tuningSize; i++)
     {
-        auto note = tuningMap->at(root + i) * 0.01;
+        int index = root + rootOffset + i;
+        auto note = mtsTableAt(index);
         auto dif = abs(note - mts);
         if (dif < difference)
         {
             difference = dif;
-            closestDegree = i;
+            closestIndex = index;
         }
 
         if (difference == 0)
             break;
     }
 
-    int closestNote = modulo(closestDegree + (int)floor(periods) * tuningSize, TUNING_TABLE_SIZE);
-    return  closestNote;
+    return  closestIndex;
 }
 
 int Tuning::closestMtsNote(double mtsIn) const
 {
-    return mtsTable[closestNoteIndex(mtsIn)];
+    int index = closestNoteIndex(mtsIn);
+    index = (index < 0) ? 0 : (index > 2047) ? 2047 : index;
+    return mtsTable[index];
 }

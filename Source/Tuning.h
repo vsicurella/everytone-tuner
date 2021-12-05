@@ -34,6 +34,7 @@ class Tuning
     int rootMidiNote;
 	int rootMidiChannelIndex;
 	double rootFrequency;
+	double rootMts;
 
     int transpose;
 
