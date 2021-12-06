@@ -26,16 +26,18 @@ class MidiNoteTuner
 	// Target Tuning Parameters
 	const Tuning* targetTuning;
 
+	const Keytographer::TuningTableMap* tuningTableMap;
+
+
 	bool cached = false;
-    juce::Array<int> pitchbendTable;
+	juce::Array<int> pitchbendTable;
 
-	const Tuning standard;
-
-	std::unique_ptr<Keytographer::TuningTableMap> tuningTableMap;
+	const Tuning standardTuning;
+	const Keytographer::TuningTableMap standardMap = Keytographer::MultichannelMap::CreatePeriodicMapping(12, 60);
 
 public:
     
-    MidiNoteTuner(const Tuning* targetTuningIn = nullptr);
+    MidiNoteTuner(const Tuning* targetTuningIn = nullptr, const Keytographer::TuningTableMap* noteMapIn = nullptr);
 	MidiNoteTuner(const Tuning* sourceTuningIn, const Tuning* targetTuningIn);
     ~MidiNoteTuner();
 
@@ -46,12 +48,12 @@ public:
 
     int getPitchbendMax() const;
 
-	void setSourceTuning(const Tuning& newSourceTuning);
-	void setTargetTuning(const Tuning& newTuningIn);
+	void setSourceTuning(const Tuning* newSourceTuning);
+	void setTargetTuning(const Tuning* newTuningIn);
     
     void setPitchbendRange(int pitchBendMaxIn);
 
-	void setTuningTableMap(Keytographer::TuningTableMap* mapIn);
+	void setTuningTableMap(const Keytographer::TuningTableMap* mapIn);
 
 	/// <summary>
 	/// Use the current Tuning Table Map to change the MIDI note number

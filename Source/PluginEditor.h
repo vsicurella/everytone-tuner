@@ -13,6 +13,7 @@
 #include "LogWindow.h"
 #include "UI/MainWindow.h"
 #include "UI/MenuBar.h"
+#include "../Source/MultichannelMap.h"
 
 
 

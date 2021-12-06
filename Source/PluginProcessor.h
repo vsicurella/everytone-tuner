@@ -77,8 +77,10 @@ public:
 
     //==============================================================================
 
-    void loadTuningSource(Tuning& tuning);
-    void loadTuningTarget(Tuning& tuning);
+    void loadTuningSource(const Tuning& tuning);
+    void loadTuningTarget(const Tuning& tuning);
+
+    void loadNoteMapping(const Keytographer::TuningTableMap& map);
 
 private:
 

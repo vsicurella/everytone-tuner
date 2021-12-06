@@ -42,6 +42,13 @@ void MidiBrain::setTuningTarget(const Tuning& tuning)
     postTuningChange();
 }
 
+void MidiBrain::setNoteMap(const Keytographer::TuningTableMap& map)
+{
+    preMapChange(map);
+    noteMap.reset(new Keytographer::TuningTableMap(map));
+    postMapChange();
+}
+
 void MidiBrain::processMidi(juce::MidiBuffer& buffer)
 {
     juce::MidiBuffer processedBuffer;
@@ -52,19 +59,26 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
 
         if (msg.isNoteOn())
         {
+#if JUCE_DEBUG
+            juce::Logger::writeToLog("Before: " + msg.getDescription());
+#endif
             int pitchbend = tuner->mapNoteAndPitchbend(msg);
+
+#if JUCE_DEBUG
+            juce::Logger::writeToLog(" After: " + msg.getDescription());
+#endif
 
             if (pitchbend != 8192)
             {
                 // Create and add pitchbend message
                 auto pbmsg = juce::MidiMessage::pitchWheel(msg.getChannel(), pitchbend);
-                auto sample = (metadata.samplePosition == 0) ? 0 : metadata.samplePosition - 1;
+                auto sample = (metadata.samplePosition == 0) ? 0 : metadata.samplePosition - 1; 
 
 #if JUCE_DEBUG
-                juce::Logger::writeToLog(pbmsg.getDescription());
+                juce::Logger::writeToLog("^Pitch: " + pbmsg.getDescription());
 #endif
 
-                processedBuffer.addEvent(msg, sample);
+                processedBuffer.addEvent(pbmsg, sample);
             }
         }
         // Don't have to find pitchbend for Note Off or Aftertouch
@@ -87,5 +101,17 @@ void MidiBrain::preTuningChange(const Tuning& tuning)
 
 void MidiBrain::postTuningChange()
 {
+    tuner->setSourceTuning(tuningSource.get());
+    tuner->setTargetTuning(tuningTarget.get());
+}
+
+void MidiBrain::preMapChange(const Keytographer::TuningTableMap& map)
+{
 
 }
+
+void MidiBrain::postMapChange()
+{
+    tuner->setTuningTableMap(noteMap.get());
+}
+

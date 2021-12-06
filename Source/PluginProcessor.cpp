@@ -255,12 +255,17 @@ void MultimapperAudioProcessor::testMidi()
     //}
 }
 
-void MultimapperAudioProcessor::loadTuningSource(Tuning& tuning)
+void MultimapperAudioProcessor::loadTuningSource(const Tuning& tuning)
 {
     midiBrain->setTuningSource(tuning);
 }
 
-void MultimapperAudioProcessor::loadTuningTarget(Tuning& tuning)
+void MultimapperAudioProcessor::loadTuningTarget(const Tuning& tuning)
 {
     midiBrain->setTuningTarget(tuning);
+}
+
+void MultimapperAudioProcessor::loadNoteMapping(const Keytographer::TuningTableMap& map)
+{
+    midiBrain->setNoteMap(map);
 }
