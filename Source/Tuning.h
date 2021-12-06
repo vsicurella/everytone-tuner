@@ -100,19 +100,24 @@ public:
         }
 	};
 
-	struct IntervalDefinition : Definition
+	struct CentsDefinition : Definition
 	{
 		juce::Array<double> intervalCents = { 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200 };
 
-        IntervalDefinition() {}
-	};
+        CentsDefinition() {}
+		CentsDefinition(double divisions, double periodCents = 1200.0)
+		{
+			double step = periodCents / divisions;
+			intervalCents = { step };
+			name = juce::String(divisions) + "ed " + juce::String(periodCents) + " cents";
+		}
 
-	struct EqualDivisionsDefinition : Definition
-	{
-		double divisions = 1;
-
-		double periodCents = -1;
-		double periodRatio = -1;
+		static CentsDefinition RatioDivisions(double divisions, double periodRatio = 2.0)
+		{
+			auto cents = ratioToCents(periodRatio);
+			auto definition = CentsDefinition(divisions, cents);
+			return definition;
+		}
 	};
 
 public:
@@ -120,9 +125,7 @@ public:
 	/*
 		Expects a full interval table in cents, ending with period. May or may not include unison.
 	*/
-	Tuning(IntervalDefinition definition=IntervalDefinition());
-
-	Tuning(EqualDivisionsDefinition definition);
+	Tuning(CentsDefinition definition=CentsDefinition());
 
     Tuning(const Tuning&);
     
@@ -186,7 +189,7 @@ public:
 
 	static Tuning StandardTuning()
 	{
-		IntervalDefinition definition;
+		CentsDefinition definition;
 		definition.name = "12-edo";
 		definition.description = "Octave divided in 12 equal steps";
 		return Tuning(definition);

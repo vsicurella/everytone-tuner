@@ -271,7 +271,7 @@ private:
     {
         Tuning tuning;
 
-        Tuning::IntervalDefinition definition;
+        Tuning::CentsDefinition definition;
 
         const int size = 12;
         const double expectedIntervalCentsTable[size] = { 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0, 1100.0, 1200.0 };
@@ -355,7 +355,7 @@ private:
         const int size = 31;
         const double expectedIntervalCentsTable[size] = { 38.70967741935484, 77.41935483870968, 116.12903225806451, 154.83870967741936, 193.5483870967742, 232.25806451612902, 270.9677419354839, 309.6774193548387, 348.38709677419354, 387.0967741935484, 425.80645161290323, 464.51612903225805, 503.2258064516129, 541.9354838709678, 580.6451612903226, 619.3548387096774, 658.0645161290323, 696.7741935483871, 735.483870967742, 774.1935483870968, 812.9032258064516, 851.6129032258065, 890.3225806451613, 929.0322580645161, 967.741935483871, 1006.4516129032259, 1045.1612903225807, 1083.8709677419356, 1122.5806451612902, 1161.2903225806451, 1200.0 };
 
-        Tuning::IntervalDefinition definition;
+        Tuning::CentsDefinition definition;
         definition.intervalCents =  { 38.70967741935484, 77.41935483870968, 116.12903225806451, 154.83870967741936, 193.5483870967742, 232.25806451612902, 270.9677419354839, 309.6774193548387, 348.38709677419354, 387.0967741935484, 425.80645161290323, 464.51612903225805, 503.2258064516129, 541.9354838709678, 580.6451612903226, 619.3548387096774, 658.0645161290323, 696.7741935483871, 735.483870967742, 774.1935483870968, 812.9032258064516, 851.6129032258065, 890.3225806451613, 929.0322580645161, 967.741935483871, 1006.4516129032259, 1045.1612903225807, 1083.8709677419356, 1122.5806451612902, 1161.2903225806451, 1200.0 };
         definition.name = "31-edo";
         definition.description = "Octave divided in 31 equal steps";
@@ -428,13 +428,9 @@ private:
         const int size = 1;
         const double expectedIntervalCentsTable[size] = { 35.29411764705883 };
 
-        Tuning::EqualDivisionsDefinition definition;
-        definition.divisions = 34;
+        auto definition = Tuning::CentsDefinition(34);
 
-        //Tuning::IntervalDefinition definition;
-        //definition.intervalCents = { 35.294117647 };
-
-        definition.name = "35.294 cET aka 34edo";
+        definition.name = "35.294118 cET aka 34edo";
         definition.description = "Octave divided in 34 equal steps";
         definition.reference.rootMidiChannel = 5;
         definition.reference.rootMidiNote = 60;
@@ -532,7 +528,7 @@ private:
 
     //     beginTest("Default Tuning Tables");
         
-    //     Tuning::IntervalDefinition defaultIntervalDefinition;
+    //     Tuning::CentsDefinition defaultIntervalDefinition;
     //     juce::Array<double> expectedIntervalCents = { 0 };
     //     expectedIntervalCents.addArray(defaultIntervalDefinition.intervalCents);
     //     test_table(expectedIntervalCents, tuning.getIntervalCentsTable(), "getIntervalCentsTable()");

@@ -10,7 +10,7 @@
 
 #include "Tuning.h"
 
-Tuning::Tuning(IntervalDefinition definition)
+Tuning::Tuning(CentsDefinition definition)
     : tuningSize(definition.intervalCents.size()),
       rootMidiNote(definition.reference.rootMidiNote),
       rootMidiChannelIndex(definition.reference.rootMidiChannel - 1),
@@ -20,31 +20,6 @@ Tuning::Tuning(IntervalDefinition definition)
       description(definition.description)
 {
 	setupTuning(definition.intervalCents);
-}
-
-Tuning::Tuning(EqualDivisionsDefinition definition)
-    : tuningSize(1),
-      rootMidiNote(definition.reference.rootMidiNote),
-      rootMidiChannelIndex(definition.reference.rootMidiChannel - 1),
-      rootFrequency(definition.reference.rootFrequency),
-      transpose(definition.transpose),
-      name(definition.name),
-      description(definition.description)
-{
-    periodCents = 1200.0;
-
-    // Use provided period if valid one, or fallback to octave
-    if (definition.periodCents > 0)
-    {
-        periodCents = definition.periodCents;
-    }
-    else if (definition.periodRatio > 0)
-    {
-        periodCents = ratioToCents(definition.periodRatio);
-    }
-    
-    juce::Array<double> interval = { periodCents / definition.divisions };
-    setupTuning(interval);
 }
 
 Tuning::Tuning(const Tuning& tuning)

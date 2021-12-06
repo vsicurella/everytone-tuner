@@ -17,10 +17,7 @@ MidiBrain::MidiBrain()
     auto standardTuning = Tuning::StandardTuning();
     tuningSource.reset(new Tuning(standardTuning));
 
-    Tuning::EqualTemperamentDefinition def31;
-    def31.divisions = 31;
-
-    tuningTarget.reset(new Tuning(def31));
+    tuningTarget.reset(new Tuning(standardTuning));
     tuner.reset(new MidiNoteTuner(tuningSource.get(), tuningTarget.get()));
 }
 
