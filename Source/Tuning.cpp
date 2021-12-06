@@ -22,7 +22,7 @@ Tuning::Tuning(IntervalDefinition definition)
 	setupTuning(definition.intervalCents);
 }
 
-Tuning::Tuning(EqualTemperamentDefinition definition)
+Tuning::Tuning(EqualDivisionsDefinition definition)
     : tuningSize(1),
       rootMidiNote(definition.reference.rootMidiNote),
       rootMidiChannelIndex(definition.reference.rootMidiChannel - 1),

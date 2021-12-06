@@ -428,7 +428,7 @@ private:
         const int size = 1;
         const double expectedIntervalCentsTable[size] = { 35.29411764705883 };
 
-        Tuning::EqualTemperamentDefinition definition;
+        Tuning::EqualDivisionsDefinition definition;
         definition.divisions = 34;
 
         //Tuning::IntervalDefinition definition;

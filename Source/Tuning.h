@@ -107,7 +107,7 @@ public:
         IntervalDefinition() {}
 	};
 
-	struct EqualTemperamentDefinition : Definition
+	struct EqualDivisionsDefinition : Definition
 	{
 		double divisions = 1;
 
@@ -122,7 +122,7 @@ public:
 	*/
 	Tuning(IntervalDefinition definition=IntervalDefinition());
 
-	Tuning(EqualTemperamentDefinition definition);
+	Tuning(EqualDivisionsDefinition definition);
 
     Tuning(const Tuning&);
     
