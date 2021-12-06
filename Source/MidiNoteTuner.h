@@ -53,7 +53,22 @@ public:
 
 	void setTuningTableMap(Keytographer::TuningTableMap* mapIn);
 
-	int tuneNoteAndGetPitchbend(juce::MidiMessage& msg);
+	/// <summary>
+	/// Use the current Tuning Table Map to change the MIDI note number
+	/// and channel of the provided juce::MidiMessage.
+	/// </summary>
+	/// <param name="msg"></param>
+	/// <returns>Semitone discrepancy between source and target note</returns>
+	double mapMidiNote(juce::MidiMessage& msg);
+
+	/// <summary>
+	/// Remap the provided juce::MidiMessage via MidiNoteTuner::mapMidiNote
+	/// and return the 14-bit pitchbend value to make up the source -> target discrepancy 
+	/// </summary>
+	/// <param name="msg"></param>
+	/// <returns></returns>
+	int mapNoteAndPitchbend(juce::MidiMessage& msg);
+
 
 	/******************
 
@@ -66,8 +81,6 @@ public:
 	double pitchbendToSemitones(int pitchbendIn) const;
 	
 	int	ratioToPitchbend(double ratioIn) const;
-
-
 
 
 	/******************

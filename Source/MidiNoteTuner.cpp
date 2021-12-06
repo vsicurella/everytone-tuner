@@ -64,20 +64,14 @@ void MidiNoteTuner::setTuningTableMap(Keytographer::TuningTableMap* mapIn)
 	tuningTableMap.reset(new Keytographer::TuningTableMap(*mapIn));
 }
 
-int MidiNoteTuner::tuneNoteAndGetPitchbend(juce::MidiMessage& msg)
+double MidiNoteTuner::mapMidiNote(juce::MidiMessage& msg)
 {
 	auto ch = msg.getChannel();
 	auto note = msg.getNoteNumber();
-	auto isnoteon = msg.isNoteOn();
-
-	juce::String dbgmsg = "In. (Ch: " + juce::String(ch) + ", N: " + juce::String(note);
-
 	auto mapped = tuningTableMap->getMappedNote(ch, note);
-	
+
 	// First get target MTS note
 	auto targetMts = targetTuning->mtsTableAt(mapped.index);
-
-	dbgmsg += ") -> tI: " + juce::String(mapped.index) + " (" + juce::String(roundN(3, targetMts));
 
 	// Then find closest source note
 	auto sourceNote = sourceTuning->closestNoteIndex(targetMts);
@@ -87,21 +81,22 @@ int MidiNoteTuner::tuneNoteAndGetPitchbend(juce::MidiMessage& msg)
 	msg.setNoteNumber(newNote);
 	msg.setChannel(newChannel);
 
-	// Lastly find pitchbend amount
 	auto sourceMts = sourceTuning->mtsTableAt(sourceNote);
-	double difference = targetMts - sourceMts;
+	return targetMts - sourceMts;
+}
 
-	dbgmsg += ") from sI: " + juce::String(sourceNote) + " (" + juce::String(roundN(3, sourceMts)) + ")";
-	if (msg.isNoteOn())
-		juce::Logger::writeToLog(dbgmsg);
+int MidiNoteTuner::mapNoteAndPitchbend(juce::MidiMessage& msg)
+{
+	double discrepancy = mapMidiNote(msg);
 
-	int pitchbendOut = 8192;
-	if (abs(difference) <= pitchbendRange)
+	int pitchbend = 8192;
+	if (abs(discrepancy) >= 1e-6)
 	{
-		pitchbendOut = semitonesToPitchbend(difference / 100.0);
+		pitchbend = semitonesToPitchbend(discrepancy);
+		jassert(pitchbend >= 0 && pitchbend < (1 << 14));
 	}
 
-	return pitchbendOut;
+	return pitchbend;
 }
 
 int MidiNoteTuner::semitonesToPitchbend(double semitonesIn) const

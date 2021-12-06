@@ -39,7 +39,7 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
     juce::UnitTestRunner tester;
     tester.runTests(tests);
 
-    juce::Timer::callAfterDelay(500, [&]() { this->testMidi(); });
+    //juce::Timer::callAfterDelay(500, [&]() { this->testMidi(); });
     #endif
 #endif
 }

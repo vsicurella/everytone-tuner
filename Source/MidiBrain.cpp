@@ -38,9 +38,10 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
     for (auto metadata : buffer)
     {
         auto msg = metadata.getMessage();
-        if (msg.isNoteOnOrOff() || msg.isAftertouch())
+
+        if (msg.isNoteOn())
         {
-            int pitchbend = tuner->tuneNoteAndGetPitchbend(msg);
+            int pitchbend = tuner->mapNoteAndPitchbend(msg);
 
             if (pitchbend != 8192)
             {
@@ -55,6 +56,12 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
                 processedBuffer.addEvent(msg, sample);
             }
         }
+        // Don't have to find pitchbend for Note Off or Aftertouch
+        else if (msg.isNoteOff() || msg.isAftertouch())
+        {
+            tuner->mapMidiNote(msg);
+        }
+      
         
         processedBuffer.addEvent(msg, metadata.samplePosition);
     }
