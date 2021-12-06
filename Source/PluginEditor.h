@@ -11,6 +11,10 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "LogWindow.h"
+#include "UI/MainWindow.h"
+#include "UI/MenuBar.h"
+
+
 
 //==============================================================================
 /**
@@ -30,13 +34,10 @@ private:
     // access the processor object that created it.
     MultimapperAudioProcessor& audioProcessor;
 
-    std::unique_ptr<juce::Slider> size;
-    std::unique_ptr<juce::Slider> period;
-    std::unique_ptr<juce::Slider> rootNote;
-    std::unique_ptr<juce::Slider> rootChannel;
-    std::unique_ptr<juce::Slider> rootFrequency;
+    MenuBarModel menuModel;
 
-    juce::Array<Component*> components;
+    std::unique_ptr<juce::MenuBarComponent> menuBar;
+    std::unique_ptr<MainWindow> mainWindow;
 
     std::unique_ptr<LogWindow> logger;
 

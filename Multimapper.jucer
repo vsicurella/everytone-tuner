@@ -5,6 +5,12 @@
               defines="RUN_MULTIMAPPER_TESTS=1">
   <MAINGROUP id="H8zE4n" name="Multimapper">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
+      <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="UI">
+        <FILE id="ksMnFa" name="CommonUI.h" compile="0" resource="0" file="Source/UI/CommonUI.h"/>
+        <FILE id="L2UxsU" name="MainWindow.cpp" compile="1" resource="0" file="Source/UI/MainWindow.cpp"/>
+        <FILE id="D4fDVq" name="MainWindow.h" compile="0" resource="0" file="Source/UI/MainWindow.h"/>
+        <FILE id="ANBE3D" name="MenuBar.h" compile="0" resource="0" file="Source/UI/MenuBar.h"/>
+      </GROUP>
       <GROUP id="{79A5D062-8ED3-30D7-15DF-F01D07F22E53}" name="tests">
         <FILE id="P6b0jk" name="Tuning_tests.h" compile="0" resource="0" file="Source/tests/Tuning_tests.h"/>
       </GROUP>
