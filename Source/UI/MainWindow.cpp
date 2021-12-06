@@ -117,17 +117,12 @@ void MainWindow::resized()
 	main.performLayout(getLocalBounds());
 }
 
-void MainWindow::loadOptionsNode(juce::ValueTree optionsNodeIn)
-{
-	optionsNode = optionsNodeIn;
-	updateTuningOutProperties();
-}
 
-void MainWindow::updateTuningOutProperties()
+void MainWindow::setTuningDisplayed(const Tuning& tuning)
 {
-	setTuningNameLabel("");
-	setDescriptionText("");
-	setTuningSizeLabel("");
+	setTuningNameLabel(tuning.getName());
+	setDescriptionText(tuning.getDescription());
+	setTuningSizeLabel(juce::String(tuning.getTuningSize()));
 
 	//double period = ;
 	//if (tuningOutDefinition[TuneUpIDs::functionalId])
@@ -146,7 +141,7 @@ void MainWindow::updateTuningOutProperties()
 	//if (period != virtualPeriod)
 	//	periodDisplay += " (" + juce::String(virtualPeriod) + ")";
 	
-	setTuningPeriodLabel("");
+	setTuningPeriodLabel(juce::String(tuning.getPeriodCents()) + " cents");
 }
 
 void MainWindow::setTuningNameLabel(juce::String nameIn)

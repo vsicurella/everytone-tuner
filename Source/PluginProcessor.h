@@ -75,6 +75,11 @@ public:
 
     juce::String getLog() const;
 
+    //==============================================================================
+
+    void loadTuningSource(Tuning& tuning);
+    void loadTuningTarget(Tuning& tuning);
+
 private:
 
     void testMidi();

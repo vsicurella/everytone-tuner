@@ -254,3 +254,13 @@ void MultimapperAudioProcessor::testMidi()
     //    }
     //}
 }
+
+void MultimapperAudioProcessor::loadTuningSource(Tuning& tuning)
+{
+    midiBrain->setTuningSource(tuning);
+}
+
+void MultimapperAudioProcessor::loadTuningTarget(Tuning& tuning)
+{
+    midiBrain->setTuningTarget(tuning);
+}

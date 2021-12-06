@@ -22,14 +22,23 @@ public:
 
     void processMidi(juce::MidiBuffer& buffer);
 
+    void setTuningSource(const Tuning& tuning);
+    void setTuningTarget(const Tuning& tuning);
+
+    
+private:
+
+    void preTuningChange(const Tuning& tuning);
+    void postTuningChange();
+
 private:
 
     juce::MidiKeyboardState state;
 
     int pitchbendRange = 2;
 
-    std::unique_ptr<Tuning> oldTuning;
-    std::unique_ptr<Tuning> newTuning;
+    std::unique_ptr<Tuning> tuningSource;
+    std::unique_ptr<Tuning> tuningTarget;
 
     std::unique_ptr<MidiNoteTuner> tuner;
 

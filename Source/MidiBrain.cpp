@@ -15,20 +15,34 @@
 MidiBrain::MidiBrain()
 {
     auto standardTuning = Tuning::StandardTuning();
-    oldTuning.reset(new Tuning(standardTuning));
+    tuningSource.reset(new Tuning(standardTuning));
 
     Tuning::EqualTemperamentDefinition def31;
     def31.divisions = 31;
 
-    newTuning.reset(new Tuning(def31));
-    tuner.reset(new MidiNoteTuner(oldTuning.get(), newTuning.get()));
+    tuningTarget.reset(new Tuning(def31));
+    tuner.reset(new MidiNoteTuner(tuningSource.get(), tuningTarget.get()));
 }
 
 MidiBrain::~MidiBrain()
 {
     tuner       = nullptr;
-    oldTuning   = nullptr;
-    newTuning   = nullptr;
+    tuningSource   = nullptr;
+    tuningTarget   = nullptr;
+}
+
+void MidiBrain::setTuningSource(const Tuning& tuning)
+{
+    preTuningChange(tuning);
+    tuningSource.reset(new Tuning(tuning));
+    postTuningChange();
+}
+
+void MidiBrain::setTuningTarget(const Tuning& tuning)
+{
+    preTuningChange(tuning);
+    tuningTarget.reset(new Tuning(tuning));
+    postTuningChange();
 }
 
 void MidiBrain::processMidi(juce::MidiBuffer& buffer)
@@ -67,4 +81,14 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
     }
 
     buffer.swapWith(processedBuffer);
+}
+
+void MidiBrain::preTuningChange(const Tuning& tuning)
+{
+
+}
+
+void MidiBrain::postTuningChange()
+{
+
 }

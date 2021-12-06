@@ -11,7 +11,7 @@
 #pragma once
 
 #include "CommonUI.h"
-
+#include "../Tuning.h"
 
 class MainWindow  : public juce::Component
 {
@@ -22,9 +22,7 @@ public:
 
 public:
 
-	void loadOptionsNode(juce::ValueTree optionsNodeIn);
-
-	void updateTuningOutProperties();
+	void setTuningDisplayed(const Tuning& tuning);
 
 	void setTuningNameLabel(juce::String nameIn);
 	void setTuningSizeLabel(juce::String numNotesIn);
