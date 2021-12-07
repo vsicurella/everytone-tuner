@@ -22,6 +22,10 @@ public:
 
     void processMidi(juce::MidiBuffer& buffer);
 
+    int nextAvailableChannel();
+
+    int channelOfActiveNote(int noteNumber);
+
     void setTuningSource(const Tuning& tuning);
     void setTuningTarget(const Tuning& tuning);
 
@@ -38,6 +42,9 @@ private:
 private:
 
     juce::MidiKeyboardState state;
+    juce::MidiKeyboardState midiInputState;
+    
+    juce::Array<int> channelsInUse;
 
     int pitchbendRange = 2;
 
