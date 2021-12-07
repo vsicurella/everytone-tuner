@@ -22,9 +22,15 @@ public:
 
     void processMidi(juce::MidiBuffer& buffer);
 
+    int nextAvailableChannel();
+
+    int channelOfActiveNote(int noteNumber);
+
 private:
 
-    juce::MidiKeyboardState state;
+    juce::MidiKeyboardState midiInputState;
+    
+    juce::Array<int> channelsInUse;
 
     int pitchbendRange = 2;
 

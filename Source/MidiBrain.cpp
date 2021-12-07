@@ -22,6 +22,9 @@ MidiBrain::MidiBrain()
 
     newTuning.reset(new Tuning(def31));
     tuner.reset(new MidiNoteTuner(oldTuning.get(), newTuning.get()));
+
+    channelsInUse.resize(16);
+    channelsInUse.fill(false);
 }
 
 MidiBrain::~MidiBrain()
@@ -39,32 +42,70 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
     {
         auto msg = metadata.getMessage();
 
-        if (msg.isNoteOn())
+        auto status = msg.getRawData()[0];
+        bool isVoice = status >= 0x80 && status < 0xb0;
+       
+        if (isVoice)
         {
-            int pitchbend = tuner->mapNoteAndPitchbend(msg);
+            double semitones = tuner->mapMidiNote(msg);
 
-            if (pitchbend != 8192)
+            if (msg.isNoteOn())
             {
-                // Create and add pitchbend message
-                auto pbmsg = juce::MidiMessage::pitchWheel(msg.getChannel(), pitchbend);
-                auto sample = (metadata.samplePosition == 0) ? 0 : metadata.samplePosition - 1;
+                int newChannel = nextAvailableChannel();
+                if (newChannel < 0)
+                    continue;
 
-#if JUCE_DEBUG
-                juce::Logger::writeToLog(pbmsg.getDescription());
-#endif
+                msg.setChannel(newChannel + 1);
+                channelsInUse.set(newChannel, msg.getNoteNumber());
 
-                processedBuffer.addEvent(msg, sample);
+                if (abs(semitones) >= 1e-6)
+                {
+                    auto pitchbend = tuner->semitonesToPitchbend(semitones);
+
+                    // Create and add pitchbend message
+                    auto pbmsg = juce::MidiMessage::pitchWheel(msg.getChannel(), pitchbend);
+                    auto sample = (metadata.samplePosition == 0) ? 0 : metadata.samplePosition - 1;
+//
+//#if JUCE_DEBUG
+//                    juce::Logger::writeToLog(pbmsg.getDescription());
+//#endif
+
+                    processedBuffer.addEvent(msg, sample);
+                }
+            }
+            else
+            {
+                int noteChannel = channelOfActiveNote(msg.getNoteNumber());
+                msg.setChannel(noteChannel + 1);
+
+                if (msg.isNoteOff())
+                    channelsInUse.set(noteChannel, -1);
             }
         }
-        // Don't have to find pitchbend for Note Off or Aftertouch
-        else if (msg.isNoteOff() || msg.isAftertouch())
-        {
-            tuner->mapMidiNote(msg);
-        }
-      
         
         processedBuffer.addEvent(msg, metadata.samplePosition);
     }
 
     buffer.swapWith(processedBuffer);
+}
+
+int MidiBrain::nextAvailableChannel()
+{
+    for (int ch = 0; ch < 16; ch++)
+    {
+        if (channelsInUse[ch] < 0)
+            return ch;
+    }
+
+    return -1;
+}
+
+int MidiBrain::channelOfActiveNote(int noteNumber)
+{
+    for (int ch = 0; ch < 16; ch++)
+    {
+        if (channelsInUse[ch] == noteNumber)
+            return ch;
+    }
+    return -1;
 }
