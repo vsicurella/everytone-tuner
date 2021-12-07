@@ -16,6 +16,20 @@
 #include "TuningTableMap.h"
 #include "MultichannelMap.h"
 
+struct MidiPitch
+{
+	int coarse = 0;
+	int pitchbend = 8192;
+	bool mapped = false;
+
+	bool operator==(const MidiPitch& pitch)
+	{
+		return coarse == pitch.coarse 
+			&& pitchbend == pitch.pitchbend 
+			&& mapped == pitch.mapped;
+	}
+};
+
 class MidiNoteTuner
 {
 	int pitchbendRange = 2; // total range of pitchbend in semitones
@@ -55,21 +69,14 @@ public:
 
 	void setTuningTableMap(const Keytographer::TuningTableMap* mapIn);
 
-	/// <summary>
-	/// Use the current Tuning Table Map to change the MIDI note number
-	/// and channel of the provided juce::MidiMessage.
-	/// </summary>
-	/// <param name="msg"></param>
-	/// <returns>Semitone discrepancy between source and target note</returns>
-	double mapMidiNote(juce::MidiMessage& msg);
 
 	/// <summary>
-	/// Remap the provided juce::MidiMessage via MidiNoteTuner::mapMidiNote
-	/// and return the 14-bit pitchbend value to make up the source -> target discrepancy 
+	/// 
+	/// 
 	/// </summary>
 	/// <param name="msg"></param>
 	/// <returns></returns>
-	int mapNoteAndPitchbend(juce::MidiMessage& msg);
+	MidiPitch mapNoteAndPitchbend(const juce::MidiMessage& msg);
 
 
 	/******************

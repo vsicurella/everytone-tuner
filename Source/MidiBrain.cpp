@@ -21,7 +21,7 @@ MidiBrain::MidiBrain()
     tuner.reset(new MidiNoteTuner(tuningSource.get(), tuningTarget.get()));
 
     channelsInUse.resize(16);
-    channelsInUse.fill(-1);
+    channelsInUse.fill(MidiPitch());
 }
 
 MidiBrain::~MidiBrain()
@@ -65,9 +65,12 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
        
         if (isVoice)
         {
-            auto oldnote = msg.getNoteNumber();
-            double semitones = tuner->mapMidiNote(msg);
-            //juce::Logger::writeToLog("Remapped note " + juce::String(oldnote) + " to " + juce::String(msg.getNoteNumber()));
+            auto pitch = tuner->mapNoteAndPitchbend(msg);
+
+            if (!pitch.mapped)
+                continue;
+
+            msg.setNoteNumber(pitch.coarse);
 
             if (msg.isNoteOn())
             {
@@ -81,14 +84,12 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
 
                 //juce::Logger::writeToLog("channel set to " + juce::String(newChannel +1));
                 msg.setChannel(newChannel + 1);
-                channelsInUse.set(newChannel, msg.getNoteNumber());
+                channelsInUse.set(newChannel, pitch);
 
-                if (abs(semitones) >= 1e-6)
+                if (pitch.pitchbend != 8192)
                 {
-                    auto pitchbend = tuner->semitonesToPitchbend(semitones);
-
                     // Create and add pitchbend message
-                    auto pbmsg = juce::MidiMessage::pitchWheel(msg.getChannel(), pitchbend);
+                    auto pbmsg = juce::MidiMessage::pitchWheel(msg.getChannel(), pitch.pitchbend);
                     //auto sample = (metadata.samplePosition == 0) ? 0 : metadata.samplePosition - 1;
 
 //#if JUCE_DEBUG
@@ -100,7 +101,7 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
             }
             else
             {
-                int noteChannel = channelOfActiveNote(msg.getNoteNumber());
+                int noteChannel = channelOfActiveNote(pitch);
                 if (noteChannel < 0)
                 {
                     //juce::Logger::writeToLog("got voice with no note on");
@@ -111,7 +112,7 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
 
                 if (msg.isNoteOff())
                 {
-                    channelsInUse.set(noteChannel, -1);
+                    channelsInUse.set(noteChannel, MidiPitch());
                     //juce::Logger::writeToLog("note off " + juce::String(msg.getNoteNumber()) + " channel " + juce::String(noteChannel+1));
                 }
             }
@@ -127,18 +128,20 @@ int MidiBrain::nextAvailableChannel()
 {
     for (int ch = 0; ch < 16; ch++)
     {
-        if (channelsInUse[ch] < 0)
+        auto pitch = channelsInUse[ch];
+        if (!pitch.mapped || pitch.coarse < 0)
             return ch;
     }
 
     return -1;
 }
 
-int MidiBrain::channelOfActiveNote(int noteNumber)
+int MidiBrain::channelOfActiveNote(const MidiPitch& pitch)
 {
     for (int ch = 0; ch < 16; ch++)
     {
-        if (channelsInUse[ch] == noteNumber)
+        auto chPitch = channelsInUse[ch];
+        if (chPitch == pitch)
             return ch;
     }
     return -1;
