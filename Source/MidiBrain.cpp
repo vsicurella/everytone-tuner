@@ -114,6 +114,10 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
                 {
                     channelsInUse.set(noteChannel, MidiPitch());
                     //juce::Logger::writeToLog("note off " + juce::String(msg.getNoteNumber()) + " channel " + juce::String(noteChannel+1));
+
+                    // Reset pitchbend
+                    auto pbmsg = juce::MidiMessage::pitchWheel(noteChannel + 1, 8192);
+                    processedBuffer.addEvent(pbmsg, -1);
                 }
             }
         }
