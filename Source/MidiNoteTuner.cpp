@@ -72,9 +72,8 @@ double MidiNoteTuner::mapMidiNote(juce::MidiMessage& msg)
 	auto sourceNote = sourceTuning->closestNoteIndex(targetMts);
 
 	int newNote = sourceNote % 128;
-	int newChannel = (sourceNote / 128) + 1; // Unsure about channel re-mapping
+	//int newChannel = (sourceNote / 128) + 1; // Unsure about channel re-mapping
 	msg.setNoteNumber(newNote);
-	msg.setChannel(newChannel);
 
 	auto sourceMts = sourceTuning->mtsTableAt(sourceNote);
 	return targetMts - sourceMts;

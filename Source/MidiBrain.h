@@ -42,7 +42,6 @@ private:
 private:
 
     juce::MidiKeyboardState state;
-    juce::MidiKeyboardState midiInputState;
     
     juce::Array<int> channelsInUse;
 

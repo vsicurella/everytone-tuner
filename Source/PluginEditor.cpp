@@ -37,7 +37,7 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     auto ode31 = Tuning(def31edo);
     audioProcessor.loadTuningTarget(ode31);
 
-    auto period31On4C60 = Keytographer::MultichannelMap::CreatePeriodicMapping(31, 60, 4);
+    auto period31On4C60 = Keytographer::MultichannelMap::CreatePeriodicMapping(31, 0, 4);
     audioProcessor.loadNoteMapping(period31On4C60);
     
     mainWindow->setTuningDisplayed(ode31);

@@ -90,10 +90,8 @@ private:
 
     std::unique_ptr<MidiBrain> midiBrain;
     
-#if JUCE_DEBUG
     juce::String dbgLog;
     std::unique_ptr<MultimapperLog> logger;
-#endif
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultimapperAudioProcessor)
