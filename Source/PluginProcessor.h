@@ -9,13 +9,14 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "TuningChanger.h"
 #include "MidiBrain.h"
 
 #if RUN_MULTIMAPPER_TESTS
     #include "./tests/Tuning_tests.h"
 #endif
 
-class MultimapperLog : public juce::Logger
+class MultimapperLog : public juce::Logger, public TuningChanger
 {
     std::function<void(juce::StringRef msg)> callback;
 

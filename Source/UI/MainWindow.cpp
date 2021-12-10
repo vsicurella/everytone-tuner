@@ -13,7 +13,6 @@
 
 //==============================================================================
 MainWindow::MainWindow ()
-	//: grid(6)
 {
 	tuningNameLabel.reset(new juce::Label("tuningNameLabel", nameTrans + ":"));
 	tuningNameLabel->setJustificationType(juce::Justification::centredRight);
@@ -47,12 +46,12 @@ MainWindow::MainWindow ()
     descriptionTextBox->setPopupMenuEnabled (true);
 	descriptionTextBox->setTextToShowWhenEmpty(TRANS("No description"), juce::Colours::darkgrey);
 
-	for (auto str : { nameTrans, sizeTrans, periodTrans })
-	{
-		int width = font.getStringWidth(str + ":") + componentGap;
-		if (width > valueLabelWidth)
-			valueLabelWidth = width;
-	}
+	//for (auto str : { nameTrans, sizeTrans, periodTrans })
+	//{
+	//	int width = font.getStringWidth(str + ":") + componentGap;
+	//	if (width > valueLabelWidth)
+	//		valueLabelWidth = width;
+	//}
 }
 
 MainWindow::~MainWindow()
@@ -164,3 +163,7 @@ void MainWindow::setDescriptionText(juce::String descIn)
 	descriptionTextBox->setText(descIn);
 }
 
+void MainWindow::tuningChanged(TuningChanger* changer, Tuning* tuning)
+{
+	setTuningDisplayed(*tuning);
+}

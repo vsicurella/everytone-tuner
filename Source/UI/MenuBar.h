@@ -24,7 +24,7 @@ protected:
 
 public:
 
-    MenuBarModel() {}
+    MenuBarModel(juce::ApplicationCommandManager* cmdManagerIn = nullptr) : cmdManager(cmdManagerIn) {}
     ~MenuBarModel() override {}
 
     juce::StringArray MenuBarModel::getMenuBarNames() override
@@ -39,8 +39,8 @@ public:
         switch (topLevelMenuIndex)
         {
         case MenuNames::File:
-            menu.addItem("New", [&]() {});
-            menu.addItem("Load", [&]() {});
+            menu.addCommandItem(cmdManager, Multimapper::Commands::NewTuning, "New");
+            menu.addCommandItem(cmdManager, Multimapper::Commands::LoadTuning, "Load");
             break;
         case MenuNames::Options:
             menu.addItem("Midi", [&]() {});
@@ -59,6 +59,8 @@ public:
     }
 
 private:
+
+    juce::ApplicationCommandManager* cmdManager;
 
     juce::StringArray menuNames = { "File", "Options" };
 

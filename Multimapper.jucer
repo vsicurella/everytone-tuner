@@ -7,9 +7,15 @@
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
       <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="UI">
         <FILE id="ksMnFa" name="CommonUI.h" compile="0" resource="0" file="Source/UI/CommonUI.h"/>
+        <FILE id="whyaXp" name="EqualTemperamentInterface.h" compile="0" resource="0"
+              file="Source/UI/EqualTemperamentInterface.h"/>
         <FILE id="L2UxsU" name="MainWindow.cpp" compile="1" resource="0" file="Source/UI/MainWindow.cpp"/>
         <FILE id="D4fDVq" name="MainWindow.h" compile="0" resource="0" file="Source/UI/MainWindow.h"/>
         <FILE id="ANBE3D" name="MenuBar.h" compile="0" resource="0" file="Source/UI/MenuBar.h"/>
+        <FILE id="hGuq5c" name="NewTuningPanel.cpp" compile="1" resource="0"
+              file="Source/UI/NewTuningPanel.cpp"/>
+        <FILE id="c1KNVt" name="NewTuningPanel.h" compile="0" resource="0"
+              file="Source/UI/NewTuningPanel.h"/>
       </GROUP>
       <GROUP id="{79A5D062-8ED3-30D7-15DF-F01D07F22E53}" name="tests">
         <FILE id="P6b0jk" name="Tuning_tests.h" compile="0" resource="0" file="Source/tests/Tuning_tests.h"/>
@@ -50,6 +56,7 @@
                 file="../Keytographer/Source/TuningTableMap.h"/>
         </GROUP>
       </GROUP>
+      <FILE id="HhASYm" name="TuningChanger.h" compile="0" resource="0" file="Source/TuningChanger.h"/>
       <FILE id="wyXPRk" name="LogWindow.h" compile="0" resource="0" file="Source/LogWindow.h"/>
       <FILE id="lloha5" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>

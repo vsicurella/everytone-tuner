@@ -32,6 +32,8 @@ class Tuning
 	double periodRatio;
 	double periodMts;
 
+	double virtualPeriod; // Mainly for equal/rank-1 temperaments to record the divided period
+
 	int tuningSize;
 
     int rootMidiNote;
@@ -103,6 +105,8 @@ public:
 	struct CentsDefinition : Definition
 	{
 		juce::Array<double> intervalCents = { 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200 };
+
+		double virtualPeriod = 0;
 
         CentsDefinition() {}
 		CentsDefinition(double divisions, double periodCents = 1200.0)

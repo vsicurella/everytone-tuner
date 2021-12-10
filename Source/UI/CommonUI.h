@@ -30,42 +30,52 @@ static juce::String browseTrans = TRANS("Browse") + " ...";
 static juce::String reuseTrans = TRANS("Reuse channels when possible");
 static juce::String resetTrans = TRANS("Reset empty channel pitchbend");
 
-// UI Helpers
+//// UI Helpers
+//
+//static int borderGap = 8;
+//static int componentGap = 8;
+//static int valueLabelWidth = 32;
+//
+//// TableListBox Helpers
+//
+//class TableComponent
+//{
+//	int rowNumber;
+//	int columnId;
+//
+//public:
+//
+//	void setRowNumber(int rowNumberIn)
+//	{
+//		rowNumber = rowNumberIn;
+//	}
+//
+//	void setColumnId(int columnIdIn)
+//	{
+//		columnId = columnIdIn;
+//	}
+//
+//	int getRowNumber() const
+//	{
+//		return rowNumber;
+//	}
+//
+//	int getColumnId() const
+//	{
+//		return columnId;
+//	}
+//};
+//
+//class TableLabel : public TableComponent, public juce::Label {};
+//class TableButton : public TableComponent, public juce::TextButton {};
+//class TableSlider : public TableComponent, public juce::Slider {};
 
-static int borderGap = 8;
-static int componentGap = 8;
-static int valueLabelWidth = 32;
-
-// TableListBox Helpers
-
-class TableComponent
+namespace Multimapper
 {
-	int rowNumber;
-	int columnId;
-
-public:
-
-	void setRowNumber(int rowNumberIn)
+	enum Commands
 	{
-		rowNumber = rowNumberIn;
-	}
-
-	void setColumnId(int columnIdIn)
-	{
-		columnId = columnIdIn;
-	}
-
-	int getRowNumber() const
-	{
-		return rowNumber;
-	}
-
-	int getColumnId() const
-	{
-		return columnId;
-	}
-};
-
-class TableLabel : public TableComponent, public juce::Label {};
-class TableButton : public TableComponent, public juce::TextButton {};
-class TableSlider : public TableComponent, public juce::Slider {};
+		Back = 1,
+		NewTuning,
+		LoadTuning,
+	};
+}

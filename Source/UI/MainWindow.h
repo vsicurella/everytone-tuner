@@ -12,8 +12,9 @@
 
 #include "CommonUI.h"
 #include "../Tuning.h"
+#include "../TuningChanger.h"
 
-class MainWindow  : public juce::Component
+class MainWindow  : public juce::Component, public TuningWatcher
 {
 public:
     //==============================================================================
@@ -35,6 +36,9 @@ public:
     void resized() override;
 
 	//==============================================================================
+	// TuningWatcher implementation
+
+	void tuningChanged(TuningChanger* changer, Tuning* tuning) override;
 
 private:
 
