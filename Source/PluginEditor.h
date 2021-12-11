@@ -11,7 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "LogWindow.h"
-#include "UI/MainWindow.h"
+#include "UI/OverviewPanel.h"
 #include "UI/MenuBar.h"
 #include "UI/NewTuningPanel.h"
 #include "../Source/MultichannelMap.h"
@@ -85,7 +85,7 @@ private:
     std::unique_ptr<juce::MenuBarComponent> menuBar;
 
     juce::Component* contentComponent = nullptr;
-    std::unique_ptr<MainWindow> mainWindow;
+    std::unique_ptr<OverviewPanel> overviewPanel;
     std::unique_ptr<NewTuningPanel> newTuningPanel;
 
     std::unique_ptr<LogWindow> logger;

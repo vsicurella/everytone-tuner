@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-  MainWindow.cpp
+  OverviewPanel.cpp
 
   Created by Vincenzo Sicurella on 6/30/2020
 
@@ -14,12 +14,12 @@
 #include "../Tuning.h"
 #include "../TuningChanger.h"
 
-class MainWindow  : public juce::Component, public TuningWatcher
+class OverviewPanel  : public juce::Component, public TuningWatcher
 {
 public:
     //==============================================================================
-	MainWindow();
-    ~MainWindow() override;
+	OverviewPanel();
+    ~OverviewPanel() override;
 
 public:
 
@@ -47,15 +47,15 @@ private:
 
     //==============================================================================
 	
-	std::unique_ptr<juce::Label> tuningNameLabel;
 	std::unique_ptr<juce::Label> tuningNameBox;
-	std::unique_ptr<juce::Label> tuningSizeLabel;
 	std::unique_ptr<juce::Label> tuningSizeBox;
-	std::unique_ptr<juce::Label> tuningPeriodLabel;
 	std::unique_ptr<juce::Label> tuningPeriodBox;
 
-	std::unique_ptr<juce::TextEditor> descriptionTextBox;
+	std::unique_ptr<juce::Label> descriptionTextLabel;
+	std::unique_ptr<juce::TextEditor> descriptionEditor;
+
+	juce::OwnedArray<juce::Label> labels;
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OverviewPanel)
 };

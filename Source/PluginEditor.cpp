@@ -18,11 +18,11 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     menuBar.reset(new juce::MenuBarComponent(&menuModel));
     addAndMakeVisible(*menuBar);
 
-    mainWindow.reset(new MainWindow());
-    addAndMakeVisible(mainWindow.get());
-    mainWindow->setTuningDisplayed(*tuningBackup);
+    overviewPanel.reset(new OverviewPanel());
+    addAndMakeVisible(overviewPanel.get());
+    overviewPanel->setTuningDisplayed(*tuningBackup);
 
-    contentComponent = mainWindow.get();
+    contentComponent = overviewPanel.get();
 
     setSize (600, 250);
 
@@ -48,13 +48,13 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     //auto period31On4C60 = Keytographer::MultichannelMap::CreatePeriodicMapping(31, 0, 4);
     //audioProcessor.loadNoteMapping(period31On4C60);
     //
-    //mainWindow->setTuningDisplayed(ode31);
+    //overviewPanel->setTuningDisplayed(ode31);
 }
 
 MultimapperAudioProcessorEditor::~MultimapperAudioProcessorEditor()
 {
     logger = nullptr;
-    mainWindow = nullptr;
+    overviewPanel = nullptr;
 }
 
 //==============================================================================
@@ -66,13 +66,14 @@ void MultimapperAudioProcessorEditor::paint (juce::Graphics& g)
 void MultimapperAudioProcessorEditor::resized()
 {
     double menuHeight = getHeight() * 0.125;
-
     menuBar->setBounds(getLocalBounds().withBottom(menuHeight));
     
-    //mainWindow->setBounds(getLocalBounds().withTop(menuHeight).withTrimmedBottom(menuHeight));
+    int margin = 5;
+
+    //overviewPanel->setBounds(getLocalBounds().withTop(menuHeight).withTrimmedBottom(menuHeight));
     if (contentComponent != nullptr)
     {
-        contentComponent->setBounds(getLocalBounds().withTop(menuHeight).withTrimmedBottom(menuHeight));
+        contentComponent->setBounds(getLocalBounds().withTop(menuHeight).reduced(margin));
     }
 
 }
@@ -168,7 +169,7 @@ bool MultimapperAudioProcessorEditor::performBack(const juce::ApplicationCommand
         }
     }
 
-    setContentComponent(mainWindow.get());
+    setContentComponent(overviewPanel.get());
 
     return true;
 }
@@ -184,7 +185,7 @@ bool MultimapperAudioProcessorEditor::performSave(const juce::ApplicationCommand
         }
     }
 
-    setContentComponent(mainWindow.get());
+    setContentComponent(overviewPanel.get());
 
     return true;
 }
@@ -195,7 +196,7 @@ bool MultimapperAudioProcessorEditor::performNewTuning(const juce::ApplicationCo
     {
         newTuningPanel.reset(new NewTuningPanel(this));
         addChildComponent(*newTuningPanel);
-        newTuningPanel->addTuningWatcher(mainWindow.get());
+        newTuningPanel->addTuningWatcher(overviewPanel.get());
     }
     
     setContentComponent(newTuningPanel.get());
@@ -213,7 +214,7 @@ void MultimapperAudioProcessorEditor::commitTuning(const Tuning* tuning)
     audioProcessor.loadTuningTarget(*tuning);
     auto savedTuning = audioProcessor.activeTargetTuning();
     tuningBackup.reset(new Tuning(*savedTuning));
-    mainWindow->setTuningDisplayed(*savedTuning);
+    overviewPanel->setTuningDisplayed(*savedTuning);
 }
 
 void MultimapperAudioProcessorEditor::setContentComponent(juce::Component* component)

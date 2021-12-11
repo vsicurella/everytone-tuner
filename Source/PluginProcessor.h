@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "GlobalState.h"
 #include "TuningChanger.h"
 #include "MidiBrain.h"
 

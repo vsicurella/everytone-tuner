@@ -17,8 +17,7 @@ protected:
 
     enum MenuNames
     {
-        File,
-        Options
+        File
     };
 
 
@@ -39,13 +38,10 @@ public:
         switch (topLevelMenuIndex)
         {
         case MenuNames::File:
-            menu.addCommandItem(cmdManager, Multimapper::Commands::NewTuning, "New");
-            menu.addCommandItem(cmdManager, Multimapper::Commands::LoadTuning, "Load");
-            break;
-        case MenuNames::Options:
-            menu.addItem("Midi", [&]() {});
-            break;
-
+            menu.addCommandItem(cmdManager, Multimapper::Commands::NewTuning, "New Tuning");
+            menu.addCommandItem(cmdManager, Multimapper::Commands::LoadTuning, "Load Tuning (.scl, .tun)");
+            menu.addCommandItem(cmdManager, Multimapper::Commands::NewMapping, "New Mapping");
+            menu.addCommandItem(cmdManager, Multimapper::Commands::ShowOptions, "Preferences");
         default:
             break;
         }

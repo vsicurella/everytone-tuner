@@ -9,7 +9,6 @@
 */
 
 #include "NewTuningPanel.h"
-#include "../GlobalState.h"
 
 NewTuningPanel::NewTuningPanel(juce::ApplicationCommandManager* cmdManagerIn)
     : cmdManager(cmdManagerIn), TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop)
