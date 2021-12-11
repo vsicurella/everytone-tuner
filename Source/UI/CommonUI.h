@@ -75,6 +75,7 @@ namespace Multimapper
 	enum Commands
 	{
 		Back = 1,
+		Save,
 		NewTuning,
 		LoadTuning,
 	};

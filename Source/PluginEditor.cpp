@@ -13,6 +13,7 @@
 MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p), menuModel(static_cast<juce::ApplicationCommandManager*>(this))
 {
+    tuningBackup.reset(new Tuning(*audioProcessor.activeTargetTuning()));
 
     menuBar.reset(new juce::MenuBarComponent(&menuModel));
     addAndMakeVisible(*menuBar);
@@ -20,6 +21,7 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     mainWindow.reset(new MainWindow());
     addAndMakeVisible(mainWindow.get());
     contentComponent = mainWindow.get();
+
 
     setSize (600, 250);
 
@@ -30,6 +32,8 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
 #endif
 
     setupCommands();
+
+    addKeyListener(this->getKeyMappings());
 
     // Load 31 edo with a C center in channel 4, periodic mapping
     //auto def31edo = Tuning::CentsDefinition(31);
@@ -81,12 +85,8 @@ juce::ApplicationCommandTarget* MultimapperAudioProcessorEditor::getFirstCommand
 {
     switch (commandID)
     {
-    case Multimapper::Commands::Back:
-    case Multimapper::Commands::NewTuning:
-        return this;
-
     default:
-        break;
+        return this;
     }
 
     return nullptr;
@@ -103,6 +103,7 @@ void MultimapperAudioProcessorEditor::getAllCommands(juce::Array<juce::CommandID
     {
         Multimapper::Back,
         Multimapper::NewTuning,
+        Multimapper::Save
     };
 }
 
@@ -114,6 +115,12 @@ void MultimapperAudioProcessorEditor::getCommandInfo(juce::CommandID commandID, 
         result = juce::ApplicationCommandInfo(Multimapper::Commands::Back);
         result.setInfo("Back", "Back to main window", "", 0);
         result.addDefaultKeypress(juce::KeyPress::escapeKey, juce::ModifierKeys::noModifiers);
+        break;
+
+    case Multimapper::Save:
+        result = juce::ApplicationCommandInfo(Multimapper::Commands::Save);
+        result.setInfo("Save", "Save currently edited tuning", "", 0);
+        result.addDefaultKeypress('s', juce::ModifierKeys::ctrlModifier);
         break;
 
     case Multimapper::NewTuning:
@@ -128,23 +135,18 @@ void MultimapperAudioProcessorEditor::getCommandInfo(juce::CommandID commandID, 
     }
 }
 
-bool MultimapperAudioProcessorEditor::perform(const InvocationInfo& info)
+bool MultimapperAudioProcessorEditor::perform(const juce::ApplicationCommandTarget::InvocationInfo& info)
 {
     switch (info.commandID)
     {
     case Multimapper::Back:
-        setContentComponent(mainWindow.get());
-        return true;
+        return performBack(info);
 
     case Multimapper::NewTuning:
-        if (newTuningPanel == nullptr)
-        {
-            newTuningPanel.reset(new NewTuningPanel(this));
-            addChildComponent(*newTuningPanel);
-            newTuningPanel->addTuningWatcher(mainWindow.get());
-        }
-        setContentComponent(newTuningPanel.get());
-        return true;
+        return performNewTuning(info);
+    
+    case Multimapper::Save:
+        return performSave(info);
 
     default:
         // forgot to add command handler?
@@ -152,6 +154,65 @@ bool MultimapperAudioProcessorEditor::perform(const InvocationInfo& info)
     }
 
     return false;
+}
+
+bool MultimapperAudioProcessorEditor::performBack(const juce::ApplicationCommandTarget::InvocationInfo& info)
+{
+    if (contentComponent == newTuningPanel.get())
+    {
+        // Revert tuning if preview is on
+        if (newTuningPanel->previewOn())
+        {
+            audioProcessor.loadTuningTarget(*tuningBackup);
+        }
+    }
+
+    setContentComponent(mainWindow.get());
+
+    return true;
+}
+
+bool MultimapperAudioProcessorEditor::performSave(const juce::ApplicationCommandTarget::InvocationInfo& info)
+{
+    if (contentComponent == newTuningPanel.get())
+    {
+        // Load tuning if it wasn't previewed
+        if (!newTuningPanel->previewOn())
+        {
+            commitTuning(newTuningPanel->stagedTuning());
+        }
+    }
+
+    setContentComponent(mainWindow.get());
+
+    return true;
+}
+
+bool MultimapperAudioProcessorEditor::performNewTuning(const juce::ApplicationCommandTarget::InvocationInfo& info)
+{
+    if (newTuningPanel == nullptr)
+    {
+        newTuningPanel.reset(new NewTuningPanel(this));
+        addChildComponent(*newTuningPanel);
+        newTuningPanel->addTuningWatcher(mainWindow.get());
+    }
+    
+    setContentComponent(newTuningPanel.get());
+
+    return true;
+}
+
+bool MultimapperAudioProcessorEditor::performLoadTuning(const juce::ApplicationCommandTarget::InvocationInfo& info)
+{
+    return false;
+}
+
+void MultimapperAudioProcessorEditor::commitTuning(const Tuning* tuning)
+{
+    audioProcessor.loadTuningTarget(*tuning);
+    auto savedTuning = audioProcessor.activeTargetTuning();
+    tuningBackup.reset(new Tuning(*savedTuning));
+    mainWindow->setTuningDisplayed(*savedTuning);
 }
 
 void MultimapperAudioProcessorEditor::setContentComponent(juce::Component* component)

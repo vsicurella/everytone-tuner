@@ -22,9 +22,10 @@
 /**
 */
 class MultimapperAudioProcessorEditor  : public juce::AudioProcessorEditor, 
-                                         public TuningWatcher, 
                                          public juce::ApplicationCommandManager,
-                                         public juce::ApplicationCommandTarget
+                                         public juce::ApplicationCommandTarget,
+                                         public TuningWatcher,
+                                         public TuningChanger
 {
 public:
     MultimapperAudioProcessorEditor (MultimapperAudioProcessor&);
@@ -49,10 +50,22 @@ public:
     ApplicationCommandTarget* getNextCommandTarget() override;
     void getAllCommands(juce::Array<juce::CommandID>& commands) override;
     void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
-    bool perform(const InvocationInfo& info) override;
+    bool perform(const juce::ApplicationCommandTarget::InvocationInfo& info) override;
+
+    //==============================================================================
+    // ApplicationCommand perfom callbacks
+
+    bool performBack(const juce::ApplicationCommandTarget::InvocationInfo& info);
+
+    bool performSave(const juce::ApplicationCommandTarget::InvocationInfo& info);
+
+    bool performNewTuning(const juce::ApplicationCommandTarget::InvocationInfo& info);
+
+    bool performLoadTuning(const juce::ApplicationCommandTarget::InvocationInfo& info);
 
     //==============================================================================
 
+    void commitTuning(const Tuning* tuning);
 
     void setContentComponent(juce::Component* component);
 
@@ -64,6 +77,8 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     MultimapperAudioProcessor& audioProcessor;
+
+    std::unique_ptr<Tuning> tuningBackup;
 
     MenuBarModel menuModel;
 

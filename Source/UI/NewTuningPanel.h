@@ -22,24 +22,37 @@ class NewTuningPanel : public juce::TabbedComponent,
 
     std::unique_ptr<EqualTemperamentInterface> equalTemperamentInterface;
 
+    std::unique_ptr<juce::TextButton> saveButton;
+    std::unique_ptr<juce::TextButton> backButton;
+    std::unique_ptr<juce::TextButton> previewButton;
+
+    std::unique_ptr<Tuning> tuningStaged;
+
+    int lastTabIndex = 1;
+
 public:
 
     enum NewTuningTabs
     {
-        Back = 0,
-        EqualTemperament,
+        EqualTemperament = 0,
         Rank2Temperament,
     };
 
     NewTuningPanel(juce::ApplicationCommandManager* cmdManager);
     ~NewTuningPanel() override;
 
-    void currentTabChanged(int newCurrentTabIndex, const juce::String& newCurrentTabName) override;
+    
+    bool previewOn() const { return previewButton->getToggleState(); }
+    const Tuning* stagedTuning() const { return tuningStaged.get(); }
+
+    void saveTuning();
+
+    // juce::Component implementation
+    void resized() override;
 
     // TuningWatcher Implementation
     void tuningChanged(TuningChanger* changer, Tuning* tuning) override;
 
-    //void resized() override;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewTuningPanel)

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+#include "GlobalState.h"
 #include "TuningChanger.h"
 #include "MidiBrain.h"
 
@@ -16,7 +16,7 @@
     #include "./tests/Tuning_tests.h"
 #endif
 
-class MultimapperLog : public juce::Logger, public TuningChanger
+class MultimapperLog : public juce::Logger
 {
     std::function<void(juce::StringRef msg)> callback;
 
@@ -75,6 +75,15 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     juce::String getLog() const;
+
+    //==============================================================================
+
+    
+    //==============================================================================
+
+    const Tuning* activeSourceTuning() const;
+
+    const Tuning* activeTargetTuning() const;
 
     //==============================================================================
 

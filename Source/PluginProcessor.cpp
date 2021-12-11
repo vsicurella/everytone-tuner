@@ -269,3 +269,13 @@ void MultimapperAudioProcessor::loadNoteMapping(const Keytographer::TuningTableM
 {
     midiBrain->setNoteMap(map);
 }
+
+const Tuning* MultimapperAudioProcessor::activeSourceTuning() const
+{
+    return midiBrain->getTuningSource();
+}
+
+const Tuning* MultimapperAudioProcessor::activeTargetTuning() const
+{
+    return midiBrain->getTuningTarget();
+}

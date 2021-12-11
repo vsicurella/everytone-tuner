@@ -26,6 +26,9 @@ public:
 
     int channelOfActiveNote(const MidiPitch& pitch);
 
+    const Tuning* getTuningSource() const { return tuningSource.get(); }
+    const Tuning* getTuningTarget() const { return tuningTarget.get(); }
+
     void setTuningSource(const Tuning& tuning);
     void setTuningTarget(const Tuning& tuning);
 

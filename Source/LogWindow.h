@@ -41,6 +41,11 @@ public:
         
     }
 
+    void closeButtonPressed() override
+    {
+        
+    }
+
     void timerCallback() override
     {
         textBox->setText(callback(), false);

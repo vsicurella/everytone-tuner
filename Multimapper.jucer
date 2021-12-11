@@ -5,6 +5,7 @@
               defines="RUN_MULTIMAPPER_TESTS=1" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn">
   <MAINGROUP id="H8zE4n" name="Multimapper">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
+      <FILE id="rZjXMn" name="GlobalState.h" compile="0" resource="0" file="Source/GlobalState.h"/>
       <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="UI">
         <FILE id="ksMnFa" name="CommonUI.h" compile="0" resource="0" file="Source/UI/CommonUI.h"/>
         <FILE id="whyaXp" name="EqualTemperamentInterface.h" compile="0" resource="0"
