@@ -31,13 +31,32 @@ namespace Multimapper
         static juce::Identifier RootMidiNote("rootMidiNote");
         static juce::Identifier RootMidiChannel("rootMidiChannel");
         static juce::Identifier RootFrequency("rootFrequency");
-        static juce::Identifier RootTuningIndex("RootTuningIndex");
 
         // Mapping
-        static juce::Identifier MidiMapping("MidiMapping");
-        static juce::Identifier MappingPattern("MappingPattern");
+        static juce::Identifier TuningTableMidiMap("TuningTableMidiMap");
+        static juce::Identifier RootTuningIndex("RootTuningIndex");
+        static juce::Identifier Period("MapPeriod");
+        static juce::Identifier Pattern("Pattern");
+        static juce::Identifier PatternRoot("PatternRoot");
+        static juce::Identifier MapRoot("MapRoot");
+
+        
         static juce::Identifier Value("Value");
     }
+}
+
+template <typename ARR>
+static juce::ValueTree arrayToValueTree(ARR array, juce::Identifier id, juce::Identifier nodeId, juce::Identifier valueId = Multimapper::ID::Value)
+{
+    auto tree = juce::ValueTree(id);
+    for (auto value : array)
+    {
+        auto node = juce::ValueTree(nodeId);
+        node.setProperty(valueId, value, nullptr);
+        tree.addChild(node, -1, nullptr);
+    }
+
+    return tree;
 }
 
 static juce::ValueTree tuningToValueTree(const Tuning& tuning, juce::Identifier name = Multimapper::ID::Tuning)
@@ -48,21 +67,13 @@ static juce::ValueTree tuningToValueTree(const Tuning& tuning, juce::Identifier 
     tree.setProperty(Multimapper::ID::Description, tuning.getDescription(), nullptr);
     //tree.setProperty(Multimapper::ID::Transpose, tuning.tranpose)
 
-    auto intervalTree = juce::ValueTree(Multimapper::ID::IntervalTable);
     auto intervals = tuning.getIntervalCentsTable();
-    for (auto cents : intervals)
-    {
-        auto node = juce::ValueTree(Multimapper::ID::Cents);
-        node.setProperty(Multimapper::ID::Value, cents, nullptr);
-        intervalTree.addChild(node, -1, nullptr);
-    }
-
+    auto intervalTree = arrayToValueTree(intervals, Multimapper::ID::IntervalTable, Multimapper::ID::Cents);
     tree.addChild(intervalTree, 0, nullptr);
 
     tree.setProperty(Multimapper::ID::RootMidiNote, tuning.getRootMidiNote(), nullptr);
     tree.setProperty(Multimapper::ID::RootMidiChannel, tuning.getRootMidiChannel(), nullptr);
     tree.setProperty(Multimapper::ID::RootFrequency, tuning.getRootFrequency(), nullptr);
-    tree.setProperty(Multimapper::ID::RootTuningIndex, tuning.getRootIndex(), nullptr);
 
     return tree;
 }
@@ -80,12 +91,75 @@ static Tuning parseTuningValueTree(juce::ValueTree tree)
 
     definition.intervalCents = cents;
 
-    definition.name = tree.getProperty(Multimapper::ID::Name, "");
-    definition.description = tree.getProperty(Multimapper::ID::Description, "");
-    definition.transpose = tree.getProperty(Multimapper::ID::Transpose, 0);
-    definition.reference.rootMidiNote = tree.getProperty(Multimapper::ID::RootMidiNote, 60);
-    definition.reference.rootMidiChannel = tree.getProperty(Multimapper::ID::RootMidiChannel, 1);
-    definition.reference.rootFrequency = tree.getProperty(Multimapper::ID::RootFrequency, 256);
+    definition.name =                       tree.getProperty(Multimapper::ID::Name, "");
+    definition.description =                tree.getProperty(Multimapper::ID::Description, "");
+    definition.transpose =                  tree.getProperty(Multimapper::ID::Transpose, 0);
+    definition.reference.rootMidiNote =     tree.getProperty(Multimapper::ID::RootMidiNote, 60);
+    definition.reference.rootMidiChannel =  tree.getProperty(Multimapper::ID::RootMidiChannel, 1);
+    definition.reference.rootFrequency =    tree.getProperty(Multimapper::ID::RootFrequency, 256);
 
     return Tuning(definition);
+}
+
+static juce::ValueTree tuningTableMapToValueTree(const Keytographer::TuningTableMap& midiMap)
+{
+    auto tree = juce::ValueTree(Multimapper::ID::TuningTableMidiMap);
+   
+    auto definition = midiMap.getDefinition();
+
+    tree.setProperty(Multimapper::ID::RootMidiNote,     definition.rootMidiNote,            nullptr);
+    tree.setProperty(Multimapper::ID::RootTuningIndex,  definition.rootTuningIndex,         nullptr);
+
+    tree.setProperty(Multimapper::ID::Period,           definition.map->base(),             nullptr);
+    tree.setProperty(Multimapper::ID::PatternRoot,      definition.map->patternRoot(),      nullptr);
+    tree.setProperty(Multimapper::ID::MapRoot,          definition.map->mapRoot(),          nullptr);
+    tree.setProperty(Multimapper::ID::Transpose,        definition.map->transposition(),    nullptr);
+
+    auto pattern = arrayToValueTree(definition.map->pattern(), Multimapper::ID::Pattern, Multimapper::ID::Pattern);
+
+    tree.addChild(pattern, -1, nullptr);
+
+    return tree;
+}
+
+static Keytographer::TuningTableMap parseTuningTableMapTree(juce::ValueTree tree)
+{
+    auto patternNode = tree.getChildWithName(Multimapper::ID::Pattern);
+    const int mapSize = patternNode.getNumChildren();
+
+    Keytographer::Map<int>::Pattern pattern;
+    for (int i = 0; i < mapSize; i++)
+    {
+        pattern.push_back((int)patternNode.getChild(i)[Multimapper::ID::Value]);
+    }
+
+    int period = tree.getProperty(Multimapper::ID::Period, 0);
+    int patternRoot = tree.getProperty(Multimapper::ID::PatternRoot, 0);
+    int mapRoot = tree.getProperty(Multimapper::ID::MapRoot, 0);
+    int transpose = tree.getProperty(Multimapper::ID::Transpose, 0);
+
+    auto mapDefinition = Keytographer::Map<int>::Definition
+    {
+        mapSize,
+        pattern.data(),
+        period,
+        patternRoot,
+        mapRoot,
+        transpose
+    };
+
+    auto map = Keytographer::Map<int>(mapDefinition);
+
+    int rootMidiNote = tree.getProperty(Multimapper::ID::RootMidiNote);
+    int rootTuningIndex = tree.getProperty(Multimapper::ID::RootTuningIndex);
+
+    auto definition = Keytographer::TuningTableMap::Definition
+    {
+        rootMidiNote,
+        rootTuningIndex,
+        &map
+    };
+
+    auto tuningTableMap = Keytographer::TuningTableMap(definition);
+    return tuningTableMap;
 }
