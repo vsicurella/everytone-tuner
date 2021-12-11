@@ -74,6 +74,7 @@
       <FILE id="ff6htV" name="MidiNoteTuner.cpp" compile="1" resource="0"
             file="Source/MidiNoteTuner.cpp"/>
       <FILE id="DfAwtl" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
+      <FILE id="pYwkia" name="TuningHelpers.h" compile="0" resource="0" file="Source/TuningHelpers.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

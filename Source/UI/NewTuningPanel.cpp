@@ -33,9 +33,6 @@ NewTuningPanel::NewTuningPanel(juce::ApplicationCommandManager* cmdManagerIn)
     addTab("Equal", juce::Colours::transparentBlack, equalTemperamentInterface.get(), false, NewTuningTabs::EqualTemperament);
 
     setCurrentTabIndex(NewTuningTabs::EqualTemperament, true);
-
-    // TODO preview implementation
-    previewButton->setEnabled(false);
 }
 
 NewTuningPanel::~NewTuningPanel()

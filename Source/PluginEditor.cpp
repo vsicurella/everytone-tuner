@@ -20,8 +20,9 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
 
     mainWindow.reset(new MainWindow());
     addAndMakeVisible(mainWindow.get());
-    contentComponent = mainWindow.get();
+    mainWindow->setTuningDisplayed(*tuningBackup);
 
+    contentComponent = mainWindow.get();
 
     setSize (600, 250);
 

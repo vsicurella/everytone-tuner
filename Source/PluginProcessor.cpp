@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "TuningHelpers.h"
 
 //==============================================================================
 MultimapperAudioProcessor::MultimapperAudioProcessor()
@@ -199,12 +200,40 @@ void MultimapperAudioProcessor::getStateInformation (juce::MemoryBlock& destData
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    juce::ValueTree state(Multimapper::ID::State);
+
+    //auto sourceNode = tuningToValueTree(*midiBrain->getTuningSource(), Multimapper::ID::TuningSource);
+    //state.addChild(sourceNode, -1, nullptr);
+    
+    auto targetNode = tuningToValueTree(*midiBrain->getTuningTarget(), Multimapper::ID::TuningTarget);
+    state.addChild(targetNode, -1, nullptr);
+
+    juce::MemoryOutputStream stream(destData, false);
+    state.writeToStream(stream);
 }
 
 void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    juce::MemoryBlock       buffer(data, (size_t)sizeInBytes);
+    juce::MemoryInputStream stream(buffer, false);
+    
+    auto state = juce::ValueTree::readFromStream(juce::MemoryInputStream(data, (size_t)sizeInBytes, false));
+
+    //auto sourceTree = state.getChildWithName(Multimapper::ID::TuningSource);
+    //if (sourceTree.isValid())
+    //{
+    //    auto source = parseTuningValueTree(state.getChild(0));
+    //    loadTuningSource(source);
+    //}
+
+    auto targetTree = state.getChildWithName(Multimapper::ID::TuningTarget);
+    if (targetTree.isValid())
+    {
+        auto target = parseTuningValueTree(targetTree);
+        loadTuningTarget(target);
+    }
 }
 
 //==============================================================================
@@ -263,6 +292,7 @@ void MultimapperAudioProcessor::loadTuningSource(const Tuning& tuning)
 void MultimapperAudioProcessor::loadTuningTarget(const Tuning& tuning)
 {
     midiBrain->setTuningTarget(tuning);
+    juce::Logger::writeToLog("Loaded new tuning: " + tuning.getDescription());
 }
 
 void MultimapperAudioProcessor::loadNoteMapping(const Keytographer::TuningTableMap& map)
