@@ -10,6 +10,7 @@
 
 #include "TuningChanger.h"
 #include "MidiBrain.h"
+#include "TuningMapHelper.h"
 
 #if RUN_MULTIMAPPER_TESTS
     #include "./tests/Tuning_tests.h"
@@ -97,6 +98,8 @@ private:
 
 private:
 
+    TuningMapHelper tuningMapHelper;
+    
     std::unique_ptr<MidiBrain> midiBrain;
     
     juce::String dbgLog;

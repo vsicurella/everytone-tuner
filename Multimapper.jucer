@@ -82,6 +82,10 @@
         <FILE id="LueTGM" name="TuningFileParser.h" compile="0" resource="0"
               file="Source/io/TuningFileParser.h"/>
       </GROUP>
+      <FILE id="h3R26G" name="TuningMapHelper.h" compile="0" resource="0"
+            file="Source/TuningMapHelper.h"/>
+      <FILE id="QKYQ2p" name="TuningMapHelper.cpp" compile="1" resource="0"
+            file="Source/TuningMapHelper.cpp"/>
       <FILE id="HhASYm" name="TuningChanger.h" compile="0" resource="0" file="Source/TuningChanger.h"/>
       <FILE id="wyXPRk" name="LogWindow.h" compile="0" resource="0" file="Source/LogWindow.h"/>
       <FILE id="lloha5" name="PluginProcessor.cpp" compile="1" resource="0"

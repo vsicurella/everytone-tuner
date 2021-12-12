@@ -292,12 +292,17 @@ void MultimapperAudioProcessor::loadTuningSource(const Tuning& tuning)
 void MultimapperAudioProcessor::loadTuningTarget(const Tuning& tuning)
 {
     midiBrain->setTuningTarget(tuning);
+    tuningMapHelper.createTuningMap(tuning);
     juce::Logger::writeToLog("Loaded new tuning: " + tuning.getDescription());
+
+    /* TODO if auto mapping */
+    loadNoteMapping(tuningMapHelper.getTuningMap());
 }
 
 void MultimapperAudioProcessor::loadNoteMapping(const Keytographer::TuningTableMap& map)
 {
     midiBrain->setNoteMap(map);
+    juce::Logger::writeToLog("Loaded new mapping");
 }
 
 const Tuning* MultimapperAudioProcessor::activeSourceTuning() const
