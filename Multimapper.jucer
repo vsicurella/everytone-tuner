@@ -82,6 +82,8 @@
         <FILE id="LueTGM" name="TuningFileParser.h" compile="0" resource="0"
               file="Source/io/TuningFileParser.h"/>
       </GROUP>
+      <FILE id="TlWn9G" name="MidiVoice.cpp" compile="1" resource="0" file="Source/MidiVoice.cpp"/>
+      <FILE id="cdGlcX" name="MidiVoice.h" compile="0" resource="0" file="Source/MidiVoice.h"/>
       <FILE id="h3R26G" name="TuningMapHelper.h" compile="0" resource="0"
             file="Source/TuningMapHelper.h"/>
       <FILE id="QKYQ2p" name="TuningMapHelper.cpp" compile="1" resource="0"
@@ -97,6 +99,10 @@
       <FILE id="mXqLfq" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       <FILE id="rbisqW" name="MidiBrain.cpp" compile="1" resource="0" file="Source/MidiBrain.cpp"/>
       <FILE id="Wryr94" name="MidiBrain.h" compile="0" resource="0" file="Source/MidiBrain.h"/>
+      <FILE id="x5beT5" name="MidiVoiceController.cpp" compile="1" resource="0"
+            file="Source/MidiVoiceController.cpp"/>
+      <FILE id="MmJg1Z" name="MidiVoiceController.h" compile="0" resource="0"
+            file="Source/MidiVoiceController.h"/>
       <FILE id="ymzr9A" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
       <FILE id="ITcsEF" name="TuningMath.h" compile="0" resource="0" file="Source/TuningMath.h"/>
       <FILE id="HcnY7X" name="MidiNoteTuner.h" compile="0" resource="0" file="Source/MidiNoteTuner.h"/>
