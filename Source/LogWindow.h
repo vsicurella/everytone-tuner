@@ -49,5 +49,6 @@ public:
     void timerCallback() override
     {
         textBox->setText(callback(), false);
+        textBox->moveCaretToEnd();
     }
 };
