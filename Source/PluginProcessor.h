@@ -34,7 +34,7 @@ public:
 //==============================================================================
 /**
 */
-class MultimapperAudioProcessor  : public juce::AudioProcessor
+class MultimapperAudioProcessor  : public juce::AudioProcessor, public TuningWatcher
 {
 public:
     //==============================================================================
@@ -79,7 +79,6 @@ public:
     //==============================================================================
 
     const Tuning* activeSourceTuning() const;
-
     const Tuning* activeTargetTuning() const;
 
     //==============================================================================
@@ -87,9 +86,14 @@ public:
     void loadTuningSource(const Tuning& tuning);
     void loadTuningTarget(const Tuning& tuning);
 
+    void setTargetTuningReference(Tuning::Reference reference);
+
     void loadNoteMapping(const Keytographer::TuningTableMap& map);
 
     void setAutoMappingType(TuningMapHelper::MappingType type);
+
+    //void addTuningWatchersToChanger(TuningChanger* changerToWatch);
+    //void addMappingWatchersToChanger(MappingChanger* changerToWatch);
 
 private:
 

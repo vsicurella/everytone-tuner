@@ -299,6 +299,11 @@ void MultimapperAudioProcessor::loadTuningTarget(const Tuning& tuning)
     loadNoteMapping(tuningMapHelper.getTuningMap());
 }
 
+void MultimapperAudioProcessor::setTargetTuningReference(Tuning::Reference reference)
+{
+
+}
+
 void MultimapperAudioProcessor::loadNoteMapping(const Keytographer::TuningTableMap& map)
 {
     midiBrain->setNoteMap(map);
@@ -320,3 +325,14 @@ const Tuning* MultimapperAudioProcessor::activeTargetTuning() const
 {
     return midiBrain->getTuningTarget();
 }
+
+
+//void MultimapperAudioProcessor::addTuningWatchersToChanger(TuningChanger* changerToWatch)
+//{
+//
+//}
+//
+//void MultimapperAudioProcessor::addMappingWatchersToChanger(MappingChanger* changerToWatch)
+//{
+//
+//}

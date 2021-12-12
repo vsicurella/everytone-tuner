@@ -7,7 +7,7 @@
 
   ==============================================================================
 */
-
+    
 #pragma once
 
 #include <JuceHeader.h>
@@ -19,6 +19,7 @@ class TuningWatcher
 {
 public:
     virtual void tuningChanged(TuningChanger* changer, Tuning* newTuning) = 0;
+    virtual void tuningReferenceChanged(TuningChanger* changer, Tuning::Reference reference) {}
 };
 
 class TuningChanger

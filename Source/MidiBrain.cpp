@@ -65,7 +65,7 @@ void MidiBrain::processMidi(juce::MidiBuffer& buffer)
        
         if (isVoice)
         {
-            auto pitch = tuner->mapNoteAndPitchbend(msg);
+            auto pitch = tuner->getMidiPitch(msg);
 
             if (!pitch.mapped)
                 continue;
