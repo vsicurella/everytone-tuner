@@ -78,5 +78,8 @@ namespace Multimapper
 		Save,
 		NewTuning,
 		LoadTuning,
+		NewMapping,
+		LoadMapping,
+		ShowOptions,
 	};
 }
