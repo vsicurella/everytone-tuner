@@ -77,9 +77,6 @@ namespace Multimapper
 		Back = 1,
 		Save,
 		NewTuning,
-		LoadTuning,
-		NewMapping,
-		LoadMapping,
-		ShowOptions,
+		OpenTuning,
 	};
 }

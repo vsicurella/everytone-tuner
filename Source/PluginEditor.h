@@ -11,9 +11,10 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "LogWindow.h"
-#include "UI/OverviewPanel.h"
-#include "UI/MenuBar.h"
-#include "UI/NewTuningPanel.h"
+#include "ui/OverviewPanel.h"
+#include "ui/MenuBar.h"
+#include "ui/NewTuningPanel.h"
+#include "io/TuningFileParser.h"
 #include "../Source/MultichannelMap.h"
 
 
@@ -61,7 +62,7 @@ public:
 
     bool performNewTuning(const juce::ApplicationCommandTarget::InvocationInfo& info);
 
-    bool performLoadTuning(const juce::ApplicationCommandTarget::InvocationInfo& info);
+    bool performOpenTuning(const juce::ApplicationCommandTarget::InvocationInfo& info);
 
     //==============================================================================
 
@@ -87,6 +88,8 @@ private:
     juce::Component* contentComponent = nullptr;
     std::unique_ptr<OverviewPanel> overviewPanel;
     std::unique_ptr<NewTuningPanel> newTuningPanel;
+
+    std::unique_ptr<juce::FileChooser> fileChooser;
 
     std::unique_ptr<LogWindow> logger;
 

@@ -5,7 +5,7 @@
               defines="RUN_MULTIMAPPER_TESTS=1" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn">
   <MAINGROUP id="H8zE4n" name="Multimapper">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
-      <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="UI">
+      <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="ui">
         <FILE id="ksMnFa" name="CommonUI.h" compile="0" resource="0" file="Source/UI/CommonUI.h"/>
         <FILE id="whyaXp" name="EqualTemperamentInterface.h" compile="0" resource="0"
               file="Source/UI/EqualTemperamentInterface.h"/>
@@ -56,6 +56,31 @@
           <FILE id="aRz980" name="TuningTableMap.h" compile="0" resource="0"
                 file="../Keytographer/Source/TuningTableMap.h"/>
         </GROUP>
+      </GROUP>
+      <GROUP id="{8B807919-2EE7-BE69-09B0-6C440054EDAD}" name="io">
+        <GROUP id="{A3277773-B40D-C9A4-C1A3-50104F0A9FFF}" name="TUN_V2">
+          <FILE id="lmUF9R" name="SCL_Import.cpp" compile="1" resource="0" file="Source/io/TUN_V2/SCL_Import.cpp"/>
+          <FILE id="TjTJlJ" name="SCL_Import.h" compile="0" resource="0" file="Source/io/TUN_V2/SCL_Import.h"/>
+          <FILE id="YDMhnL" name="TUN_EmbedHTML.cpp" compile="1" resource="0"
+                file="Source/io/TUN_V2/TUN_EmbedHTML.cpp"/>
+          <FILE id="rsUeFv" name="TUN_EmbedHTML.h" compile="0" resource="0" file="Source/io/TUN_V2/TUN_EmbedHTML.h"/>
+          <FILE id="sjsH8d" name="TUN_Error.h" compile="0" resource="0" file="Source/io/TUN_V2/TUN_Error.h"/>
+          <FILE id="SzRW0u" name="TUN_Formula.h" compile="0" resource="0" file="Source/io/TUN_V2/TUN_Formula.h"/>
+          <FILE id="T9uckc" name="TUN_MIDIChannelRange.h" compile="0" resource="0"
+                file="Source/io/TUN_V2/TUN_MIDIChannelRange.h"/>
+          <FILE id="tyg0aN" name="TUN_MultiScaleFile.h" compile="0" resource="0"
+                file="Source/io/TUN_V2/TUN_MultiScaleFile.h"/>
+          <FILE id="lhRssm" name="TUN_Scale.cpp" compile="1" resource="0" file="Source/io/TUN_V2/TUN_Scale.cpp"/>
+          <FILE id="HbDACp" name="TUN_Scale.h" compile="0" resource="0" file="Source/io/TUN_V2/TUN_Scale.h"/>
+          <FILE id="uEH9q5" name="TUN_StringTools.cpp" compile="1" resource="0"
+                file="Source/io/TUN_V2/TUN_StringTools.cpp"/>
+          <FILE id="I6q6L2" name="TUN_StringTools.h" compile="0" resource="0"
+                file="Source/io/TUN_V2/TUN_StringTools.h"/>
+        </GROUP>
+        <FILE id="dE9H82" name="TuningFileParser.cpp" compile="1" resource="0"
+              file="Source/io/TuningFileParser.cpp"/>
+        <FILE id="LueTGM" name="TuningFileParser.h" compile="0" resource="0"
+              file="Source/io/TuningFileParser.h"/>
       </GROUP>
       <FILE id="HhASYm" name="TuningChanger.h" compile="0" resource="0" file="Source/TuningChanger.h"/>
       <FILE id="wyXPRk" name="LogWindow.h" compile="0" resource="0" file="Source/LogWindow.h"/>

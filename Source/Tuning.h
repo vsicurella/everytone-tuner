@@ -109,6 +109,7 @@ public:
 		double virtualPeriod = 0;
 
         CentsDefinition() {}
+		CentsDefinition(const juce::Array<double> centsIn) : intervalCents(centsIn) {}
 		CentsDefinition(double divisions, double periodCents = 1200.0)
 		{
 			double step = periodCents / divisions;
@@ -121,6 +122,20 @@ public:
 			auto cents = ratioToCents(periodRatio);
 			auto definition = CentsDefinition(divisions, cents);
 			return definition;
+		}
+
+		void operator=(const Tuning::Definition& definition)
+		{
+			reference = definition.reference;
+			name = definition.name;
+			description = definition.description;
+			transpose = definition.transpose;
+		}
+
+		void operator=(const Tuning::CentsDefinition& definition)
+		{
+			intervalCents = definition.intervalCents;
+			*this = (Definition)definition;
 		}
 	};
 
