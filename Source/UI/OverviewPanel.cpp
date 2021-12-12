@@ -10,7 +10,6 @@
 
 #include "OverviewPanel.h"
 
-
 //==============================================================================
 OverviewPanel::OverviewPanel ()
 {
@@ -53,11 +52,63 @@ OverviewPanel::OverviewPanel ()
 	//addAndMakeVisible(tuningPeriodLabel);
 	//descriptionlabel->attachToComponent(descriptionTextBox.get(), false);
 
+
+	rootMidiChannelBox.reset(new juce::Label("rootMidiChannelBox", "1"));
+	addAndMakeVisible(rootMidiChannelBox.get());
+
+	auto rootChannelLabel = labels.add(new juce::Label("rootChannelLabel", "Root MIDI Channel:"));
+	rootChannelLabel->setJustificationType(juce::Justification::centredRight);
+	addAndMakeVisible(rootChannelLabel);
+	rootChannelLabel->attachToComponent(rootMidiChannelBox.get(), true);
+
+	rootMidiNoteBox.reset(new juce::Label("rootMidiNoteBox", "60"));
+	addAndMakeVisible(rootMidiNoteBox.get());
+
+	auto rootNoteLabel = labels.add(new juce::Label("rootNoteLabel", "Root MIDI Note:"));
+	rootNoteLabel->setJustificationType(juce::Justification::centredRight);
+	addAndMakeVisible(rootNoteLabel);
+	rootNoteLabel->attachToComponent(rootMidiNoteBox.get(), true);
+
+	rootFrequencyBox.reset(new juce::Label("rootFrequencyBox", "263"));
+	addAndMakeVisible(rootFrequencyBox.get());
+
+	auto rootFrequencyLabel = labels.add(new juce::Label("rootFrequencyLabel", "Root Frequency:"));
+	rootFrequencyLabel->setJustificationType(juce::Justification::centredRight);
+	addAndMakeVisible(rootFrequencyLabel);
+	rootFrequencyLabel->attachToComponent(rootFrequencyBox.get(), true);
+
+	linearMappingButton.reset(new juce::TextButton("linearMappingButton"));
+	addAndMakeVisible(linearMappingButton.get());
+	linearMappingButton->setButtonText("Linear");
+	linearMappingButton->setConnectedEdges(juce::Button::ConnectedEdgeFlags::ConnectedOnRight);
+	linearMappingButton->setClickingTogglesState(true);
+	linearMappingButton->setToggleState(true, juce::NotificationType::dontSendNotification);
+	linearMappingButton->setRadioGroupId(10);
+
+	periodicMappingButton.reset(new juce::TextButton("periodicMappingButton"));
+	addAndMakeVisible(periodicMappingButton.get());
+	periodicMappingButton->setButtonText("Periodic");
+	periodicMappingButton->setConnectedEdges(juce::Button::ConnectedEdgeFlags::ConnectedOnLeft);
+	periodicMappingButton->setClickingTogglesState(true);
+	periodicMappingButton->setToggleState(false, juce::NotificationType::dontSendNotification);
+	periodicMappingButton->setRadioGroupId(10);
+
+	auto mappingLabel = labels.add(new juce::Label("mappingLabel", "Mapping:"));
+	mappingLabel->setJustificationType(juce::Justification::centredRight);
+	addAndMakeVisible(mappingLabel);
+	mappingLabel->attachToComponent(linearMappingButton.get(), true);
 }
 
 OverviewPanel::~OverviewPanel()
 {
 	labels.clear();
+
+	periodicMappingButton = nullptr;
+	linearMappingButton = nullptr;
+	rootFrequencyBox = nullptr;
+	rootMidiNoteBox = nullptr;
+	rootMidiChannelBox = nullptr;
+
 	tuningNameBox = nullptr;
 	tuningSizeBox = nullptr;
 	tuningPeriodBox = nullptr;
@@ -68,8 +119,16 @@ OverviewPanel::~OverviewPanel()
 void OverviewPanel::paint (juce::Graphics& g)
 {
 #if JUCE_DEBUG
-	g.setColour(juce::Colours::blue);
-	g.drawRect(0, 0, getWidth(), getHeight());
+	juce::Random r(420);
+	for (auto rect : debugBoxes)
+	{
+		g.setColour(juce::Colour(r.nextFloat(), 1.0f, 1.0f, 1.0f));
+		g.drawRect(rect);
+	}
+
+	/*rootMidiChannelBox->setColour(juce::Label::ColourIds::outlineColourId, juce::Colour(r.nextFloat(), 1.0f, 1.0f, 1.0f));
+	rootMidiNoteBox->setColour(juce::Label::ColourIds::outlineColourId, juce::Colour(r.nextFloat(), 1.0f, 1.0f, 1.0f));
+	rootFrequencyBox->setColour(juce::Label::ColourIds::outlineColourId, juce::Colour(r.nextFloat(), 1.0f, 1.0f, 1.0f));*/
 #endif
 }
 
@@ -78,43 +137,70 @@ void OverviewPanel::resized()
 	int w = getWidth();
 	int h = getHeight();
 	int halfWidth = juce::roundToInt(w * 0.5);
-	int eighthWidth = juce::roundToInt(w * 0.125);
 	int controlHeight = juce::roundToInt(h * 0.18);
 
 	int yMargin = juce::roundToInt(h * 0.2);
-	int labelWidth = w * 0.1;
+	int tuningLabelWidth = w * 0.1;
+
+
+	juce::FlexBox tuningInfo;
+	tuningInfo.flexDirection = juce::FlexBox::Direction::column;
+
+	juce::FlexItem::Margin tuningMargin(0, 0, 0, tuningLabelWidth);
+	tuningInfo.items.add(juce::FlexItem(halfWidth, controlHeight, *tuningNameBox).withMargin(tuningMargin));
+	tuningInfo.items.add(juce::FlexItem(halfWidth, controlHeight, *tuningSizeBox).withMargin(tuningMargin));
+	tuningInfo.items.add(juce::FlexItem(halfWidth, controlHeight, *tuningPeriodBox).withMargin(tuningMargin));
+	tuningInfo.items.add(juce::FlexItem(halfWidth, h * 0.4, *descriptionEditor));
+	
+	
+	juce::FlexBox referenceInfo;
+	referenceInfo.flexDirection = juce::FlexBox::Direction::column;
+
+	int referenceControlWidth = w * 0.18;
+	int referenceWidth = w * 0.38;
+	int referenceLabelWidth = w * 0.15;
+	juce::FlexItem::Margin referenceMargin(0, 0, 0, referenceLabelWidth);
+	
+	referenceInfo.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *rootMidiChannelBox).withMargin(referenceMargin));
+	referenceInfo.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *rootMidiNoteBox).withMargin(referenceMargin));
+	referenceInfo.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *rootFrequencyBox).withMargin(referenceMargin));
+
+	int buttonWidth = juce::roundToInt(w * 0.15);
+	int buttonHeight = juce::roundToInt(controlHeight * 0.6);
+
+	juce::FlexBox mappingRow;
+	mappingRow.justifyContent = juce::FlexBox::JustifyContent::flexStart;
+	mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *linearMappingButton));
+	mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *periodicMappingButton));
+
+	referenceInfo.items.add(juce::FlexItem(buttonWidth * 2, buttonHeight, mappingRow).withMargin(referenceMargin));
+
 
 	juce::FlexBox main;
+	main.justifyContent = juce::FlexBox::JustifyContent::flexStart;
 
-	//juce::FlexBox rightHalf;
+	auto tuningItem = juce::FlexItem(halfWidth, h, tuningInfo);
+	main.items.add(tuningItem);
 
-	juce::FlexBox overview;
-	overview.flexDirection = juce::FlexBox::Direction::column;
-	overview.justifyContent = juce::FlexBox::JustifyContent::flexStart;
-
-	juce::FlexItem::Margin controlsMargin(0, 0, 0, labelWidth);
-	overview.items.add(juce::FlexItem(halfWidth, controlHeight, *tuningNameBox).withMargin(controlsMargin));
-	overview.items.add(juce::FlexItem(halfWidth, controlHeight, *tuningSizeBox).withMargin(controlsMargin));
-	overview.items.add(juce::FlexItem(halfWidth, controlHeight, *tuningPeriodBox).withMargin(controlsMargin));
-	overview.items.add(juce::FlexItem(halfWidth, h * 0.4, *descriptionEditor));
-	//juce::FlexBox leftHalf;
-	//leftHalf.flexDirection = juce::FlexBox::Direction::column;
-	//leftHalf.items.add(juce::FlexItem(halfWidth, quarterHeight, overview).withMargin(juce::FlexItem::Margin(0, 0, 0, labelWidth)));
-
-	//main.items.add(juce::FlexItem(halfWidth, h, leftHalf));
-	//main.items.add(juce::FlexItem(halfWidth, h, rightHalf));
-
-	auto overviewItem = juce::FlexItem(w, h, overview).withMargin(juce::FlexItem::Margin(0, 0, 0, 0));
-	main.items.add(overviewItem);
+	auto referenceItem = juce::FlexItem(referenceWidth, h, referenceInfo)
+									   .withMargin(juce::FlexItem::Margin(0, 0, 0, 10));
+	main.items.add(referenceItem);
 
 	for (auto label : labels)
 	{
-		label->setSize(labelWidth, controlHeight);
+		label->setSize(tuningLabelWidth, controlHeight);
 	}
 
 	main.performLayout(getLocalBounds());
 
 	descriptionEditor->setBounds(descriptionEditor->getBounds().withRight(halfWidth).withBottom(h));
+
+#if JUCE_DEBUG
+	debugBoxes.clear();
+	/*debugBoxes.add(getLocalBounds());
+	for (auto box : main.items)
+		debugBoxes.add(box.currentBounds.toNearestInt().reduced(2));	*/
+#endif
 }
 
 
@@ -142,6 +228,10 @@ void OverviewPanel::setTuningDisplayed(const Tuning& tuning)
 	//	periodDisplay += " (" + juce::String(virtualPeriod) + ")";
 	
 	setTuningPeriodLabel(juce::String(tuning.getPeriodCents()) + " cents");
+
+	setRootMidiChannelLabel(juce::String(tuning.getRootMidiChannel()));
+	setRootMidiNoteLabel(juce::String(tuning.getRootMidiNote()));
+	setRootFrequencyLabel(juce::String(tuning.getRootFrequency()) + " hz");
 }
 
 void OverviewPanel::setTuningNameLabel(juce::String nameIn)
@@ -162,6 +252,19 @@ void OverviewPanel::setTuningPeriodLabel(juce::String periodIn)
 void OverviewPanel::setDescriptionText(juce::String descIn)
 {
 	descriptionEditor->setText(descIn);
+}
+
+void OverviewPanel::setRootMidiChannelLabel(juce::String channel)
+{
+	rootMidiChannelBox->setText(channel, juce::NotificationType::dontSendNotification);
+}
+void OverviewPanel::setRootMidiNoteLabel(juce::String note)
+{
+	rootMidiNoteBox->setText(note, juce::NotificationType::dontSendNotification);
+}
+void OverviewPanel::setRootFrequencyLabel(juce::String frequency)
+{
+	rootFrequencyBox->setText(frequency, juce::NotificationType::dontSendNotification);
 }
 
 void OverviewPanel::tuningChanged(TuningChanger* changer, Tuning* tuning)

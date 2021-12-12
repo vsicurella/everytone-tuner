@@ -25,11 +25,6 @@ public:
 
 	void setTuningDisplayed(const Tuning& tuning);
 
-	void setTuningNameLabel(juce::String nameIn);
-	void setTuningSizeLabel(juce::String numNotesIn);
-	void setTuningPeriodLabel(juce::String periodIn);
-	void setDescriptionText(juce::String descIn);
-
 	//==============================================================================
 
     void paint (juce::Graphics& g) override;
@@ -39,6 +34,17 @@ public:
 	// TuningWatcher implementation
 
 	void tuningChanged(TuningChanger* changer, Tuning* tuning) override;
+
+private:
+
+	void setTuningNameLabel(juce::String nameIn);
+	void setTuningSizeLabel(juce::String numNotesIn);
+	void setTuningPeriodLabel(juce::String periodIn);
+	void setDescriptionText(juce::String descIn);
+
+	void setRootMidiChannelLabel(juce::String channel);
+	void setRootMidiNoteLabel(juce::String note);
+	void setRootFrequencyLabel(juce::String frequency);
 
 private:
 
@@ -54,7 +60,18 @@ private:
 	std::unique_ptr<juce::Label> descriptionTextLabel;
 	std::unique_ptr<juce::TextEditor> descriptionEditor;
 
+	std::unique_ptr<juce::Label> rootMidiChannelBox;
+	std::unique_ptr<juce::Label> rootMidiNoteBox;
+	std::unique_ptr<juce::Label> rootFrequencyBox;
+
+	std::unique_ptr<juce::TextButton> linearMappingButton;
+	std::unique_ptr<juce::TextButton> periodicMappingButton;
+
 	juce::OwnedArray<juce::Label> labels;
+
+#if JUCE_DEBUG
+	juce::Array<juce::Rectangle<int>> debugBoxes;
+#endif
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OverviewPanel)

@@ -35,20 +35,6 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     setupCommands();
 
     addKeyListener(this->getKeyMappings());
-
-    // Load 31 edo with a C center in channel 4, periodic mapping
-    //auto def31edo = Tuning::CentsDefinition(31);
-    //def31edo.reference.rootMidiChannel = 4;
-    //def31edo.reference.rootMidiNote = 60;
-    //def31edo.reference.rootFrequency = 261.6255653;
-
-    //auto ode31 = Tuning(def31edo);
-    //audioProcessor.loadTuningTarget(ode31);
-
-    //auto period31On4C60 = Keytographer::MultichannelMap::CreatePeriodicMapping(31, 0, 4);
-    //audioProcessor.loadNoteMapping(period31On4C60);
-    //
-    //overviewPanel->setTuningDisplayed(ode31);
 }
 
 MultimapperAudioProcessorEditor::~MultimapperAudioProcessorEditor()
@@ -65,7 +51,7 @@ void MultimapperAudioProcessorEditor::paint (juce::Graphics& g)
 
 void MultimapperAudioProcessorEditor::resized()
 {
-    double menuHeight = getHeight() * 0.125;
+    double menuHeight = getHeight() * 0.11;
     menuBar->setBounds(getLocalBounds().withBottom(menuHeight));
     
     int margin = 5;
