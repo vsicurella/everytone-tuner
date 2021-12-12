@@ -17,7 +17,7 @@ OverviewPanel::OverviewPanel ()
 	tuningNameBox->setJustificationType(juce::Justification::centredLeft);
 	addAndMakeVisible(tuningNameBox.get());
 
-	auto tuningNameLabel = labels.add(new juce::Label("tuningNameLabel", nameTrans + ":"));
+	auto tuningNameLabel = labels.add(new juce::Label("tuningNameLabel", juce::translate("Name") + ":"));
 	tuningNameLabel->setJustificationType(juce::Justification::centredRight);
 	addAndMakeVisible(tuningNameLabel);
 	tuningNameLabel->attachToComponent(tuningNameBox.get(), true);
@@ -26,7 +26,7 @@ OverviewPanel::OverviewPanel ()
 	tuningSizeBox->setJustificationType(juce::Justification::centredLeft);
 	addAndMakeVisible(tuningSizeBox.get());
 
-	auto tuningSizeLabel = labels.add(new juce::Label("tuningSizeLabel", sizeTrans + ":"));
+	auto tuningSizeLabel = labels.add(new juce::Label("tuningSizeLabel", juce::translate("Size") + ":"));
 	tuningSizeLabel->setJustificationType(juce::Justification::centredRight);
 	addAndMakeVisible(tuningSizeLabel);
 	tuningSizeLabel->attachToComponent(tuningSizeBox.get(), true);
@@ -35,7 +35,7 @@ OverviewPanel::OverviewPanel ()
 	tuningPeriodBox->setJustificationType(juce::Justification::centredLeft);
 	addAndMakeVisible(tuningPeriodBox.get());
 
-	auto tuningPeriodLabel = labels.add(new juce::Label("tuningPeriodLabel", periodTrans + ":"));
+	auto tuningPeriodLabel = labels.add(new juce::Label("tuningPeriodLabel", juce::translate("Period") + ":"));
 	tuningPeriodLabel->setJustificationType(juce::Justification::centredRight);
 	addAndMakeVisible(tuningPeriodLabel);
 	tuningPeriodLabel->attachToComponent(tuningPeriodBox.get(), true);
