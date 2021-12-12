@@ -69,14 +69,12 @@ public:
 
 	void setTuningTableMap(const Keytographer::TuningTableMap* mapIn);
 
+	Keytographer::MappedNote getNoteMapping(int midiChannel, int midiNote) const;
+	Keytographer::MappedNote getNoteMapping(const juce::MidiMessage& msg) const;
 
-	/// <summary>
-	/// 
-	/// 
-	/// </summary>
-	/// <param name="msg"></param>
-	/// <returns></returns>
-	MidiPitch mapNoteAndPitchbend(const juce::MidiMessage& msg);
+	MidiPitch getMidiPitch(const Keytographer::MappedNote& mappedNote) const;
+	MidiPitch getMidiPitch(int midiChannel, int midiNote) const;
+	MidiPitch getMidiPitch(const juce::MidiMessage& msg) const;
 
 
 	/******************
