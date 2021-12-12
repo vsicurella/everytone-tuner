@@ -17,8 +17,6 @@
 #include "io/TuningFileParser.h"
 #include "../Source/MultichannelMap.h"
 
-
-
 //==============================================================================
 /**
 */
@@ -26,7 +24,8 @@ class MultimapperAudioProcessorEditor  : public juce::AudioProcessorEditor,
                                          public juce::ApplicationCommandManager,
                                          public juce::ApplicationCommandTarget,
                                          public TuningWatcher,
-                                         public TuningChanger
+                                         public TuningChanger,
+                                         public MappingWatcher
 {
 public:
     MultimapperAudioProcessorEditor (MultimapperAudioProcessor&);
@@ -40,6 +39,11 @@ public:
     // TuningWatcher implementation
 
     void tuningChanged(TuningChanger* changer, Tuning* tuning) override;
+
+    //==============================================================================
+    // MappingWatcher implementation
+
+    void mappingTypeChanged(MappingChanger* changer, TuningMapHelper::MappingType type) override;
 
     //==============================================================================
     // ApplicationCommandManager implementation

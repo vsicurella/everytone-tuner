@@ -78,9 +78,6 @@ public:
 
     //==============================================================================
 
-    
-    //==============================================================================
-
     const Tuning* activeSourceTuning() const;
 
     const Tuning* activeTargetTuning() const;
@@ -91,6 +88,8 @@ public:
     void loadTuningTarget(const Tuning& tuning);
 
     void loadNoteMapping(const Keytographer::TuningTableMap& map);
+
+    void setAutoMappingType(TuningMapHelper::MappingType type);
 
 private:
 

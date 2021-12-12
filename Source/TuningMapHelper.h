@@ -48,3 +48,22 @@ private:
     static Keytographer::TuningTableMap* NewLinearMappingFromTuning(const Tuning& tuning);
     static Keytographer::TuningTableMap* NewPeriodicMappingFromTuning(const Tuning& tuning);
 };
+
+struct MappingChanger;
+
+struct MappingWatcher
+{
+    virtual void mappingTypeChanged(MappingChanger* changer, TuningMapHelper::MappingType type) {};
+};
+
+class MappingChanger
+{
+protected:
+    juce::ListenerList<MappingWatcher> mappingWatchers;
+
+public:
+    virtual ~MappingChanger() { mappingWatchers.clear(); }
+
+    void addMappingWatcher(MappingWatcher* watcher) { mappingWatchers.add(watcher); }
+    void removeMappingWatcher(MappingWatcher* watcher) { mappingWatchers.remove(watcher); }
+};

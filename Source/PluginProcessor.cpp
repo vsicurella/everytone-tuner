@@ -305,6 +305,12 @@ void MultimapperAudioProcessor::loadNoteMapping(const Keytographer::TuningTableM
     juce::Logger::writeToLog("Loaded new mapping");
 }
 
+void MultimapperAudioProcessor::setAutoMappingType(TuningMapHelper::MappingType type)
+{
+    tuningMapHelper.setMappingType(type);
+    loadNoteMapping(tuningMapHelper.getTuningMap());
+}
+
 const Tuning* MultimapperAudioProcessor::activeSourceTuning() const
 {
     return midiBrain->getTuningSource();

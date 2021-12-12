@@ -13,8 +13,9 @@
 #include "CommonUI.h"
 #include "../Tuning.h"
 #include "../TuningChanger.h"
+#include "../TuningMapHelper.h"
 
-class OverviewPanel  : public juce::Component, public TuningWatcher
+class OverviewPanel  : public juce::Component, public TuningWatcher, public MappingChanger
 {
 public:
     //==============================================================================
@@ -24,6 +25,8 @@ public:
 public:
 
 	void setTuningDisplayed(const Tuning& tuning);
+
+	void mappingTypeButtonClicked();
 
 	//==============================================================================
 

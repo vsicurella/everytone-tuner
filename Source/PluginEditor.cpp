@@ -21,6 +21,7 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     overviewPanel.reset(new OverviewPanel());
     addAndMakeVisible(overviewPanel.get());
     overviewPanel->setTuningDisplayed(*tuningBackup);
+    overviewPanel->addMappingWatcher(this);
 
     contentComponent = overviewPanel.get();
 
@@ -69,6 +70,11 @@ void MultimapperAudioProcessorEditor::resized()
 void MultimapperAudioProcessorEditor::tuningChanged(TuningChanger* changer, Tuning* tuning)
 {
     audioProcessor.loadTuningTarget(*tuning);
+}
+
+void MultimapperAudioProcessorEditor::mappingTypeChanged(MappingChanger* changer, TuningMapHelper::MappingType type)
+{
+    audioProcessor.setAutoMappingType(type);
 }
 
 juce::ApplicationCommandTarget* MultimapperAudioProcessorEditor::getFirstCommandTarget(juce::CommandID commandID)

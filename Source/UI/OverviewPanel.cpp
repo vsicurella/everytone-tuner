@@ -77,6 +77,8 @@ OverviewPanel::OverviewPanel ()
 	addAndMakeVisible(rootFrequencyLabel);
 	rootFrequencyLabel->attachToComponent(rootFrequencyBox.get(), true);
 
+	auto mappingButtonCallback = [&]() { mappingTypeButtonClicked(); };
+
 	linearMappingButton.reset(new juce::TextButton("linearMappingButton"));
 	addAndMakeVisible(linearMappingButton.get());
 	linearMappingButton->setButtonText("Linear");
@@ -84,6 +86,7 @@ OverviewPanel::OverviewPanel ()
 	linearMappingButton->setClickingTogglesState(true);
 	linearMappingButton->setToggleState(true, juce::NotificationType::dontSendNotification);
 	linearMappingButton->setRadioGroupId(10);
+	linearMappingButton->onClick = mappingButtonCallback;
 
 	periodicMappingButton.reset(new juce::TextButton("periodicMappingButton"));
 	addAndMakeVisible(periodicMappingButton.get());
@@ -92,6 +95,7 @@ OverviewPanel::OverviewPanel ()
 	periodicMappingButton->setClickingTogglesState(true);
 	periodicMappingButton->setToggleState(false, juce::NotificationType::dontSendNotification);
 	periodicMappingButton->setRadioGroupId(10);
+
 
 	auto mappingLabel = labels.add(new juce::Label("mappingLabel", "Mapping:"));
 	mappingLabel->setJustificationType(juce::Justification::centredRight);
@@ -232,6 +236,15 @@ void OverviewPanel::setTuningDisplayed(const Tuning& tuning)
 	setRootMidiChannelLabel(juce::String(tuning.getRootMidiChannel()));
 	setRootMidiNoteLabel(juce::String(tuning.getRootMidiNote()));
 	setRootFrequencyLabel(juce::String(tuning.getRootFrequency()) + " hz");
+}
+
+void OverviewPanel::mappingTypeButtonClicked()
+{
+	auto type = (linearMappingButton->getToggleState())
+		? TuningMapHelper::MappingType::Linear
+		: TuningMapHelper::MappingType::Periodic;
+
+	mappingWatchers.call(&MappingWatcher::mappingTypeChanged, this, type);
 }
 
 void OverviewPanel::setTuningNameLabel(juce::String nameIn)
