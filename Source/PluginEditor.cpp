@@ -72,7 +72,7 @@ void MultimapperAudioProcessorEditor::tuningChanged(TuningChanger* changer, Tuni
     audioProcessor.loadTuningTarget(*tuning);
 }
 
-void MultimapperAudioProcessorEditor::mappingTypeChanged(MappingChanger* changer, TuningMapHelper::MappingType type)
+void MultimapperAudioProcessorEditor::mappingTypeChanged(MappingChanger* changer, Multimapper::MappingType type)
 {
     audioProcessor.setAutoMappingType(type);
 }

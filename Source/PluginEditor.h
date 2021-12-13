@@ -43,7 +43,7 @@ public:
     //==============================================================================
     // MappingWatcher implementation
 
-    void mappingTypeChanged(MappingChanger* changer, TuningMapHelper::MappingType type) override;
+    void mappingTypeChanged(MappingChanger* changer, Multimapper::MappingType type) override;
 
     //==============================================================================
     // ApplicationCommandManager implementation

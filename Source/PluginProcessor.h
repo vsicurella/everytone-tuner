@@ -10,7 +10,7 @@
 
 #include "TuningChanger.h"
 #include "MidiBrain.h"
-#include "TuningMapHelper.h"
+#include "MappedTuningController.h"
 
 #if RUN_MULTIMAPPER_TESTS
     #include "./tests/Tuning_tests.h"
@@ -34,7 +34,7 @@ public:
 //==============================================================================
 /**
 */
-class MultimapperAudioProcessor  : public juce::AudioProcessor, public TuningWatcher
+class MultimapperAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
@@ -90,10 +90,9 @@ public:
 
     void loadNoteMapping(const Keytographer::TuningTableMap& map);
 
-    void setAutoMappingType(TuningMapHelper::MappingType type);
+    void setAutoMappingType(Multimapper::MappingType type);
 
-    //void addTuningWatchersToChanger(TuningChanger* changerToWatch);
-    //void addMappingWatchersToChanger(MappingChanger* changerToWatch);
+    void refreshAutoMapping();
 
 private:
 
@@ -101,7 +100,17 @@ private:
 
 private:
 
-    TuningMapHelper tuningMapHelper;
+    std::unique_ptr<Tuning> tuningSource;
+    std::unique_ptr<Tuning> tuningTarget;
+
+    std::unique_ptr<Keytographer::TuningTableMap> noteMap;
+
+    MappedTuningController tuningMapHelper;
+
+    Multimapper::MappingMode mappingMode = Multimapper::MappingMode::Auto;
+    Multimapper::MappingType mappingType = Multimapper::MappingType::Linear;
+
+    MidiVoiceController voiceController;
     
     std::unique_ptr<MidiBrain> midiBrain;
     
