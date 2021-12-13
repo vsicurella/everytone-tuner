@@ -42,7 +42,7 @@ NewTuningPanel::~NewTuningPanel()
 
 void NewTuningPanel::saveTuning()
 {
-    tuningWatchers.call(&TuningWatcher::tuningChanged, this, tuningStaged.get());
+    tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuningStaged.get());
 }
 
 void NewTuningPanel::resized()
@@ -73,10 +73,10 @@ void NewTuningPanel::resized()
     previewButton->setBounds(saveButton->getBounds().translated(buttonWidth, 0));
 }
 
-void NewTuningPanel::tuningChanged(TuningChanger* changer, Tuning* tuning)
+void NewTuningPanel::tuningTargetChanged(TuningChanger* changer, const Tuning* tuning)
 {
     tuningStaged.reset(new Tuning(*tuning));
 
     if (previewOn())
-        tuningWatchers.call(&TuningWatcher::tuningChanged, this, tuningStaged.get());
+        tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuningStaged.get());
 }

@@ -52,7 +52,7 @@ public:
     void resized() override;
 
     // TuningWatcher Implementation
-    void tuningChanged(TuningChanger* changer, Tuning* tuning) override;
+    void tuningTargetChanged(TuningChanger* changer, const Tuning* tuning) override;
 
 
 private:

@@ -38,7 +38,9 @@ public:
     //==============================================================================
     // TuningWatcher implementation
 
-    void tuningChanged(TuningChanger* changer, Tuning* tuning) override;
+    void tuningTargetChanged(TuningChanger* changer, const Tuning* tuning) override;
+
+    void tuningTargetReferenceChanged(TuningChanger* changer, Tuning::Reference reference) override;
 
     //==============================================================================
     // MappingWatcher implementation

@@ -18,8 +18,10 @@ class TuningChanger;
 class TuningWatcher
 {
 public:
-    virtual void tuningChanged(TuningChanger* changer, Tuning* newTuning) = 0;
-    virtual void tuningReferenceChanged(TuningChanger* changer, Tuning::Reference reference) {}
+    virtual void tuningSourceChanged(TuningChanger* changer, const Tuning* newTuning) {}
+    virtual void tuningTargetChanged(TuningChanger* changer, const Tuning* newTuning) {}
+    virtual void tuningSourceReferenceChanged(TuningChanger* changer, Tuning::Reference reference) {}
+    virtual void tuningTargetReferenceChanged(TuningChanger* changer, Tuning::Reference reference) {}
 };
 
 class TuningChanger

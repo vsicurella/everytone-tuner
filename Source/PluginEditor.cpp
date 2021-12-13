@@ -20,10 +20,13 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
 
     overviewPanel.reset(new OverviewPanel());
     addAndMakeVisible(overviewPanel.get());
-    overviewPanel->setTuningDisplayed(*tuningBackup);
+    overviewPanel->setTuningDisplayed(tuningBackup.get());
     overviewPanel->addMappingWatcher(this);
+    overviewPanel->addTuningWatcher(this);
 
     contentComponent = overviewPanel.get();
+
+    audioProcessor.addTuningWatcher(this);
 
     setSize (600, 250);
 
@@ -67,9 +70,20 @@ void MultimapperAudioProcessorEditor::resized()
 
 }
 
-void MultimapperAudioProcessorEditor::tuningChanged(TuningChanger* changer, Tuning* tuning)
+void MultimapperAudioProcessorEditor::tuningTargetChanged(TuningChanger* changer, const Tuning* tuning)
 {
-    audioProcessor.loadTuningTarget(*tuning);
+    if (changer == &audioProcessor)
+        overviewPanel->setTuningDisplayed(tuning);
+    else
+        audioProcessor.loadTuningTarget(*tuning);
+}
+
+void MultimapperAudioProcessorEditor::tuningTargetReferenceChanged(TuningChanger* changer, Tuning::Reference reference)
+{
+    if (changer == &audioProcessor)
+        overviewPanel->setTuningDisplayed(audioProcessor.activeTargetTuning());
+    else
+        audioProcessor.setTargetTuningReference(reference);
 }
 
 void MultimapperAudioProcessorEditor::mappingTypeChanged(MappingChanger* changer, Multimapper::MappingType type)
@@ -200,7 +214,6 @@ bool MultimapperAudioProcessorEditor::performNewTuning(const juce::ApplicationCo
     {
         newTuningPanel.reset(new NewTuningPanel(this));
         addChildComponent(*newTuningPanel);
-        newTuningPanel->addTuningWatcher(overviewPanel.get());
     }
     
     setContentComponent(newTuningPanel.get());
@@ -236,7 +249,7 @@ void MultimapperAudioProcessorEditor::commitTuning(const Tuning* tuning)
     audioProcessor.loadTuningTarget(*tuning);
     auto savedTuning = audioProcessor.activeTargetTuning();
     tuningBackup.reset(new Tuning(*savedTuning));
-    overviewPanel->setTuningDisplayed(*savedTuning);
+    overviewPanel->setTuningDisplayed(savedTuning);
 }
 
 void MultimapperAudioProcessorEditor::setContentComponent(juce::Component* component)

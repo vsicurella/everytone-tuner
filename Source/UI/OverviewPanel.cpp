@@ -55,6 +55,9 @@ OverviewPanel::OverviewPanel ()
 
 	rootMidiChannelBox.reset(new juce::Label("rootMidiChannelBox", "1"));
 	addAndMakeVisible(rootMidiChannelBox.get());
+	rootMidiChannelBox->setEditable(false, true);
+	rootMidiChannelBox->onEditorShow = [&]() { rootChannelBackup = rootMidiChannelBox->getText(); };
+	rootMidiChannelBox->onTextChange = [&]() { tuningReferenceEdited(); };
 
 	auto rootChannelLabel = labels.add(new juce::Label("rootChannelLabel", "Root MIDI Channel:"));
 	rootChannelLabel->setJustificationType(juce::Justification::centredRight);
@@ -63,6 +66,9 @@ OverviewPanel::OverviewPanel ()
 
 	rootMidiNoteBox.reset(new juce::Label("rootMidiNoteBox", "60"));
 	addAndMakeVisible(rootMidiNoteBox.get());
+	rootMidiNoteBox->setEditable(false, true);
+	rootMidiNoteBox->onEditorShow = [&]() { rootNoteBackup = rootMidiNoteBox->getText(); };
+	rootMidiNoteBox->onTextChange = [&]() { tuningReferenceEdited(); };
 
 	auto rootNoteLabel = labels.add(new juce::Label("rootNoteLabel", "Root MIDI Note:"));
 	rootNoteLabel->setJustificationType(juce::Justification::centredRight);
@@ -71,6 +77,9 @@ OverviewPanel::OverviewPanel ()
 
 	rootFrequencyBox.reset(new juce::Label("rootFrequencyBox", "263"));
 	addAndMakeVisible(rootFrequencyBox.get());
+	rootFrequencyBox->setEditable(false, true);
+	rootFrequencyBox->onEditorShow = [&]() { rootFrequencyBackup = rootFrequencyBox->getText(); };
+	rootFrequencyBox->onTextChange = [&]() { tuningReferenceEdited(); };
 
 	auto rootFrequencyLabel = labels.add(new juce::Label("rootFrequencyLabel", "Root Frequency:"));
 	rootFrequencyLabel->setJustificationType(juce::Justification::centredRight);
@@ -208,11 +217,11 @@ void OverviewPanel::resized()
 }
 
 
-void OverviewPanel::setTuningDisplayed(const Tuning& tuning)
+void OverviewPanel::setTuningDisplayed(const Tuning* tuning)
 {
-	setTuningNameLabel(tuning.getName());
-	setDescriptionText(tuning.getDescription());
-	setTuningSizeLabel(juce::String(tuning.getTuningSize()));
+	setTuningNameLabel(tuning->getName());
+	setDescriptionText(tuning->getDescription());
+	setTuningSizeLabel(juce::String(tuning->getTuningSize()));
 
 	//double period = ;
 	//if (tuningOutDefinition[TuneUpIDs::functionalId])
@@ -231,11 +240,11 @@ void OverviewPanel::setTuningDisplayed(const Tuning& tuning)
 	//if (period != virtualPeriod)
 	//	periodDisplay += " (" + juce::String(virtualPeriod) + ")";
 	
-	setTuningPeriodLabel(juce::String(tuning.getPeriodCents()) + " cents");
+	setTuningPeriodLabel(juce::String(tuning->getPeriodCents()) + " cents");
 
-	setRootMidiChannelLabel(juce::String(tuning.getRootMidiChannel()));
-	setRootMidiNoteLabel(juce::String(tuning.getRootMidiNote()));
-	setRootFrequencyLabel(juce::String(tuning.getRootFrequency()) + " hz");
+	setRootMidiChannelLabel(juce::String(tuning->getRootMidiChannel()));
+	setRootMidiNoteLabel(juce::String(tuning->getRootMidiNote()));
+	setRootFrequencyLabel(juce::String(tuning->getRootFrequency()) + " hz");
 }
 
 void OverviewPanel::mappingTypeButtonClicked()
@@ -246,6 +255,58 @@ void OverviewPanel::mappingTypeButtonClicked()
 
 	mappingWatchers.call(&MappingWatcher::mappingTypeChanged, this, type);
 }
+
+void OverviewPanel::tuningReferenceEdited()
+{
+	Tuning::Reference newReference;
+
+	auto channelInput = rootMidiChannelBox->getText().trim();
+	int channelValue = -1;
+	if (channelInput.containsOnly("0123456789"))
+	{
+		channelValue = channelInput.getIntValue();
+		if (channelValue >= 1 && channelValue <= 16)
+			newReference.rootMidiChannel = channelValue;
+	}
+	if (channelValue < 0)
+	{
+		rootMidiChannelBox->setText(rootChannelBackup, juce::NotificationType::dontSendNotification);
+	}
+
+	auto noteInput = rootMidiNoteBox->getText().trim();
+	int noteValue = -1;
+	if (noteInput.containsOnly("0123456789"))
+	{
+		noteValue = noteInput.getIntValue();
+		if (noteValue >= 0 && noteValue < 128)
+			newReference.rootMidiNote = noteValue;
+	}
+	if (noteValue < 0)
+	{
+		rootMidiNoteBox->setText(rootNoteBackup, juce::NotificationType::dontSendNotification);
+	}
+
+	auto freqInput = rootFrequencyBox->getText().trim();
+	if (freqInput.endsWith("hz"))
+		freqInput = freqInput.substring(0, freqInput.length() - 3).trim();
+
+	double freqValue = -1;
+	if (freqInput.containsOnly("0123456789."))
+	{
+		freqValue = freqInput.getDoubleValue();
+		if (freqValue >= 8.0 && freqValue < 14000.0)
+			newReference.rootFrequency = freqValue;
+
+		rootFrequencyBox->setText(freqInput + " hz", juce::NotificationType::dontSendNotification);
+	}
+	if (freqValue < 0)
+	{
+		rootFrequencyBox->setText(rootFrequencyBackup, juce::NotificationType::dontSendNotification);
+	}
+
+	tuningWatchers.call(&TuningWatcher::tuningTargetReferenceChanged, this, newReference);
+}
+
 
 void OverviewPanel::setTuningNameLabel(juce::String nameIn)
 {
@@ -280,7 +341,7 @@ void OverviewPanel::setRootFrequencyLabel(juce::String frequency)
 	rootFrequencyBox->setText(frequency, juce::NotificationType::dontSendNotification);
 }
 
-void OverviewPanel::tuningChanged(TuningChanger* changer, Tuning* tuning)
-{
-	setTuningDisplayed(*tuning);
-}
+//void OverviewPanel::tuningChanged(TuningChanger* changer, Tuning* tuning)
+//{
+//	setTuningDisplayed(*tuning);
+//}

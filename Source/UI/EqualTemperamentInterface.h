@@ -100,7 +100,7 @@ public:
         definition.description = description;
 
         tuning.reset(new Tuning(definition));
-        tuningWatchers.call(&TuningWatcher::tuningChanged, this, tuning.get());
+        tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuning.get());
     }
 
 public:

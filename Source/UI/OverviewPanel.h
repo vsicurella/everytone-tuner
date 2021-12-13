@@ -15,7 +15,7 @@
 #include "../MappingChanger.h"
 #include "../MappedTuningController.h"
 
-class OverviewPanel  : public juce::Component, public TuningWatcher, public MappingChanger
+class OverviewPanel  : public juce::Component, public MappingChanger, public TuningChanger
 {
 public:
     //==============================================================================
@@ -24,9 +24,11 @@ public:
 
 public:
 
-	void setTuningDisplayed(const Tuning& tuning);
+	void setTuningDisplayed(const Tuning* tuning);
 
 	void mappingTypeButtonClicked();
+
+	void tuningReferenceEdited();
 
 	//==============================================================================
 
@@ -36,7 +38,7 @@ public:
 	//==============================================================================
 	// TuningWatcher implementation
 
-	void tuningChanged(TuningChanger* changer, Tuning* tuning) override;
+	//void tuningChanged(TuningChanger* changer, Tuning* tuning) override;
 
 private:
 
@@ -75,6 +77,10 @@ private:
 #if JUCE_DEBUG
 	juce::Array<juce::Rectangle<int>> debugBoxes;
 #endif
+
+	juce::String rootChannelBackup;
+	juce::String rootNoteBackup;
+	juce::String rootFrequencyBackup;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OverviewPanel)
