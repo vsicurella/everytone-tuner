@@ -11,8 +11,9 @@
 #pragma once
 
 #include "../TuningChanger.h"
+#include "../MultimapperCommon.h"
 #include "EqualTemperamentInterface.h"
-#include "CommonUI.h"
+
 
 class NewTuningPanel : public juce::TabbedComponent,
                        public TuningWatcher, 

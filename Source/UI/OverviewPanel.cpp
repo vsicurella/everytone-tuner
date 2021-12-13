@@ -241,8 +241,8 @@ void OverviewPanel::setTuningDisplayed(const Tuning& tuning)
 void OverviewPanel::mappingTypeButtonClicked()
 {
 	auto type = (linearMappingButton->getToggleState())
-		? TuningMapHelper::MappingType::Linear
-		: TuningMapHelper::MappingType::Periodic;
+		? Multimapper::MappingType::Linear
+		: Multimapper::MappingType::Periodic;
 
 	mappingWatchers.call(&MappingWatcher::mappingTypeChanged, this, type);
 }

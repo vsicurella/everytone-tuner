@@ -10,13 +10,15 @@
 
 #pragma once
 #include <JuceHeader.h>
-#include "MidiNoteTuner.h"
+#include "MidiVoiceController.h"
 
 class MidiBrain
 {
+    MidiVoiceController& voiceController;
+
 public:
 
-    MidiBrain();
+    MidiBrain(MidiVoiceController& voiceController);
 
     ~MidiBrain();
 
@@ -26,13 +28,13 @@ public:
 
     int channelOfActiveNote(const MidiPitch& pitch);
 
-    const Tuning* getTuningSource() const { return tuningSource.get(); }
-    const Tuning* getTuningTarget() const { return tuningTarget.get(); }
+    //const Tuning* getTuningSource() const { return tuningSource.get(); }
+    //const Tuning* getTuningTarget() const { return tuningTarget.get(); }
 
-    void setTuningSource(const Tuning& tuning);
-    void setTuningTarget(const Tuning& tuning);
+    //void setTuningSource(const Tuning& tuning);
+    //void setTuningTarget(const Tuning& tuning);   
 
-    void setNoteMap(const Keytographer::TuningTableMap& map);
+    //void setNoteMap(const Keytographer::TuningTableMap& map);
     
 private:
 
@@ -44,18 +46,18 @@ private:
 
 private:
 
-    juce::MidiKeyboardState state;
+    //juce::MidiKeyboardState state;
     
-    juce::Array<MidiPitch> channelsInUse;
+    //juce::Array<MidiPitch> channelsInUse;
 
     int pitchbendRange = 2;
 
-    std::unique_ptr<Tuning> tuningSource;
-    std::unique_ptr<Tuning> tuningTarget;
+    //std::unique_ptr<Tuning> tuningSource;
+    //std::unique_ptr<Tuning> tuningTarget;
 
-    std::unique_ptr<Keytographer::TuningTableMap> noteMap;
+    //std::unique_ptr<Keytographer::TuningTableMap> noteMap;
 
-    std::unique_ptr<MidiNoteTuner> tuner;
+    //std::unique_ptr<MidiNoteTuner> tuner;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiBrain)

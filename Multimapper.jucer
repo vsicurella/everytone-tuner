@@ -5,8 +5,9 @@
               defines="RUN_MULTIMAPPER_TESTS=1" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn">
   <MAINGROUP id="H8zE4n" name="Multimapper">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
+      <FILE id="oMI0GT" name="MultimapperCommon.h" compile="0" resource="0"
+            file="Source/MultimapperCommon.h"/>
       <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="ui">
-        <FILE id="ksMnFa" name="CommonUI.h" compile="0" resource="0" file="Source/UI/CommonUI.h"/>
         <FILE id="whyaXp" name="EqualTemperamentInterface.h" compile="0" resource="0"
               file="Source/UI/EqualTemperamentInterface.h"/>
         <FILE id="L2UxsU" name="OverviewPanel.cpp" compile="1" resource="0"
@@ -84,11 +85,13 @@
       </GROUP>
       <FILE id="TlWn9G" name="MidiVoice.cpp" compile="1" resource="0" file="Source/MidiVoice.cpp"/>
       <FILE id="cdGlcX" name="MidiVoice.h" compile="0" resource="0" file="Source/MidiVoice.h"/>
-      <FILE id="h3R26G" name="TuningMapHelper.h" compile="0" resource="0"
-            file="Source/TuningMapHelper.h"/>
-      <FILE id="QKYQ2p" name="TuningMapHelper.cpp" compile="1" resource="0"
-            file="Source/TuningMapHelper.cpp"/>
+      <FILE id="h3R26G" name="MappedTuningController.h" compile="0" resource="0"
+            file="Source/MappedTuningController.h"/>
+      <FILE id="QKYQ2p" name="MappedTuningController.cpp" compile="1" resource="0"
+            file="Source/MappedTuningController.cpp"/>
       <FILE id="HhASYm" name="TuningChanger.h" compile="0" resource="0" file="Source/TuningChanger.h"/>
+      <FILE id="oYq05H" name="MappingChanger.h" compile="0" resource="0"
+            file="Source/MappingChanger.h"/>
       <FILE id="wyXPRk" name="LogWindow.h" compile="0" resource="0" file="Source/LogWindow.h"/>
       <FILE id="lloha5" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>

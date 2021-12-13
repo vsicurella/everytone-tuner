@@ -1,15 +1,14 @@
 /*
   ==============================================================================
 
-    CommonUI.h
-    Created: 13 Jul 2020 18:20:57pm
+    MultimapperCommon.h
+    Created: 12 Dec 2021 5:51:24pm
     Author:  Vincenzo
 
   ==============================================================================
 */
 
 #pragma once
-#include <JuceHeader.h>
 
 namespace Multimapper
 {
@@ -22,5 +21,18 @@ namespace Multimapper
 		NewMapping,
 		OpenMapping,
 		ShowOptions,
+	};
+
+	enum class MappingMode
+	{
+		Manual = 0,
+		Auto
+	};
+
+	enum class MappingType
+	{
+		Linear,
+		Periodic,
+		Custom
 	};
 }

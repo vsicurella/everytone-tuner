@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "CommonUI.h"
 #include "../Tuning.h"
 #include "../TuningChanger.h"
-#include "../TuningMapHelper.h"
+#include "../MappingChanger.h"
+#include "../MappedTuningController.h"
 
 class OverviewPanel  : public juce::Component, public TuningWatcher, public MappingChanger
 {
