@@ -20,6 +20,14 @@ class MidiVoiceController
 
     juce::Array<bool> midiChannelDisabled;
 
+    const Tuning* currentSourceTuning = nullptr;
+    const Tuning* currentTargetTuning = nullptr;
+
+    const Keytographer::TuningTableMap* currentMapping = nullptr;
+
+    // Need to use reference counted stuff here
+    juce::OwnedArray<MidiNoteTuner> tuners;
+
 private:
 
     int nextAvailableVoiceIndex();
@@ -27,10 +35,14 @@ private:
     int midiNoteIndex(int midiChannel, int midiNote) const;
 
     int indexOfVoice(int midiChannel, int midiNote) const;
+    int indexOfVoice(const MidiVoice* voice) const;
+
+    const MidiVoice* getVoice(int index);
+    MidiVoice removeVoice(int index);
 
 public:
 
-    MidiVoiceController();
+    MidiVoiceController(const Tuning* tuningSourceIn, const Tuning* tuningTargetIn, const Keytographer::TuningTableMap* mappingIn);
     ~MidiVoiceController();
 
     const MidiVoice* getVoice(int midiChannel, int midiNote) const;
@@ -49,6 +61,13 @@ public:
 
     MidiVoice removeVoice(int midiChannel, int midiNote);
     MidiVoice removeVoice(const juce::MidiMessage& msg);
+    MidiVoice removeVoice(const MidiVoice* voice);
 
     void setChannelDisabled(int midiChannel, bool disabled);
+
+    void setSourceTuning(const Tuning* tuning);
+
+    void setTargetTuning(const Tuning* tuning);
+
+    void setNoteMapping(const Keytographer::TuningTableMap* mapping);
 };

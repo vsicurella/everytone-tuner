@@ -21,11 +21,6 @@ MidiVoice::MidiVoice(int channelIn, int noteIn, juce::uint8 velocityIn, int assi
     update();
 }
 
-MidiVoice::~MidiVoice()
-{
-
-}
-
 void MidiVoice::updateMapping()
 {
     auto previousMappedNote = currentMappedNote;

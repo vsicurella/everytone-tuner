@@ -43,11 +43,11 @@ private:
 
 public:
 
-    MidiVoice();
+    MidiVoice() {}
   
     MidiVoice(int midiChannel, int midiNote, juce::uint8 velocity, int assignedChannel, const MidiNoteTuner* tuner);
     
-    ~MidiVoice();
+    ~MidiVoice() {}
 
     int getMidiChannel() const { return midiChannel; }
 

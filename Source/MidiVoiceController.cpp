@@ -10,10 +10,13 @@
 
 #include "MidiVoiceController.h"
 
-MidiVoiceController::MidiVoiceController()
+MidiVoiceController::MidiVoiceController(const Tuning* tuningSourceIn, const Tuning* tuningTargetIn, const Keytographer::TuningTableMap* mappingIn)
+    : currentSourceTuning(tuningSourceIn), currentTargetTuning(tuningTargetIn), currentMapping(mappingIn)
 {
     voices.resize(MULTIMAPPER_MAX_VOICES);
     voices.fill(MidiVoice());
+
+    tuners.add(new MidiNoteTuner(currentSourceTuning, currentTargetTuning));
 }
 
 MidiVoiceController::~MidiVoiceController()
@@ -21,11 +24,18 @@ MidiVoiceController::~MidiVoiceController()
 
 }
 
+
+const MidiVoice* MidiVoiceController::getVoice(int index)
+{
+    return &voices.getReference(index);
+}
+
+
 const MidiVoice* MidiVoiceController::getVoice(int midiChannel, int midiNote) const
 {
     auto voiceIndex = indexOfVoice(midiChannel, midiNote);
     if (voiceIndex >= 0)
-        return &voices.getReference(voiceIndex);
+        return getVoice(voiceIndex);
 }
 
 const MidiVoice* MidiVoiceController::getVoice(const juce::MidiMessage& msg) const
@@ -37,7 +47,14 @@ const MidiVoice* MidiVoiceController::getVoice(const juce::MidiMessage& msg) con
 
 int MidiVoiceController::numVoices() const
 {
+    int num = 0;
+    for (auto voice : voices)
+    {
+        if (voice.getAssignedChannel() >= 0)
+            num++;
+    }
 
+    return num;
 }
 
 int MidiVoiceController::channelOfVoice(int midiChannel, int midiNote) const
@@ -61,9 +78,9 @@ const MidiVoice* MidiVoiceController::addVoice(int midiChannel, int midiNote, ju
 
     if (newIndex >= 0)
     {
-        auto newVoice = MidiVoice(midiChannel, midiNote, velocity, newIndex + 1);
+        auto newVoice = MidiVoice(midiChannel, midiNote, velocity, newIndex + 1, tuners.getLast());
         voices.set(newIndex, newVoice);
-        return &voices.getReference(newIndex);
+        return getVoice(newIndex);
     }
 
     return nullptr;
@@ -77,12 +94,19 @@ const MidiVoice* MidiVoiceController::addVoice(const juce::MidiMessage& msg)
     return addVoice(channel, note, velocity);
 }
 
-MidiVoice MidiVoiceController::removeVoice(int midiChannel, int midiNote)
+
+
+MidiVoice MidiVoiceController::removeVoice(int index)
 {
-    auto index = indexOfVoice(midiChannel, midiNote);
     auto voice = voices[index];
     voices.set(index, MidiVoice());
     return voice;
+}
+
+MidiVoice MidiVoiceController::removeVoice(int midiChannel, int midiNote)
+{
+    auto index = indexOfVoice(midiChannel, midiNote);
+    return removeVoice(index);
 }
 
 MidiVoice MidiVoiceController::removeVoice(const juce::MidiMessage& msg)
@@ -90,6 +114,12 @@ MidiVoice MidiVoiceController::removeVoice(const juce::MidiMessage& msg)
     auto channel = msg.getChannel();
     auto note = msg.getNoteNumber();
     return removeVoice(channel, note);
+}
+
+MidiVoice MidiVoiceController::removeVoice(const MidiVoice* voice)
+{
+    auto index = indexOfVoice(voice);
+    return removeVoice(index);
 }
 
 void MidiVoiceController::setChannelDisabled(int midiChannel, bool disabled)
@@ -117,4 +147,29 @@ int MidiVoiceController::indexOfVoice(int midiChannel, int midiNote) const
         if (voices[i].getMidiNoteIndex() == midiIndex)
             return i;
     return -1;
+}
+
+int MidiVoiceController::indexOfVoice(const MidiVoice* voice) const
+{
+    for (int i = 0; i < voices.size(); i++)
+        if (&voices.getReference(i) == voice)
+            return i;
+    return -1;
+}
+
+void MidiVoiceController::setSourceTuning(const Tuning* tuning)
+{
+    currentSourceTuning = tuning;
+    tuners.add(new MidiNoteTuner(currentSourceTuning, currentTargetTuning));
+}
+
+void MidiVoiceController::setTargetTuning(const Tuning* tuning)
+{
+    currentTargetTuning = tuning;
+    tuners.add(new MidiNoteTuner(currentSourceTuning, currentTargetTuning));
+}
+
+void MidiVoiceController::setNoteMapping(const Keytographer::TuningTableMap* mapping)
+{
+    currentMapping = mapping;
 }
