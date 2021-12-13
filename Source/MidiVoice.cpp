@@ -37,7 +37,7 @@ void MidiVoice::updatePitch()
 void MidiVoice::update()
 {
     updateMapping();
-    update();
+    updatePitch();
 }
 
 void MidiVoice::updateAftertouch(juce::uint8 aftertouchIn)
@@ -87,4 +87,10 @@ juce::MidiMessage MidiVoice::getAftertouch(int value) const
 juce::MidiMessage MidiVoice::getNoteOff() const
 {
     return juce::MidiMessage::noteOff(assignedChannel, currentPitch.coarse);
+}
+
+void MidiVoice::mapMidiMessage(juce::MidiMessage msg) const
+{
+    msg.setChannel(assignedChannel);
+    msg.setNoteNumber(currentPitch.coarse);
 }

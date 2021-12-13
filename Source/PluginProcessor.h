@@ -34,7 +34,7 @@ public:
 //==============================================================================
 /**
 */
-class MultimapperAudioProcessor  : public juce::AudioProcessor
+class MultimapperAudioProcessor  : public juce::AudioProcessor, public TuningChanger
 {
 public:
     //==============================================================================

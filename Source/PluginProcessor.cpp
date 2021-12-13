@@ -253,7 +253,8 @@ juce::String MultimapperAudioProcessor::getLog() const
 void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
 {
     juce::MidiBuffer processedBuffer;
-    int sampleOffset = 0;
+    int sample = 0;
+
     for (auto metadata : buffer)
     {
         auto msg = metadata.getMessage();
@@ -263,41 +264,37 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
 
         if (isVoice)
         {
+            const MidiVoice* voice = nullptr;
             if (msg.isNoteOn())
             {
                 // Check if voice already exists??
-                auto voice = voiceController.addVoice(msg);
+                voice = voiceController.addVoice(msg);
                 if (voice == nullptr)
                     continue;
-
-                msg = voice->getNoteOn();
 
                 auto pbmsg = voice->getPitchbend();
 
                 if (pbmsg.getPitchWheelValue() != 8192)
                 {
-                    processedBuffer.addEvent(pbmsg, -1);
+                    processedBuffer.addEvent(pbmsg, sample++);
                 }
             }
             else
             {
-                auto voice = voiceController.getVoice(msg);
+                voice = voiceController.getVoice(msg);
                 if (voice == nullptr)
                     continue;
+            }
 
-                if (msg.isNoteOff())
-                {
-                    msg = voice->getNoteOff();
-                    voiceController.removeVoice(voice);
-                }
-                else
-                {
-                    msg = voice->getAftertouch(msg.getAfterTouchValue());
-                }
+            voice->mapMidiMessage(msg);
+
+            if (msg.isNoteOff())
+            {
+                voiceController.removeVoice(voice);
             }
         }
 
-        processedBuffer.addEvent(msg, -1);
+        processedBuffer.addEvent(msg, sample++);
     }
 
     buffer.swapWith(processedBuffer);
@@ -340,12 +337,14 @@ void MultimapperAudioProcessor::testMidi()
 void MultimapperAudioProcessor::loadTuningSource(const Tuning& tuning)
 {
     tuningController.setSourceTuning(&tuning);
+    tuningWatchers.call(&TuningWatcher::tuningSourceChanged, this, tuningController.readTuningSource());
     juce::Logger::writeToLog("Loaded new source tuning: " + tuning.getDescription());
 }
 
 void MultimapperAudioProcessor::loadTuningTarget(const Tuning& tuning)
 {
     tuningController.setTargetTuning(&tuning);
+    tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuningController.readTuningTarget());
     juce::Logger::writeToLog("Loaded new target tuning: " + tuning.getDescription());
 }
 
@@ -355,12 +354,13 @@ void MultimapperAudioProcessor::setTargetTuningReference(Tuning::Reference refer
     auto newTuning = Tuning(*oldTuning.get());
     newTuning.setReference(reference);
     loadTuningTarget(newTuning);
+    tuningWatchers.call(&TuningWatcher::tuningTargetReferenceChanged, this, reference);
+    juce::Logger::writeToLog("Loaded new target tuning reference: " + reference.toString());
 }
 
 void MultimapperAudioProcessor::loadNoteMapping(const Keytographer::TuningTableMap& map)
 {
     tuningController.setNoteMapping(&map);
-    juce::Logger::writeToLog("Loaded new mapping");
 }
 
 void MultimapperAudioProcessor::setAutoMappingType(Multimapper::MappingType type)

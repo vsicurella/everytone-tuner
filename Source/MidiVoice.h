@@ -76,4 +76,6 @@ public:
     juce::MidiMessage getAftertouch(int value) const;
 
     juce::MidiMessage getNoteOff() const;
+
+    void mapMidiMessage(juce::MidiMessage msg) const;
 };
