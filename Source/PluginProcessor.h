@@ -92,27 +92,20 @@ public:
 
     void setAutoMappingType(Multimapper::MappingType type);
 
-    void refreshAutoMapping();
+    //void refreshAutoMapping();
 
 private:
+
+    void tuneMidiBuffer(juce::MidiBuffer& buffer);
+
 
     void testMidi();
 
 private:
 
-    std::unique_ptr<Tuning> tuningSource;
-    std::unique_ptr<Tuning> tuningTarget;
-
-    std::unique_ptr<Keytographer::TuningTableMap> noteMap;
-
-    MappedTuningController tuningMapHelper;
-
-    Multimapper::MappingMode mappingMode = Multimapper::MappingMode::Auto;
-    Multimapper::MappingType mappingType = Multimapper::MappingType::Linear;
-
+    MappedTuningController tuningController;
     MidiVoiceController voiceController;
     
-    std::unique_ptr<MidiBrain> midiBrain;
     
     juce::String dbgLog;
     std::unique_ptr<MultimapperLog> logger;

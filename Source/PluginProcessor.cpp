@@ -12,8 +12,8 @@
 
 //==============================================================================
 MultimapperAudioProcessor::MultimapperAudioProcessor()
-    : noteMap(std::make_unique<Keytographer::TuningTableMap>(Keytographer::MultichannelMap::StandardMapping())),
-      voiceController(tuningSource.get(), tuningTarget.get(), noteMap.get()),
+    : tuningController(),
+      voiceController(tuningController.getTuningSource(), tuningTarget.get(), noteMap.get()),
 
 #ifndef JucePlugin_PreferredChannelConfigurations
      AudioProcessor (BusesProperties()
@@ -184,7 +184,7 @@ void MultimapperAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         // ..do something to the data...
     }
 
-    midiBrain->processMidi(midiMessages);
+    tuneMidiBuffer(midiMessages);
 }
 
 //==============================================================================
@@ -252,6 +252,59 @@ juce::String MultimapperAudioProcessor::getLog() const
     return dbgLog;
 }
 
+void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
+{
+    juce::MidiBuffer processedBuffer;
+    int sampleOffset = 0;
+    for (auto metadata : buffer)
+    {
+        auto msg = metadata.getMessage();
+
+        auto status = msg.getRawData()[0];
+        bool isVoice = status >= 0x80 && status < 0xb0;
+
+        if (isVoice)
+        {
+            if (msg.isNoteOn())
+            {
+                // Check if voice already exists??
+                auto voice = voiceController.addVoice(msg);
+                if (voice == nullptr)
+                    continue;
+
+                msg = voice->getNoteOn();
+
+                auto pbmsg = voice->getPitchbend();
+
+                if (pbmsg.getPitchWheelValue() != 8192)
+                {
+                    processedBuffer.addEvent(pbmsg, -1);
+                }
+            }
+            else
+            {
+                auto voice = voiceController.getVoice(msg);
+                if (voice == nullptr)
+                    continue;
+
+                if (msg.isNoteOff())
+                {
+                    msg = voice->getNoteOff();
+                    voiceController.removeVoice(voice);
+                }
+                else
+                {
+                    msg = voice->getAftertouch(msg.getAfterTouchValue());
+                }
+            }
+        }
+
+        processedBuffer.addEvent(msg, -1);
+    }
+
+    buffer.swapWith(processedBuffer);
+}
+
 void MultimapperAudioProcessor::testMidi()
 {
     juce::MidiBuffer buffer;
@@ -315,12 +368,7 @@ void MultimapperAudioProcessor::loadNoteMapping(const Keytographer::TuningTableM
 
 void MultimapperAudioProcessor::setAutoMappingType(Multimapper::MappingType type)
 {
-    tuningMapHelper.setMappingType(type);
-}
-
-void MultimapperAudioProcessor::refreshAutoMapping()
-{
-    noteMap.reset(tuningMapHelper.newTuningMap(*tuningTarget, mappingType));
+    tuningController.setMappingType(type);
 }
 
 const Tuning* MultimapperAudioProcessor::activeSourceTuning() const

@@ -100,8 +100,6 @@
       <FILE id="wh7Cnn" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="mXqLfq" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-      <FILE id="rbisqW" name="MidiBrain.cpp" compile="1" resource="0" file="Source/MidiBrain.cpp"/>
-      <FILE id="Wryr94" name="MidiBrain.h" compile="0" resource="0" file="Source/MidiBrain.h"/>
       <FILE id="x5beT5" name="MidiVoiceController.cpp" compile="1" resource="0"
             file="Source/MidiVoiceController.cpp"/>
       <FILE id="MmJg1Z" name="MidiVoiceController.h" compile="0" resource="0"
