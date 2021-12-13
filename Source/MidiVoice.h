@@ -32,7 +32,7 @@ class MidiVoice
 
     juce::Array<LinkedController> controllers;
 
-    const MidiNoteTuner* tuner;
+    std::shared_ptr<MidiNoteTuner> tuner;
 
     Keytographer::MappedNote currentMappedNote;
     MidiPitch currentPitch;
@@ -45,7 +45,7 @@ public:
 
     MidiVoice() {}
   
-    MidiVoice(int midiChannel, int midiNote, juce::uint8 velocity, int assignedChannel, const MidiNoteTuner* tuner);
+    MidiVoice(int midiChannel, int midiNote, juce::uint8 velocity, int assignedChannel, std::shared_ptr<MidiNoteTuner> tuner);
     
     ~MidiVoice() {}
 

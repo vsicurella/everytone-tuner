@@ -10,13 +10,11 @@
 
 #include "MidiVoiceController.h"
 
-MidiVoiceController::MidiVoiceController(const Tuning* tuningSourceIn, const Tuning* tuningTargetIn, const Keytographer::TuningTableMap* mappingIn)
-    : currentSourceTuning(tuningSourceIn), currentTargetTuning(tuningTargetIn), currentMapping(mappingIn)
+MidiVoiceController::MidiVoiceController(MappedTuningController& tuningControllerIn)
+    : tuningController(tuningControllerIn)
 {
     voices.resize(MULTIMAPPER_MAX_VOICES);
     voices.fill(MidiVoice());
-
-    tuners.add(new MidiNoteTuner(currentSourceTuning, currentTargetTuning));
 }
 
 MidiVoiceController::~MidiVoiceController()
@@ -78,7 +76,7 @@ const MidiVoice* MidiVoiceController::addVoice(int midiChannel, int midiNote, ju
 
     if (newIndex >= 0)
     {
-        auto newVoice = MidiVoice(midiChannel, midiNote, velocity, newIndex + 1, tuners.getLast());
+        auto newVoice = MidiVoice(midiChannel, midiNote, velocity, newIndex + 1, tuningController.getTuner());
         voices.set(newIndex, newVoice);
         return getVoice(newIndex);
     }
@@ -155,21 +153,4 @@ int MidiVoiceController::indexOfVoice(const MidiVoice* voice) const
         if (&voices.getReference(i) == voice)
             return i;
     return -1;
-}
-
-void MidiVoiceController::setSourceTuning(const Tuning* tuning)
-{
-    currentSourceTuning = tuning;
-    tuners.add(new MidiNoteTuner(currentSourceTuning, currentTargetTuning));
-}
-
-void MidiVoiceController::setTargetTuning(const Tuning* tuning)
-{
-    currentTargetTuning = tuning;
-    tuners.add(new MidiNoteTuner(currentSourceTuning, currentTargetTuning));
-}
-
-void MidiVoiceController::setNoteMapping(const Keytographer::TuningTableMap* mapping)
-{
-    currentMapping = mapping;
 }

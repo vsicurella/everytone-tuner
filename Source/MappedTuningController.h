@@ -34,11 +34,19 @@ public:
 
     ~MappedTuningController();
 
-    const Tuning* getTuningSource() const { return currentTuningSource.get(); }
+    std::shared_ptr<Tuning>& getTuningSource() { return currentTuningSource; }
 
-    const Tuning* getTuningTarget() const { return currentTuningTarget.get(); }
+    std::shared_ptr<Tuning>& getTuningTarget() { return currentTuningTarget; }
 
-    const Keytographer::TuningTableMap* getMapping() const { return currentMapping.get(); }
+    std::shared_ptr<Keytographer::TuningTableMap> getMapping() { return currentMapping; }
+
+    std::shared_ptr<MidiNoteTuner>& getTuner() { return currentTuner; }
+
+    const Tuning* readTuningSource() const { return currentTuningSource.get(); }
+    
+    const Tuning* readTuningTarget() const { return currentTuningTarget.get(); }
+
+    const Keytographer::TuningTableMap* readMapping() const { return currentMapping.get(); }
 
 
     void setSourceTuning(const Tuning* tuning);
@@ -64,14 +72,14 @@ private:
 
     void updateCurrentTuner();
 
-    Keytographer::TuningTableMap* newTuningMap(const Tuning* tuning);
+    std::unique_ptr<Keytographer::TuningTableMap> newTuningMap(const Tuning* tuning);
 
 public:
 
-    static Keytographer::TuningTableMap* newTuningMap(const Tuning* tuning, Multimapper::MappingType mappingType);
+    static std::unique_ptr<Keytographer::TuningTableMap> newTuningMap(const Tuning* tuning, Multimapper::MappingType mappingType);
 
-    static Keytographer::TuningTableMap* NewLinearMappingFromTuning(const Tuning* tuning);
+    static std::unique_ptr<Keytographer::TuningTableMap> NewLinearMappingFromTuning(const Tuning* tuning);
 
-    static Keytographer::TuningTableMap* NewPeriodicMappingFromTuning(const Tuning* tuning);
+    static std::unique_ptr<Keytographer::TuningTableMap> NewPeriodicMappingFromTuning(const Tuning* tuning);
 };
 

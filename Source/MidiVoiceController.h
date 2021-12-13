@@ -10,23 +10,18 @@
 
 #pragma once
 
+#include "MappedTuningController.h"
 #include "MidiVoice.h"
 
 #define MULTIMAPPER_MAX_VOICES 16
 
 class MidiVoiceController
 {
+    MappedTuningController& tuningController;
+
     juce::Array<MidiVoice> voices;
 
     juce::Array<bool> midiChannelDisabled;
-
-    const Tuning* currentSourceTuning = nullptr;
-    const Tuning* currentTargetTuning = nullptr;
-
-    const Keytographer::TuningTableMap* currentMapping = nullptr;
-
-    // Need to use reference counted stuff here
-    juce::OwnedArray<MidiNoteTuner> tuners;
 
 private:
 
@@ -42,7 +37,7 @@ private:
 
 public:
 
-    MidiVoiceController(const Tuning* tuningSourceIn, const Tuning* tuningTargetIn, const Keytographer::TuningTableMap* mappingIn);
+    MidiVoiceController(MappedTuningController& tuningController);
     ~MidiVoiceController();
 
     const MidiVoice* getVoice(int midiChannel, int midiNote) const;
@@ -65,9 +60,4 @@ public:
 
     void setChannelDisabled(int midiChannel, bool disabled);
 
-    void setSourceTuning(const Tuning* tuning);
-
-    void setTargetTuning(const Tuning* tuning);
-
-    void setNoteMapping(const Keytographer::TuningTableMap* mapping);
 };

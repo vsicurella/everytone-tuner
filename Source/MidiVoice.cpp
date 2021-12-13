@@ -11,7 +11,7 @@
 #include "MidiVoice.h"
 
 
-MidiVoice::MidiVoice(int channelIn, int noteIn, juce::uint8 velocityIn, int assignedChannelIn, const MidiNoteTuner* tunerIn)
+MidiVoice::MidiVoice(int channelIn, int noteIn, juce::uint8 velocityIn, int assignedChannelIn, std::shared_ptr<MidiNoteTuner> tunerIn)
     : midiChannel(channelIn),
       midiNote(noteIn),
       velocity(velocityIn),

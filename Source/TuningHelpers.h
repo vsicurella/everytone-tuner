@@ -59,21 +59,21 @@ static juce::ValueTree arrayToValueTree(ARR array, juce::Identifier id, juce::Id
     return tree;
 }
 
-static juce::ValueTree tuningToValueTree(const Tuning& tuning, juce::Identifier name = Multimapper::ID::Tuning)
+static juce::ValueTree tuningToValueTree(const Tuning* tuning, juce::Identifier name = Multimapper::ID::Tuning)
 {
     auto tree = juce::ValueTree(name);
     
-    tree.setProperty(Multimapper::ID::Name, tuning.getName(), nullptr);
-    tree.setProperty(Multimapper::ID::Description, tuning.getDescription(), nullptr);
-    //tree.setProperty(Multimapper::ID::Transpose, tuning.tranpose)
+    tree.setProperty(Multimapper::ID::Name, tuning->getName(), nullptr);
+    tree.setProperty(Multimapper::ID::Description, tuning->getDescription(), nullptr);
+    //tree.setProperty(Multimapper::ID::Transpose, tuning->tranpose)
 
-    auto intervals = tuning.getIntervalCentsTable();
+    auto intervals = tuning->getIntervalCentsTable();
     auto intervalTree = arrayToValueTree(intervals, Multimapper::ID::IntervalTable, Multimapper::ID::Cents);
     tree.addChild(intervalTree, 0, nullptr);
 
-    tree.setProperty(Multimapper::ID::RootMidiNote, tuning.getRootMidiNote(), nullptr);
-    tree.setProperty(Multimapper::ID::RootMidiChannel, tuning.getRootMidiChannel(), nullptr);
-    tree.setProperty(Multimapper::ID::RootFrequency, tuning.getRootFrequency(), nullptr);
+    tree.setProperty(Multimapper::ID::RootMidiNote, tuning->getRootMidiNote(), nullptr);
+    tree.setProperty(Multimapper::ID::RootMidiChannel, tuning->getRootMidiChannel(), nullptr);
+    tree.setProperty(Multimapper::ID::RootFrequency, tuning->getRootFrequency(), nullptr);
 
     return tree;
 }

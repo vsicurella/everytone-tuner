@@ -11,32 +11,13 @@
 #include "MidiNoteTuner.h"
 
 
-MidiNoteTuner::MidiNoteTuner(const Tuning* targetTuningIn, const Keytographer::TuningTableMap* noteMapIn)
-{
-	sourceTuning = &standardTuning;
-
-	targetTuning = (targetTuningIn == nullptr) ? &standardTuning : targetTuningIn;
-	tuningTableMap = (noteMapIn == nullptr) ? &standardMap : noteMapIn;
-}
-
-MidiNoteTuner::MidiNoteTuner(const Tuning* sourceTuningIn, const Tuning* targetTuningIn)
-	: sourceTuning(sourceTuningIn), targetTuning(targetTuningIn)
+MidiNoteTuner::MidiNoteTuner(std::shared_ptr<Tuning> sourceTuningIn, std::shared_ptr<Tuning> targetTuningIn, std::shared_ptr<Keytographer::TuningTableMap> mapping)
+	: sourceTuning(sourceTuningIn), targetTuning(targetTuningIn), tuningTableMap(mapping)
 {
 }
 
 MidiNoteTuner::~MidiNoteTuner()
 {
-	tuningTableMap = nullptr;
-}
-
-void MidiNoteTuner::setSourceTuning(const Tuning* sourceTuningIn)
-{
-	sourceTuning = sourceTuningIn;
-}
-
-void MidiNoteTuner::setTargetTuning(const Tuning* newTuningIn)
-{
-	targetTuning = newTuningIn;
 }
 
 juce::Array<int> MidiNoteTuner::getPitchbendTable() const
@@ -52,11 +33,6 @@ int MidiNoteTuner::getPitchbendMax() const
 void MidiNoteTuner::setPitchbendRange(int pitchbendMaxIn)
 {
     pitchbendRange = pitchbendMaxIn;
-}
-
-void MidiNoteTuner::setTuningTableMap(const Keytographer::TuningTableMap* mapIn)
-{
-	tuningTableMap = mapIn;
 }
 
 Keytographer::MappedNote MidiNoteTuner::getNoteMapping(int midiChannel, int midiNote) const

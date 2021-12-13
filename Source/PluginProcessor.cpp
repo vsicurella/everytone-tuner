@@ -13,7 +13,7 @@
 //==============================================================================
 MultimapperAudioProcessor::MultimapperAudioProcessor()
     : tuningController(),
-      voiceController(tuningController.getTuningSource(), tuningTarget.get(), noteMap.get()),
+      voiceController(tuningController),
 
 #ifndef JucePlugin_PreferredChannelConfigurations
      AudioProcessor (BusesProperties()
@@ -26,13 +26,11 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
                        )
 #endif
 {
-
 #if JUCE_DEBUG
     logger.reset(new MultimapperLog([&](juce::StringRef msg) { dbgLog += msg + '\n'; }));
     juce::Logger::setCurrentLogger(logger.get());
 #endif
 
-    midiBrain.reset(new MidiBrain(voiceController));
 
 #if RUN_MULTIMAPPER_TESTS
     DBG("Running tests...");
@@ -209,7 +207,7 @@ void MultimapperAudioProcessor::getStateInformation (juce::MemoryBlock& destData
     //auto sourceNode = tuningToValueTree(*midiBrain->getTuningSource(), Multimapper::ID::TuningSource);
     //state.addChild(sourceNode, -1, nullptr);
     
-    auto targetNode = tuningToValueTree(*tuningTarget, Multimapper::ID::TuningTarget);
+    auto targetNode = tuningToValueTree(tuningController.getTuningTarget().get(), Multimapper::ID::TuningTarget);
     state.addChild(targetNode, -1, nullptr);
 
     juce::MemoryOutputStream stream(destData, false);
@@ -319,8 +317,6 @@ void MultimapperAudioProcessor::testMidi()
             buffer.addEvent(msg, sample++);
         }
 
-    midiBrain->processMidi(buffer);
-
     //int ch = 1;
     //int n = 0;
     //for (auto metadata : buffer)
@@ -343,41 +339,32 @@ void MultimapperAudioProcessor::testMidi()
 
 void MultimapperAudioProcessor::loadTuningSource(const Tuning& tuning)
 {
-    tuningSource.reset(new Tuning(tuning));
+    tuningController.setSourceTuning(&tuning);
+    juce::Logger::writeToLog("Loaded new source tuning: " + tuning.getDescription());
 }
 
 void MultimapperAudioProcessor::loadTuningTarget(const Tuning& tuning)
 {
-    tuningTarget.reset(new Tuning(tuning));
-    juce::Logger::writeToLog("Loaded new tuning: " + tuning.getDescription());
-
-    if (mappingMode == Multimapper::MappingMode::Auto)
-        refreshAutoMapping();
+    tuningController.setTargetTuning(&tuning);
+    juce::Logger::writeToLog("Loaded new target tuning: " + tuning.getDescription());
 }
 
 void MultimapperAudioProcessor::setTargetTuningReference(Tuning::Reference reference)
 {
-
+    auto oldTuning = tuningController.getTuningTarget();
+    auto newTuning = Tuning(*oldTuning.get());
+    newTuning.setReference(reference);
+    loadTuningTarget(newTuning);
 }
 
 void MultimapperAudioProcessor::loadNoteMapping(const Keytographer::TuningTableMap& map)
 {
-    noteMap.reset(new Keytographer::TuningTableMap(map));
+    tuningController.setNoteMapping(&map);
     juce::Logger::writeToLog("Loaded new mapping");
 }
 
 void MultimapperAudioProcessor::setAutoMappingType(Multimapper::MappingType type)
 {
     tuningController.setMappingType(type);
-}
-
-const Tuning* MultimapperAudioProcessor::activeSourceTuning() const
-{
-    return tuningSource.get();
-}
-
-const Tuning* MultimapperAudioProcessor::activeTargetTuning() const
-{
-    return tuningTarget.get();
 }
 

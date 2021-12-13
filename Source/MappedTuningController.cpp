@@ -15,6 +15,7 @@ MappedTuningController::MappedTuningController()
     tunings.add(std::make_unique<Tuning>(Tuning::StandardTuning()));
     currentTuningSource = tunings.getLast();
     currentTuningTarget = tunings.getLast();
+    updateAutoMapping(true);
 }
 
 MappedTuningController::~MappedTuningController()
@@ -24,7 +25,7 @@ MappedTuningController::~MappedTuningController()
 
 void MappedTuningController::setSourceTuning(const Tuning* tuning, bool updateTuner)
 {
-    tunings.add(std::make_unique<Tuning>(tuning));
+    tunings.add(std::make_unique<Tuning>(*tuning));
     currentTuningSource = tunings.getLast();
     if (updateTuner)
         updateCurrentTuner();
@@ -38,7 +39,7 @@ void MappedTuningController::setSourceTuning(const Tuning* tuning)
 
 void MappedTuningController::setTargetTuning(const Tuning* tuning, bool updateTuner)
 {
-    tunings.add(std::make_unique<Tuning>(tuning));
+    tunings.add(std::make_unique<Tuning>(*tuning));
     currentTuningTarget = tunings.getLast();
     if (updateTuner)
         updateCurrentTuner();
@@ -51,7 +52,7 @@ void MappedTuningController::setTargetTuning(const Tuning* tuning)
 
 void MappedTuningController::setNoteMapping(const Keytographer::TuningTableMap* mapping, bool updateTuner)
 {
-    mappings.add(std::make_unique<Keytographer::TuningTableMap>(mapping));
+    mappings.add(std::make_unique<Keytographer::TuningTableMap>(*mapping));
     currentMapping = mappings.getLast();
     if (updateTuner)
         updateCurrentTuner();
@@ -59,7 +60,7 @@ void MappedTuningController::setNoteMapping(const Keytographer::TuningTableMap* 
 
 void MappedTuningController::setNoteMapping(const Keytographer::TuningTableMap* mapping)
 {
-    setNoteMapping(mapping);
+    setNoteMapping(mapping, true);
 }
 
 void MappedTuningController::setTunings(const Tuning* sourceTuning, const Tuning* targetTuning, const Keytographer::TuningTableMap* mapping)
@@ -97,16 +98,17 @@ void MappedTuningController::setMappingType(Multimapper::MappingType type)
 
 void MappedTuningController::updateAutoMapping(bool updateTuner)
 {
-    auto mapping = std::make_unique<Keytographer::TuningTableMap>(newTuningMap(currentTuningTarget.get()));
+    
+    auto mapping = newTuningMap(currentTuningTarget.get());
     setNoteMapping(mapping.get(), updateTuner);
 }
 
-Keytographer::TuningTableMap* MappedTuningController::newTuningMap(const Tuning* tuning)
+std::unique_ptr<Keytographer::TuningTableMap> MappedTuningController::newTuningMap(const Tuning* tuning)
 {
     return newTuningMap(tuning, mappingType);
 }
 
-Keytographer::TuningTableMap* MappedTuningController::NewLinearMappingFromTuning(const Tuning* tuning)
+std::unique_ptr<Keytographer::TuningTableMap> MappedTuningController::NewLinearMappingFromTuning(const Tuning* tuning)
 {
     auto mapFunction = Keytographer::Map<int>::FunctionDefinition
     {
@@ -120,18 +122,17 @@ Keytographer::TuningTableMap* MappedTuningController::NewLinearMappingFromTuning
         tuning->getRootMidiNote(), tuning->getRootIndex(), &linearMap
     };
    
-    auto map = new Keytographer::TuningTableMap(definition);
-    return map;
+    return std::make_unique<Keytographer::TuningTableMap>(definition);
 }
 
-Keytographer::TuningTableMap* MappedTuningController::NewPeriodicMappingFromTuning(const Tuning* tuning)
+std::unique_ptr<Keytographer::TuningTableMap> MappedTuningController::NewPeriodicMappingFromTuning(const Tuning* tuning)
 {
+    // gotta fix this keytographer factory function
     auto periodicMap = Keytographer::MultichannelMap::CreatePeriodicMapping(tuning->getTuningSize(), tuning->getRootMidiNote(), tuning->getRootMidiChannel());
-    auto map = new Keytographer::TuningTableMap(periodicMap);
-    return map;
+    return std::make_unique<Keytographer::TuningTableMap>(periodicMap);
 }
 
-Keytographer::TuningTableMap* MappedTuningController::newTuningMap(const Tuning* tuning, Multimapper::MappingType mappingType)
+std::unique_ptr<Keytographer::TuningTableMap> MappedTuningController::newTuningMap(const Tuning* tuning, Multimapper::MappingType mappingType)
 {
     switch (mappingType)
     {

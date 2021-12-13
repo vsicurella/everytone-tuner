@@ -9,8 +9,8 @@
 #pragma once
 
 #include "TuningChanger.h"
-#include "MidiBrain.h"
 #include "MappedTuningController.h"
+#include "MidiVoiceController.h"
 
 #if RUN_MULTIMAPPER_TESTS
     #include "./tests/Tuning_tests.h"
@@ -78,8 +78,11 @@ public:
 
     //==============================================================================
 
-    const Tuning* activeSourceTuning() const;
-    const Tuning* activeTargetTuning() const;
+    const Tuning* activeSourceTuning() const { return tuningController.readTuningSource(); }
+
+    const Tuning* activeTargetTuning() const { return tuningController.readTuningTarget(); }
+
+    const Keytographer::TuningTableMap* noteMapping() const { return tuningController.readMapping(); }
 
     //==============================================================================
 
@@ -91,8 +94,6 @@ public:
     void loadNoteMapping(const Keytographer::TuningTableMap& map);
 
     void setAutoMappingType(Multimapper::MappingType type);
-
-    //void refreshAutoMapping();
 
 private:
 

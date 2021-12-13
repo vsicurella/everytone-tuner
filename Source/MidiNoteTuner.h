@@ -32,42 +32,31 @@ struct MidiPitch
 
 class MidiNoteTuner
 {
-	int pitchbendRange = 2; // total range of pitchbend in semitones
-
 	// Source Tuning Parameters
-	const Tuning* sourceTuning;
+	const std::shared_ptr<Tuning> sourceTuning;
 
 	// Target Tuning Parameters
-	const Tuning* targetTuning;
+	const std::shared_ptr<Tuning> targetTuning;
 
-	const Keytographer::TuningTableMap* tuningTableMap;
+	const std::shared_ptr<Keytographer::TuningTableMap> tuningTableMap;
 
+	const const Keytographer::TuningTableMap standardMap = Keytographer::MultichannelMap::CreatePeriodicMapping(12, 60);
+
+	int pitchbendRange = 2; // total range of pitchbend in semitones
 
 	bool cached = false;
 	juce::Array<int> pitchbendTable;
 
-	const Tuning standardTuning;
-	const Keytographer::TuningTableMap standardMap = Keytographer::MultichannelMap::CreatePeriodicMapping(12, 60);
-
 public:
     
-    MidiNoteTuner(const Tuning* targetTuningIn = nullptr, const Keytographer::TuningTableMap* noteMapIn = nullptr);
-	MidiNoteTuner(const Tuning* sourceTuningIn, const Tuning* targetTuningIn);
+	MidiNoteTuner(std::shared_ptr<Tuning> sourceTuning, std::shared_ptr<Tuning> targetTuning, std::shared_ptr<Keytographer::TuningTableMap> mapping);
     ~MidiNoteTuner();
-
-	const Tuning* getSourceTuning() { return sourceTuning; }
-	const Tuning* getTargetTuning() { return targetTuning; }
     
     juce::Array<int> getPitchbendTable() const;
 
     int getPitchbendMax() const;
-
-	void setSourceTuning(const Tuning* newSourceTuning);
-	void setTargetTuning(const Tuning* newTuningIn);
     
     void setPitchbendRange(int pitchBendMaxIn);
-
-	void setTuningTableMap(const Keytographer::TuningTableMap* mapIn);
 
 	Keytographer::MappedNote getNoteMapping(int midiChannel, int midiNote) const;
 	Keytographer::MappedNote getNoteMapping(const juce::MidiMessage& msg) const;
