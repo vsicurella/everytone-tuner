@@ -26,6 +26,7 @@ private:
                 int index = indexOffset + note;
 
                 auto pitch = tuner.getMidiPitch(ch + 1, note);
+                expect_exact(true, pitch.mapped, "pitch.mapped"); // probably should make this testable
 
                 auto chStr = juce::String(ch + 1);
                 auto noteStr = juce::String(note);

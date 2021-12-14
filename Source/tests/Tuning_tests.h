@@ -287,7 +287,7 @@ private:
 
         tuningTests("Standard Tuning", stdParams);
 
-        // Copied Standard Tuning
+        // Standard Tuning + Copy Constructor
         Tuning copiedTuning = Tuning(standardTuning);
         auto copiedParams = GetAndSetParams(stdParams);
         copiedParams.tuning = &copiedTuning;
