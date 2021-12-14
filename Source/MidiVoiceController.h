@@ -19,7 +19,7 @@ class MidiVoiceController
 {
     MappedTuningController& tuningController;
 
-    juce::Array<MidiVoice> voices;
+    juce::OwnedArray<MidiVoice> voices;
 
     juce::Array<bool> midiChannelDisabled;
 
@@ -32,7 +32,7 @@ private:
     int indexOfVoice(int midiChannel, int midiNote) const;
     int indexOfVoice(const MidiVoice* voice) const;
 
-    const MidiVoice* getVoice(int index);
+    const MidiVoice* getVoice(int index) const;
     MidiVoice removeVoice(int index);
 
 public:

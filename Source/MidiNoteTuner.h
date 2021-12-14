@@ -40,7 +40,7 @@ class MidiNoteTuner
 
 	const std::shared_ptr<Keytographer::TuningTableMap> tuningTableMap;
 
-	const const Keytographer::TuningTableMap standardMap = Keytographer::MultichannelMap::CreatePeriodicMapping(12, 60);
+	const Keytographer::TuningTableMap standardMap = Keytographer::MultichannelMap::CreatePeriodicMapping(12, 60);
 
 	int pitchbendRange = 2; // total range of pitchbend in semitones
 
