@@ -57,14 +57,84 @@ double MIDINote_DefaultCents(int nMIDINote);
 
 
 
-class CSingleScale  
+class CSingleScale
 {
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// Identification of known sections and keys
 public:
-	enum eSection;
-	enum eKey;
+	enum eSection {
+		SEC_Unknown,
+		// Begin/End sections
+		SEC_ScaleBegin,
+		SEC_ScaleEnd,
+		// Data sections
+		SEC_Info,
+		SEC_EditorSpecifics,
+		// Tuning sections: Ordering also defines priority
+		SEC_Tuning,
+		SEC_ExactTuning,
+		SEC_FunctionalTuning,
+		// Mapping
+		SEC_Mapping,
+		// Sections specifically in Multi Scale Files
+		SEC_Assignment,
+		// For referring the complete data set
+		SEC_DataSet,
+		// Number of sections
+		SEC_NumOfSections
+	};
 
+	enum eKey {
+		KEY_Unknown,
+		// Keys of section [Scale Begin]
+		KEY_Format,
+		KEY_FormatVersion,
+		KEY_FormatSpecs,
+		// Keys of section [Info]
+		KEY_Name,
+		KEY_ID,
+		KEY_Filename,
+		KEY_Author,
+		KEY_Location,
+		KEY_Contact,
+		KEY_Date,
+		KEY_Editor,
+		KEY_EditorSpecs,
+		KEY_Description,
+		KEY_Keyword,
+		KEY_History,
+		KEY_Geography,
+		KEY_Instrument,
+		KEY_Composition,
+		KEY_Comments,
+		// Keys of sections [Tuning], [Exact Tuning] and [Functional Tuning]
+		KEY_Note,
+		KEY_BaseFreq,
+		KEY_InitEqual,
+		// Keys of sections [Mapping]
+		KEY_LoopSize,
+		KEY_Keyboard,
+		// Keys of sections [Assignment]
+		KEY_MIDIChannel,
+		// No keys in section [Scale End]
+		// For referring the complete data set
+		KEY_AllData,
+		// Number of keys
+		KEY_NumOfKeys
+	};
 
+	static const std::vector<std::string> &	GetSections() { return m_vstrSections; }
+	static const std::vector<std::string> &	GetKeys() { return m_vstrKeys; }
+	static eSection							FindSection(const std::string & strSection);
+	static eKey								FindKey(const std::string & strKey,
+													long & lKeyIndex);
 
+private:
+	static std::vector<std::string>	m_vstrSections;
+	static std::vector<std::string>	m_vstrKeys;
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// Main stuff
 public:
 	CSingleScale();
 	virtual ~CSingleScale();
@@ -93,9 +163,28 @@ public:
 	// Get base note / base frequency
 	long	GetBaseNote() const { return m_lInitEqual_BaseNote; }
 	double	GetBaseFreqHz() const { return m_dblInitEqual_BaseFreqHz; }
-	// Read-access of the note frequencies
-	// (NOTE: Vector index is scale note number, NOT MIDI note number!)
+
+	/**
+	 * Read-access of the note frequencies
+	 *
+	 * Be aware that frequencies <= 0 Hz could be returned, especially
+	 * when the .tun file loaded makes use of the [Functional Tuning] section.
+	 * It is strongly suggest to handle notes of such frequencies as "muted" notes.
+	 * (i.e. do not output any sound on these notes.)
+	 *
+	 * (NOTE: Vector index is scale note number, NOT MIDI note number!)
+	 * @return Frequencies of scale notes.
+	 */
 	const std::vector<double> &	GetNoteFrequenciesHz() const { return m_vdblNoteFrequenciesHz; }
+
+	/**
+	 * Be aware that frequencies <= 0 Hz could be returned, especially
+ 	 * when the .tun file loaded makes use of the [Functional Tuning] section.
+ 	 * It is strongly suggest to handle notes of such frequencies as "muted" notes.
+ 	 * (i.e. do not output any sound on these notes.)
+	 * @param  lMIDINoteNumber MIDI note number (0 to 127)
+	 * @return                 Frequency of that note in scale
+	 */
 	double						GetMIDINoteFreqHz(long lMIDINoteNumber) const { return m_vdblNoteFrequenciesHz.at(MapMIDI2Scale(lMIDINoteNumber)); }
 	// Write-access of the note frequencies
 	// When changing values you must make use of the CFormula class
@@ -213,89 +302,13 @@ private:
 	std::string	m_strDate;
 
 
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	// Identification of known sections and keys
-public:
-	enum eSection {
-		SEC_Unknown,
-		// Begin/End sections
-		SEC_ScaleBegin,
-		SEC_ScaleEnd,
-		// Data sections
-		SEC_Info,
-		SEC_EditorSpecifics,
-		// Tuning sections: Ordering also defines priority
-		SEC_Tuning,
-		SEC_ExactTuning,
-		SEC_FunctionalTuning,
-		// Mapping
-		SEC_Mapping,
-		// Sections specifically in Multi Scale Files
-		SEC_Assignment,
-		// For referring the complete data set
-		SEC_DataSet,
-		// Number of sections
-		SEC_NumOfSections
-	};
-
-	enum eKey {
-		KEY_Unknown,
-		// Keys of section [Scale Begin]
-		KEY_Format,
-		KEY_FormatVersion,
-		KEY_FormatSpecs,
-		// Keys of section [Info]
-		KEY_Name,
-		KEY_ID,
-		KEY_Filename,
-		KEY_Author,
-		KEY_Location,
-		KEY_Contact,
-		KEY_Date,
-		KEY_Editor,
-		KEY_EditorSpecs,
-		KEY_Description,
-		KEY_Keyword,
-		KEY_History,
-		KEY_Geography,
-		KEY_Instrument,
-		KEY_Composition,
-		KEY_Comments,
-		// Keys of sections [Tuning], [Exact Tuning] and [Functional Tuning]
-		KEY_Note,
-		KEY_BaseFreq,
-		KEY_InitEqual,
-		// Keys of sections [Mapping]
-		KEY_LoopSize,
-		KEY_Keyboard,
-		// Keys of sections [Assignment]
-		KEY_MIDIChannel,
-		// No keys in section [Scale End]
-		// For referring the complete data set
-		KEY_AllData,
-		// Number of keys
-		KEY_NumOfKeys
-	};
-
-	static const std::vector<std::string> &	GetSections() { return m_vstrSections; }
-	static const std::vector<std::string> &	GetKeys() { return m_vstrKeys; }
-	static eSection							FindSection(const std::string & strSection);
-	static eKey								FindKey(const std::string & strKey,
-													long & lKeyIndex);
-
 private:
-	static std::vector<std::string>	m_vstrSections;
-	static std::vector<std::string>	m_vstrKeys;
-
-
-
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// Misc functions
 	static bool		IsNoteIndexOK(int nIndex);
 
-	
-	
+
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// Last but not least: the scale and its definitions
 	long				m_lInitEqual_BaseNote;

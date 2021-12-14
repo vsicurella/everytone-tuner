@@ -1,4 +1,4 @@
-// SCL_Import.h: Schnittstelle für die Klasse CSCL_Import.
+// SCL_Import.h: Schnittstelle fÃ¼r die Klasse CSCL_Import.
 //
 // (C)opyright in 2009 by Mark Henning, Germany
 //
