@@ -14,6 +14,7 @@
 
 #if RUN_MULTIMAPPER_TESTS
     #include "./tests/Tuning_tests.h"
+    #include "./tests/MidiNoteTuner_tests.h"
 #endif
 
 class MultimapperLog : public juce::Logger

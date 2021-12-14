@@ -36,9 +36,11 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
     DBG("Running tests...");
 
     Tuning_Test tuningTest;
+    MidiNoteTuner_Test midiNoteTunerTest;
 
     auto tests = juce::Array<juce::UnitTest*>();
     tests.add(&tuningTest);
+    tests.add(&midiNoteTunerTest);
 
     juce::UnitTestRunner tester;
     tester.runTests(tests);
@@ -253,12 +255,12 @@ juce::String MultimapperAudioProcessor::getLog() const
 void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
 {
     juce::MidiBuffer processedBuffer;
-    int sample = 0;
+    int sample = 0; 
 
     for (auto metadata : buffer)
     {
         auto msg = metadata.getMessage();
-
+        juce::Logger::writeToLog(msg.getDescription());
         auto status = msg.getRawData()[0];
         bool isVoice = status >= 0x80 && status < 0xb0;
 
@@ -276,6 +278,7 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
 
                 if (pbmsg.getPitchWheelValue() != 8192)
                 {
+                    juce::Logger::writeToLog(pbmsg.getDescription());
                     processedBuffer.addEvent(pbmsg, sample++);
                 }
             }
@@ -313,6 +316,9 @@ void MultimapperAudioProcessor::testMidi()
             msg = juce::MidiMessage::noteOff(ch, n);
             buffer.addEvent(msg, sample++);
         }
+
+    auto audioDummy = juce::AudioSampleBuffer();
+    processBlock(audioDummy, buffer);
 
     //int ch = 1;
     //int n = 0;
