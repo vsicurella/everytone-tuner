@@ -32,6 +32,24 @@ void MidiVoice::updatePitch()
 {
     auto previousPitch = currentPitch;
     currentPitch = tuner->getMidiPitch(currentMappedNote);
+
+#if JUCE_DEBUG
+    auto ch = juce::String(midiChannel);
+    auto note = juce::String(midiNote);
+    auto input = "\t(" + ch + ", " + note + ") -> ";
+    if (currentMappedNote.mapped && currentPitch.mapped)
+    {
+        auto table = juce::String(currentMappedNote.tableIndex);
+        auto index = juce::String(currentMappedNote.noteIndex);
+        auto coarse = juce::String(currentPitch.coarse);
+        auto bend = juce::String(currentPitch.pitchbend);
+        juce::Logger::writeToLog(input + "(" + table + ", " + index + ") " + coarse + " + " + bend);
+    }
+    else
+    {
+        juce::Logger::writeToLog(input + "unmapped");
+    }
+#endif
 }
 
 void MidiVoice::update()
