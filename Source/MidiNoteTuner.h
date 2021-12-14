@@ -49,8 +49,17 @@ class MidiNoteTuner
 
 public:
     
-	MidiNoteTuner(std::shared_ptr<Tuning> sourceTuning, std::shared_ptr<Tuning> targetTuning, std::shared_ptr<Keytographer::TuningTableMap> mapping);
+	MidiNoteTuner(std::shared_ptr<Tuning> sourceTuning, 
+		          std::shared_ptr<Tuning> targetTuning, 
+		          std::shared_ptr<Keytographer::TuningTableMap> mapping,
+				  int pitchbendRange = 2);
     ~MidiNoteTuner();
+
+	const Tuning* tuningSource() const { return sourceTuning.get(); }
+
+	const Tuning* tuningTarget() const { return targetTuning.get(); }
+
+	const Keytographer::TuningTableMap* mapping() const { return tuningTableMap.get(); }
     
     juce::Array<int> getPitchbendTable() const;
 

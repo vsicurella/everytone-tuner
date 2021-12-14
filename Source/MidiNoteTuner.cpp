@@ -11,8 +11,8 @@
 #include "MidiNoteTuner.h"
 
 
-MidiNoteTuner::MidiNoteTuner(std::shared_ptr<Tuning> sourceTuningIn, std::shared_ptr<Tuning> targetTuningIn, std::shared_ptr<Keytographer::TuningTableMap> mapping)
-	: sourceTuning(sourceTuningIn), targetTuning(targetTuningIn), tuningTableMap(mapping)
+MidiNoteTuner::MidiNoteTuner(std::shared_ptr<Tuning> sourceTuningIn, std::shared_ptr<Tuning> targetTuningIn, std::shared_ptr<Keytographer::TuningTableMap> mapping, int pitchbendRangeIn)
+	: sourceTuning(sourceTuningIn), targetTuning(targetTuningIn), tuningTableMap(mapping), pitchbendRange(pitchbendRangeIn)
 {
 }
 
