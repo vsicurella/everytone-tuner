@@ -26,12 +26,12 @@ public:
     MenuBarModel(juce::ApplicationCommandManager* cmdManagerIn = nullptr) : cmdManager(cmdManagerIn) {}
     ~MenuBarModel() override {}
 
-    juce::StringArray MenuBarModel::getMenuBarNames() override
+    juce::StringArray getMenuBarNames() override
     {
         return menuNames;
     }
 
-    juce::PopupMenu MenuBarModel::getMenuForIndex(int topLevelMenuIndex, const juce::String& menuName) override
+    juce::PopupMenu getMenuForIndex(int topLevelMenuIndex, const juce::String& menuName) override
     {
         juce::PopupMenu menu;
 
@@ -49,7 +49,7 @@ public:
         return menu;
     }
 
-    void MenuBarModel::menuItemSelected(int menuItemID, int topLevelMenuIndex) override
+    void menuItemSelected(int menuItemID, int topLevelMenuIndex) override
     {
 
     }
