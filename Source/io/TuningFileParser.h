@@ -40,12 +40,13 @@ public:
 public:
 
 	TuningFileParser() {};
-	TuningFileParser(const juce::String& absoluteFilePath);
+	TuningFileParser(juce::String filepath);
+	TuningFileParser(juce::File file);
 	~TuningFileParser();
 
-	void loadFile(const juce::String& absoluteFilePath);
+	void loadFile(juce::String absoluteFilePath);
 
-	void readFile(const juce::File& file);
+	void readFile(juce::File file);
 
 	Tuning::Definition getTuningDefinition() const;
 
@@ -55,19 +56,19 @@ public:
 
 public:
 	
-	static int determineTuningType(const juce::File& tuningFileIn);
+	static int determineTuningType(juce::File tuningFileIn);
 
-	static Tuning::CentsDefinition parseScalaFileDefinition(const juce::File& scalaFile);
+	static Tuning::CentsDefinition parseScalaFileDefinition(juce::File scalaFile);
 
-	static Tuning::CentsDefinition parseTunFileDefinition(const juce::File& tunFile);
-
-private:
-
-	void parseTuning(const juce::File& file);
+	static Tuning::CentsDefinition parseTunFileDefinition(juce::File tunFile);
 
 private:
 
-	juce::String filePath;
+	void parseTuning(juce::File file);
+
+private:
+
+	//juce::String filePath;
 	TuningType type = TuningType::INV;
 	std::unique_ptr<Tuning> tuningLoaded;
 };

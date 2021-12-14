@@ -223,14 +223,12 @@ bool MultimapperAudioProcessorEditor::performNewTuning(const juce::ApplicationCo
 
 bool MultimapperAudioProcessorEditor::performOpenTuning(const juce::ApplicationCommandTarget::InvocationInfo& info)
 {
-    TuningFileParser parser;
-
     auto callback = [&](const juce::FileChooser& chooser)
     {
         auto result = chooser.getResult();
         if (result.existsAsFile())
         {
-            parser.readFile(result);
+            TuningFileParser parser(result);
             commitTuning(parser.getTuning());
         }
     };
