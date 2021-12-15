@@ -10,6 +10,14 @@
 #include "PluginEditor.h"
 #include "TuningHelpers.h"
 
+#if RUN_MULTIMAPPER_TESTS
+    #include "./tests/Map_Test.h"
+    #include "./tests/MultichannelMap_Test.h"
+    #include "./tests/Tuning_tests.h"
+    #include "./tests/MidiNoteTuner_tests.h"
+#endif
+
+
 //==============================================================================
 MultimapperAudioProcessor::MultimapperAudioProcessor()
     : tuningController(),
@@ -35,10 +43,14 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
 #if RUN_MULTIMAPPER_TESTS
     DBG("Running tests...");
 
+    KeytographerTest::Map_Test mapTest;
+    KeytographerTest::MultichannelMap_Test multichannelMapTest;
     Tuning_Test tuningTest;
     MidiNoteTuner_Test midiNoteTunerTest;
 
     auto tests = juce::Array<juce::UnitTest*>();
+    tests.add(&mapTest);
+    tests.add(&multichannelMapTest);
     tests.add(&tuningTest);
     tests.add(&midiNoteTunerTest);
 

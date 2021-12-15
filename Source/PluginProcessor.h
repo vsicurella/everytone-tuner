@@ -12,11 +12,6 @@
 #include "MappedTuningController.h"
 #include "MidiVoiceController.h"
 
-#if RUN_MULTIMAPPER_TESTS
-    #include "./tests/Tuning_tests.h"
-    #include "./tests/MidiNoteTuner_tests.h"
-#endif
-
 class MultimapperLog : public juce::Logger
 {
     std::function<void(juce::StringRef msg)> callback;
