@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="dQHHPS" name="Multimapper" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" headerPath="../../../Keytographer/Source/"
-              defines="RUN_MULTIMAPPER_TESTS=1" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" defines="RUN_MULTIMAPPER_TESTS=1"
+              pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn">
   <MAINGROUP id="H8zE4n" name="Multimapper">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
       <FILE id="oMI0GT" name="MultimapperCommon.h" compile="0" resource="0"
@@ -24,42 +24,13 @@
               file="Source/tests/MidiNoteTuner_tests.h"/>
         <FILE id="Onui4N" name="TestsCommon.h" compile="0" resource="0" file="Source/tests/TestsCommon.h"/>
         <FILE id="P6b0jk" name="Tuning_tests.h" compile="0" resource="0" file="Source/tests/Tuning_tests.h"/>
-      </GROUP>
-      <GROUP id="{B28A3B7A-D56B-1E69-5B28-B1F138349D16}" name="Keytographer">
-        <GROUP id="{D707B0D2-5268-602B-ADCB-B03FC0F30F26}" name="Source">
-          <GROUP id="{D997B268-0F5D-792A-3073-C6CAF328CD64}" name="tests">
-            <FILE id="GDG9V2" name="Map_Test.h" compile="0" resource="0" file="../Keytographer/Source/tests/Map_Test.h"/>
-            <FILE id="fYDpGG" name="MultichannelMap_Test.h" compile="0" resource="0"
-                  file="../Keytographer/Source/tests/MultichannelMap_Test.h"/>
-            <FILE id="BzgxPl" name="SingleChannelMap_Test.h" compile="0" resource="0"
-                  file="../Keytographer/Source/tests/SingleChannelMap_Test.h"/>
-            <FILE id="nQIOGd" name="TestCommon.h" compile="0" resource="0" file="../Keytographer/Source/tests/TestCommon.h"/>
-          </GROUP>
-          <FILE id="KR77tV" name="Atlas.h" compile="0" resource="0" file="../Keytographer/Source/Atlas.h"/>
-          <FILE id="cKqequ" name="Map.h" compile="0" resource="0" file="../Keytographer/Source/Map.h"/>
-          <FILE id="YFnwjH" name="MultichannelMap.cpp" compile="1" resource="0"
-                file="../Keytographer/Source/MultichannelMap.cpp"/>
-          <FILE id="XffmqS" name="MultichannelMap.h" compile="0" resource="0"
-                file="../Keytographer/Source/MultichannelMap.h"/>
-          <FILE id="ydbpSw" name="NoteMapper.cpp" compile="0" resource="0" file="../Keytographer/Source/NoteMapper.cpp"/>
-          <FILE id="DZodht" name="NoteMapper.h" compile="0" resource="0" file="../Keytographer/Source/NoteMapper.h"/>
-          <FILE id="WQjvVT" name="PluginEditor.cpp" compile="0" resource="0"
-                file="../Keytographer/Source/PluginEditor.cpp"/>
-          <FILE id="l86vbK" name="PluginEditor.h" compile="0" resource="0" file="../Keytographer/Source/PluginEditor.h"/>
-          <FILE id="fintYP" name="PluginProcessor.cpp" compile="0" resource="0"
-                file="../Keytographer/Source/PluginProcessor.cpp"/>
-          <FILE id="o7DM7C" name="PluginProcessor.h" compile="0" resource="0"
-                file="../Keytographer/Source/PluginProcessor.h"/>
-          <FILE id="qp7EyQ" name="Rule.h" compile="0" resource="0" file="../Keytographer/Source/Rule.h"/>
-          <FILE id="DRB4Zu" name="SingleChannelMap.cpp" compile="0" resource="0"
-                file="../Keytographer/Source/SingleChannelMap.cpp"/>
-          <FILE id="zIJeYM" name="SingleChannelMap.h" compile="0" resource="0"
-                file="../Keytographer/Source/SingleChannelMap.h"/>
-          <FILE id="KFozT0" name="TuningTableMap.cpp" compile="1" resource="0"
-                file="../Keytographer/Source/TuningTableMap.cpp"/>
-          <FILE id="aRz980" name="TuningTableMap.h" compile="0" resource="0"
-                file="../Keytographer/Source/TuningTableMap.h"/>
-        </GROUP>
+        <FILE id="aHOyma" name="Map_Test.h" compile="0" resource="0" file="Source/tests/Map_Test.h"/>
+        <FILE id="LviRnL" name="Map_Test_Template.h" compile="0" resource="0"
+              file="Source/tests/Map_Test_Template.h"/>
+        <FILE id="hQLgt3" name="MultichannelMap_Test.h" compile="0" resource="0"
+              file="Source/tests/MultichannelMap_Test.h"/>
+        <FILE id="oAajsz" name="SingleChannelMap_Test.h" compile="0" resource="0"
+              file="Source/tests/SingleChannelMap_Test.h"/>
       </GROUP>
       <GROUP id="{8B807919-2EE7-BE69-09B0-6C440054EDAD}" name="io">
         <GROUP id="{A3277773-B40D-C9A4-C1A3-50104F0A9FFF}" name="TUN_V2">
@@ -85,6 +56,17 @@
               file="Source/io/TuningFileParser.cpp"/>
         <FILE id="LueTGM" name="TuningFileParser.h" compile="0" resource="0"
               file="Source/io/TuningFileParser.h"/>
+      </GROUP>
+      <GROUP id="{2CA2C8B2-CBA9-A918-6AC2-7ADCA4BB3DC7}" name="mapping">
+        <FILE id="YJnPDH" name="Map.h" compile="0" resource="0" file="Source/mapping/Map.h"/>
+        <FILE id="nSLi6c" name="MultichannelMap.cpp" compile="1" resource="0"
+              file="Source/mapping/MultichannelMap.cpp"/>
+        <FILE id="v5wrXh" name="MultichannelMap.h" compile="0" resource="0"
+              file="Source/mapping/MultichannelMap.h"/>
+        <FILE id="TnfA4L" name="TuningTableMap.cpp" compile="1" resource="0"
+              file="Source/mapping/TuningTableMap.cpp"/>
+        <FILE id="npzOFm" name="TuningTableMap.h" compile="0" resource="0"
+              file="Source/mapping/TuningTableMap.h"/>
       </GROUP>
       <FILE id="TlWn9G" name="MidiVoice.cpp" compile="1" resource="0" file="Source/MidiVoice.cpp"/>
       <FILE id="cdGlcX" name="MidiVoice.h" compile="0" resource="0" file="Source/MidiVoice.h"/>

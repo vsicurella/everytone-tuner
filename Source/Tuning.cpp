@@ -45,7 +45,7 @@ void Tuning::setupTuning(const juce::Array<double>& cents)
     tuningShifted.remove(tuningShifted.getLast());
     tuningShifted.insert(0, 0);    
 
-    Keytographer::Map<double>::Definition definition =
+    Map<double>::Definition definition =
     {
         tuningSize,
         tuningShifted.data(),
@@ -54,7 +54,7 @@ void Tuning::setupTuning(const juce::Array<double>& cents)
         rootMidiNote, /* tuning index root */
     };
 
-    tuningMap.reset(new Keytographer::Map<double>(definition));
+    tuningMap.reset(new Map<double>(definition));
 
     rebuildTables();
 }

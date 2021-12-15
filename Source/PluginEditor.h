@@ -15,7 +15,7 @@
 #include "ui/MenuBar.h"
 #include "ui/NewTuningPanel.h"
 #include "io/TuningFileParser.h"
-#include "../Source/MultichannelMap.h"
+#include "./mapping/MultichannelMap.h"
 
 //==============================================================================
 /**

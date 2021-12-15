@@ -11,7 +11,7 @@
 #include "MidiNoteTuner.h"
 
 
-MidiNoteTuner::MidiNoteTuner(std::shared_ptr<Tuning> sourceTuningIn, std::shared_ptr<Tuning> targetTuningIn, std::shared_ptr<Keytographer::TuningTableMap> mapping, int pitchbendRangeIn)
+MidiNoteTuner::MidiNoteTuner(std::shared_ptr<Tuning> sourceTuningIn, std::shared_ptr<Tuning> targetTuningIn, std::shared_ptr<TuningTableMap> mapping, int pitchbendRangeIn)
 	: sourceTuning(sourceTuningIn), targetTuning(targetTuningIn), tuningTableMap(mapping), pitchbendRange(pitchbendRangeIn)
 {
 }
@@ -35,17 +35,17 @@ void MidiNoteTuner::setPitchbendRange(int pitchbendMaxIn)
     pitchbendRange = pitchbendMaxIn;
 }
 
-Keytographer::MappedNote MidiNoteTuner::getNoteMapping(int midiChannel, int midiNote) const
+MappedNote MidiNoteTuner::getNoteMapping(int midiChannel, int midiNote) const
 {
 	return tuningTableMap->getMappedNote(midiChannel, midiNote);
 }
 
-Keytographer::MappedNote MidiNoteTuner::getNoteMapping(const juce::MidiMessage& msg) const
+MappedNote MidiNoteTuner::getNoteMapping(const juce::MidiMessage& msg) const
 {
 	return getNoteMapping(msg.getChannel(), msg.getNoteNumber());
 }
 
-MidiPitch MidiNoteTuner::getMidiPitch(const Keytographer::MappedNote& mapped) const
+MidiPitch MidiNoteTuner::getMidiPitch(const MappedNote& mapped) const
 {
 	// First get target MTS note
 	auto targetMts = targetTuning->mtsTableAt(mapped.index);

@@ -101,7 +101,7 @@ static Tuning parseTuningValueTree(juce::ValueTree tree)
     return Tuning(definition);
 }
 
-static juce::ValueTree tuningTableMapToValueTree(const Keytographer::TuningTableMap& midiMap)
+static juce::ValueTree tuningTableMapToValueTree(const TuningTableMap& midiMap)
 {
     auto tree = juce::ValueTree(Multimapper::ID::TuningTableMidiMap);
    
@@ -122,12 +122,12 @@ static juce::ValueTree tuningTableMapToValueTree(const Keytographer::TuningTable
     return tree;
 }
 
-static Keytographer::TuningTableMap parseTuningTableMapTree(juce::ValueTree tree)
+static TuningTableMap parseTuningTableMapTree(juce::ValueTree tree)
 {
     auto patternNode = tree.getChildWithName(Multimapper::ID::Pattern);
     const int mapSize = patternNode.getNumChildren();
 
-    Keytographer::Map<int>::Pattern pattern;
+    Map<int>::Pattern pattern;
     for (int i = 0; i < mapSize; i++)
     {
         pattern.push_back((int)patternNode.getChild(i)[Multimapper::ID::Value]);
@@ -138,7 +138,7 @@ static Keytographer::TuningTableMap parseTuningTableMapTree(juce::ValueTree tree
     int mapRoot = tree.getProperty(Multimapper::ID::MapRoot, 0);
     int transpose = tree.getProperty(Multimapper::ID::Transpose, 0);
 
-    auto mapDefinition = Keytographer::Map<int>::Definition
+    auto mapDefinition = Map<int>::Definition
     {
         mapSize,
         pattern.data(),
@@ -148,18 +148,18 @@ static Keytographer::TuningTableMap parseTuningTableMapTree(juce::ValueTree tree
         transpose
     };
 
-    auto map = Keytographer::Map<int>(mapDefinition);
+    auto map = Map<int>(mapDefinition);
 
     int rootMidiNote = tree.getProperty(Multimapper::ID::RootMidiNote);
     int rootTuningIndex = tree.getProperty(Multimapper::ID::RootTuningIndex);
 
-    auto definition = Keytographer::TuningTableMap::Definition
+    auto definition = TuningTableMap::Definition
     {
         rootMidiNote,
         rootTuningIndex,
         &map
     };
 
-    auto tuningTableMap = Keytographer::TuningTableMap(definition);
+    auto tuningTableMap = TuningTableMap(definition);
     return tuningTableMap;
 }

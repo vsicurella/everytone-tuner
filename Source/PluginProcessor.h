@@ -78,7 +78,7 @@ public:
 
     const Tuning* activeTargetTuning() const { return tuningController.readTuningTarget(); }
 
-    const Keytographer::TuningTableMap* noteMapping() const { return tuningController.readMapping(); }
+    const TuningTableMap* noteMapping() const { return tuningController.readMapping(); }
 
     //==============================================================================
 
@@ -87,7 +87,7 @@ public:
 
     void setTargetTuningReference(Tuning::Reference reference);
 
-    void loadNoteMapping(const Keytographer::TuningTableMap& map);
+    void loadNoteMapping(const TuningTableMap& map);
 
     void setAutoMappingType(Multimapper::MappingType type);
 

@@ -13,8 +13,7 @@
 // #include "CommonFunctions.h"
 #include "TuningMath.h"
 #include "Tuning.h"
-#include "TuningTableMap.h"
-#include "MultichannelMap.h"
+#include "./mapping/MultichannelMap.h"
 
 struct MidiPitch
 {
@@ -38,9 +37,9 @@ class MidiNoteTuner
 	// Target Tuning Parameters
 	const std::shared_ptr<Tuning> targetTuning;
 
-	const std::shared_ptr<Keytographer::TuningTableMap> tuningTableMap;
+	const std::shared_ptr<TuningTableMap> tuningTableMap;
 
-	const Keytographer::TuningTableMap standardMap = Keytographer::MultichannelMap::CreatePeriodicMapping(12, 60);
+	const TuningTableMap standardMap = MultichannelMap::CreatePeriodicMapping(12, 60);
 
 	int pitchbendRange = 2; // total range of pitchbend in semitones
 
@@ -51,7 +50,7 @@ public:
     
 	MidiNoteTuner(std::shared_ptr<Tuning> sourceTuning, 
 		          std::shared_ptr<Tuning> targetTuning, 
-		          std::shared_ptr<Keytographer::TuningTableMap> mapping,
+		          std::shared_ptr<TuningTableMap> mapping,
 				  int pitchbendRange = 2);
     ~MidiNoteTuner();
 
@@ -59,7 +58,7 @@ public:
 
 	const Tuning* tuningTarget() const { return targetTuning.get(); }
 
-	const Keytographer::TuningTableMap* mapping() const { return tuningTableMap.get(); }
+	const TuningTableMap* mapping() const { return tuningTableMap.get(); }
     
     juce::Array<int> getPitchbendTable() const;
 
@@ -67,10 +66,10 @@ public:
     
     void setPitchbendRange(int pitchBendMaxIn);
 
-	Keytographer::MappedNote getNoteMapping(int midiChannel, int midiNote) const;
-	Keytographer::MappedNote getNoteMapping(const juce::MidiMessage& msg) const;
+	MappedNote getNoteMapping(int midiChannel, int midiNote) const;
+	MappedNote getNoteMapping(const juce::MidiMessage& msg) const;
 
-	MidiPitch getMidiPitch(const Keytographer::MappedNote& mappedNote) const;
+	MidiPitch getMidiPitch(const MappedNote& mappedNote) const;
 	MidiPitch getMidiPitch(int midiChannel, int midiNote) const;
 	MidiPitch getMidiPitch(const juce::MidiMessage& msg) const;
 

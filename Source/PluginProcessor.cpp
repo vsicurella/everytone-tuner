@@ -43,13 +43,13 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
 #if RUN_MULTIMAPPER_TESTS
     DBG("Running tests...");
 
-    KeytographerTest::Map_Test mapTest;
-    KeytographerTest::MultichannelMap_Test multichannelMapTest;
+    Map_Test_Generator mapTests;
+    MultichannelMap_Test multichannelMapTest;
     Tuning_Test tuningTest;
     MidiNoteTuner_Test midiNoteTunerTest;
 
     auto tests = juce::Array<juce::UnitTest*>();
-    tests.add(&mapTest);
+    mapTests.addToTests(tests);
     tests.add(&multichannelMapTest);
     tests.add(&tuningTest);
     tests.add(&midiNoteTunerTest);
@@ -376,7 +376,7 @@ void MultimapperAudioProcessor::setTargetTuningReference(Tuning::Reference refer
     juce::Logger::writeToLog("Loaded new target tuning reference: " + reference.toString());
 }
 
-void MultimapperAudioProcessor::loadNoteMapping(const Keytographer::TuningTableMap& map)
+void MultimapperAudioProcessor::loadNoteMapping(const TuningTableMap& map)
 {
     tuningController.setNoteMapping(&map);
 }

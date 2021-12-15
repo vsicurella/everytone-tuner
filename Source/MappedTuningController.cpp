@@ -50,20 +50,20 @@ void MappedTuningController::setTargetTuning(const Tuning* tuning)
     setTargetTuning(tuning, true);
 }
 
-void MappedTuningController::setNoteMapping(const Keytographer::TuningTableMap* mapping, bool updateTuner)
+void MappedTuningController::setNoteMapping(const TuningTableMap* mapping, bool updateTuner)
 {
-    mappings.add(std::make_unique<Keytographer::TuningTableMap>(*mapping));
+    mappings.add(std::make_unique<TuningTableMap>(*mapping));
     currentMapping = mappings.getLast();
     if (updateTuner)
         updateCurrentTuner();
 }
 
-void MappedTuningController::setNoteMapping(const Keytographer::TuningTableMap* mapping)
+void MappedTuningController::setNoteMapping(const TuningTableMap* mapping)
 {
     setNoteMapping(mapping, true);
 }
 
-void MappedTuningController::setTunings(const Tuning* sourceTuning, const Tuning* targetTuning, const Keytographer::TuningTableMap* mapping)
+void MappedTuningController::setTunings(const Tuning* sourceTuning, const Tuning* targetTuning, const TuningTableMap* mapping)
 {
     if (sourceTuning != nullptr)
     {
@@ -103,36 +103,36 @@ void MappedTuningController::updateAutoMapping(bool updateTuner)
     setNoteMapping(mapping.get(), updateTuner);
 }
 
-std::unique_ptr<Keytographer::TuningTableMap> MappedTuningController::newTuningMap(const Tuning* tuning)
+std::unique_ptr<TuningTableMap> MappedTuningController::newTuningMap(const Tuning* tuning)
 {
     return newTuningMap(tuning, mappingType);
 }
 
-std::unique_ptr<Keytographer::TuningTableMap> MappedTuningController::NewLinearMappingFromTuning(const Tuning* tuning)
+std::unique_ptr<TuningTableMap> MappedTuningController::NewLinearMappingFromTuning(const Tuning* tuning)
 {
-    auto mapFunction = Keytographer::Map<int>::FunctionDefinition
+    auto mapFunction = Map<int>::FunctionDefinition
     {
         2048,
         tuning->getRootIndex(),
         [&](int x) { return modulo(x - tuning->getRootIndex(), 2048); }
     };
-    auto linearMap = Keytographer::Map<int>(mapFunction);
-    auto definition = Keytographer::TuningTableMap::Definition
+    auto linearMap = Map<int>(mapFunction);
+    auto definition = TuningTableMap::Definition
     {
         tuning->getRootMidiNote(), tuning->getRootIndex(), &linearMap
     };
    
-    return std::make_unique<Keytographer::TuningTableMap>(definition);
+    return std::make_unique<TuningTableMap>(definition);
 }
 
-std::unique_ptr<Keytographer::TuningTableMap> MappedTuningController::NewPeriodicMappingFromTuning(const Tuning* tuning)
+std::unique_ptr<TuningTableMap> MappedTuningController::NewPeriodicMappingFromTuning(const Tuning* tuning)
 {
     // gotta fix this keytographer factory function
-    auto periodicMap = Keytographer::MultichannelMap::CreatePeriodicMapping(tuning->getTuningSize(), tuning->getRootMidiNote(), tuning->getRootMidiChannel());
-    return std::make_unique<Keytographer::TuningTableMap>(periodicMap);
+    auto periodicMap = MultichannelMap::CreatePeriodicMapping(tuning->getTuningSize(), tuning->getRootMidiNote(), tuning->getRootMidiChannel());
+    return std::make_unique<TuningTableMap>(periodicMap);
 }
 
-std::unique_ptr<Keytographer::TuningTableMap> MappedTuningController::newTuningMap(const Tuning* tuning, Multimapper::MappingType mappingType)
+std::unique_ptr<TuningTableMap> MappedTuningController::newTuningMap(const Tuning* tuning, Multimapper::MappingType mappingType)
 {
     switch (mappingType)
     {

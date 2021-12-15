@@ -11,13 +11,13 @@
 #pragma once
 
 #include "TuningMath.h"
-#include "Map.h"
+#include "./mapping/Map.h"
 
 #define TUNING_TABLE_SIZE 2048
 
 class Tuning
 {
-    std::unique_ptr<Keytographer::Map<double>> tuningMap;
+    std::unique_ptr<Map<double>> tuningMap;
 	
 	juce::Array<double> centsTable;
 	juce::Array<double> ratioTable;
