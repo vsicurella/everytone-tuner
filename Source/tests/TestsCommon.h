@@ -15,6 +15,8 @@
 #define TABLE_EPSILON 1e-5
 #define MAX_FREQ 12543.854
 
+using namespace juce;
+
 static int precision(double number)
 {
     auto p = log(abs(number));
@@ -23,14 +25,42 @@ static int precision(double number)
     return -p + 12;
 }
 
-class MultimapperUnitTest : public juce::UnitTest
+template <typename T>
+static String arrayToString(T const* array, int size, bool newLines = true)
+{
+    String str = "";
+    for (int i = 0; i < size; i++)
+    {
+        str += String(i) + ": " + String(array[i]);
+        if (newLines)
+            str += newLine;
+        else
+            str += ", ";
+    }
+
+    return str;
+}
+
+//template <typename T>
+//static String MapDefToString(Map<T>::Definition def)
+//{
+//    String str = "Size: " + String(def.mapSize);
+//    str += "\nPattern   : " + arrayToString<T>(def.pattern, def.mapSize, false);
+//    str += "\nBase      : " + String(def.patternBase);
+//    str += "\nPat. Root : " + String(def.patternRootIndex);
+//    str += "\nMap Root  : " + String(def.mapRootIndex);
+//    str += "\nTranspose : " + String(def.transpose);
+//    return str;
+//}
+
+class MultimapperUnitTest : public UnitTest
 {
 protected:
-    juce::String name;
+    String name;
 
 public:
 
-    MultimapperUnitTest(juce::String className) : name(className), juce::UnitTest(className) {}
+    MultimapperUnitTest(String className) : name(className), UnitTest(className) {}
 
     virtual ~MultimapperUnitTest() override {}
 
@@ -39,47 +69,43 @@ public:
 protected:
 
     template <typename T>
-    juce::String testErrorMessage(juce::String keyName, T expected, T actual)
+    String testErrorMessage(String keyName, T expected, T actual)
     {
-        auto e = juce::var(expected);
-        auto a = juce::var(actual);
-        juce::String msg = name + "." + keyName + " should equal " + e.toString() + " but is " + a.toString();
+        auto e = var(expected);
+        auto a = var(actual);
+        String msg = name + "." + keyName + " should equal " + e.toString() + " but is " + a.toString();
         return msg;
     }
 
     template <typename T>
-    void expect_exact(T expected, T actual, juce::String keyName)
+    void expect_exact(T expected, T actual, String keyName)
     {
         expect(expected == actual, testErrorMessage(keyName, expected, actual));
     }
 
     template <typename T>
-    void expect_equals(T expected, T actual, juce::String keyName)
+    void expect_equals(T expected, T actual, String keyName)
     {
         auto dif = abs(actual - expected);
         expect(dif < TABLE_EPSILON, testErrorMessage(keyName, expected, actual));
     }
 
     template <typename T>
-    void expect_pointers(T* expected, T* actual, juce::String keyName)
+    void expect_pointers(T* expected, T* actual, String keyName)
     {
-        //auto e = std::reinterpret_pointer_cast<const char*>(&expected);
-        //auto a = std::reinterpret_pointer_cast<const char*>(&actual);
-        //auto eStr = juce::String(e);
-        //auto aStr = juce::String(a);
-        auto eStr = juce::String::createStringFromData(&expected, sizeof(&expected));
-        auto aStr = juce::String::createStringFromData(&actual, sizeof(&actual));
+        auto eStr = String::createStringFromData(&expected, sizeof(&expected));
+        auto aStr = String::createStringFromData(&actual, sizeof(&actual));
         expect(expected == actual, testErrorMessage(keyName, eStr, aStr));
     }
 
     template <typename T>
-    void test_getter(T expected, juce::String name, std::function<T(void)> getFunction)
+    void test_getter(T expected, String name, std::function<T(void)> getFunction)
     {
         auto value = getFunction();
         expect(expected == value, testErrorMessage(name, expected, value));
     }
 
-    void test_table(int expectedSize, const double* expected, const juce::Array<double>& table, juce::String tableName)
+    void test_table(int expectedSize, const double* expected, const Array<double>& table, String tableName)
     {
         for (int i = 0; i < expectedSize; i++)
         {
@@ -93,7 +119,29 @@ protected:
             auto t = round(table[i] * roundProduct) * roundQuotient;
             auto dif = abs(t - e);
 
-            expect(dif <= epsilon, testErrorMessage(tableName + " at " + juce::String(i), e, t));
+            expect(dif <= epsilon, testErrorMessage(tableName + " at " + String(i), e, t));
+        }
+    }
+
+    template <typename T, typename TARR>
+    void test_table(int expectedSize, const T* expected, const TARR& table, String tableName)
+    {
+        for (int i = 0; i < expectedSize; i++)
+        {
+            int e = expected[i];
+            int t = table[i];
+            expect_exact(e, t, testErrorMessage(tableName + " at " + String(i), e, t));
+        }
+    }
+
+    template <typename T>
+    void test_integer_array(int expectedSize, const int* expected, const T& table, String tableName)
+    {
+        for (int i = 0; i < expectedSize; i++)
+        {
+            int e = expected[i];
+            int t = table[i];
+            expect_exact(e, t, testErrorMessage(tableName + " at " + String(i), e, t));
         }
     }
 };

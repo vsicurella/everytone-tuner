@@ -17,7 +17,7 @@ class Tuning_Test : public MultimapperUnitTest
 
 private:
 
-    void test_tuningMap(int expectedSize, const double* expected, const Keytographer::Map<double>* map, int start = 0)
+    void test_tuningMap(int expectedSize, const double* expected, const Map<double>* map, int start = 0)
     {
         int index;
         for (int i = 0; i < expectedSize; i++)
