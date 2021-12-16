@@ -11,7 +11,7 @@
 #pragma once
 #include "TestsCommon.h"
 
-class MultichannelMap_Test : public juce::UnitTest
+class MultichannelMap_Test : public MultimapperUnitTest
 {
 public:
 
@@ -26,7 +26,7 @@ static bool testTable(const MultichannelMap& multimap, int* expectedIndices)
     return true;
 }
 
-    MultichannelMap_Test() : juce::UnitTest("MultichannelMap Test") {}
+    MultichannelMap_Test() : MultimapperUnitTest("MultichannelMap") {}
 
     void runTest() override
     {
@@ -74,13 +74,14 @@ static bool testTable(const MultichannelMap& multimap, int* expectedIndices)
                     
                 int expectedNoteNum = expectedIndex % 128;
                 int expectedTableNum = expectedIndex / 128;
-                    
+
                 auto mapped = stdMap.getMappedNote(ch, note);
-                expect(mapped.inputChannel == ch, "Input channel should be " + juce::String(ch) + " but is " + juce::String(mapped.inputChannel));
-                expect(mapped.inputNote == note,  "Input note should be " + juce::String(note) + " but is " + juce::String(mapped.inputNote));
-                expect(mapped.tableIndex == expectedTableNum, "Table Index should be " + juce::String(expectedTableNum) + " but is " + juce::String(mapped.tableIndex));
-                expect(mapped.noteIndex == expectedNoteNum, "Note index should be " + juce::String(expectedNoteNum) + " but is " + juce::String(mapped.noteIndex));
-                expect(mapped.index == expectedIndex, "Full Index should be " + juce::String(expectedIndex) + " but is " + juce::String(mapped.index));
+                String tableAt = " @ " + String(midiNoteIndex);
+                expect_exact(ch, mapped.inputChannel, "inputChannel" + tableAt);
+                expect_exact(note, mapped.inputNote, "inputNote" + tableAt);
+                expect_exact(expectedTableNum, mapped.tableIndex, "tableIndex" + tableAt);
+                expect_exact(expectedNoteNum, mapped.noteIndex, "noteIndex" + tableAt);
+                expect_exact(expectedIndex, mapped.index, "fullIndex" + tableAt);
             }
         }
 

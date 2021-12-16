@@ -91,7 +91,16 @@ public:
 /// <returns></returns>
 static TuningTableMap StandardMapping()
 {
-    auto map = LinearMap();
+    Map<int>::FunctionDefinition mapDefinition =
+    {
+        128,
+        0,
+        [&](int x) { return x % 128; },
+        0,
+        0
+    };
+
+    auto map = Map<int>(mapDefinition);
         
     TuningTableMap::Definition definition;
     definition.map = &map;

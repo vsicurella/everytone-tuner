@@ -70,10 +70,11 @@ public:
 
     struct FunctionDefinition
     {
-        int mapSize = 0;
-        int start = 0;
-        PatternFunction function;
-        T transpose = 0;
+        int mapSize = 0;            // Iterations of the function
+        int start = 0;              // Starting value
+        PatternFunction function;   // Integer input, T output
+        T base = 0;                 // Number to add each cycle
+        T transpose = 0;            // Number to add to function output
     };
 
 private:
@@ -149,7 +150,7 @@ public:
     Map(FunctionDefinition definition)
         : mapSize(definition.mapSize), 
             mapPattern(initializePattern(definition)),
-            patternBase(definition.mapSize),
+            patternBase(definition.base),
             patternRootIndex(0),
             mapRootIndex(0),
             transpose(definition.transpose) {}
@@ -227,9 +228,10 @@ static Map<int> LinearMap(int mapRootIndex = 0, int base = 1, int transpose = 0)
 {
     Map<int>::FunctionDefinition d = 
     { 
-        base,          /* size */
+        1,             /* size */
         0,             /* start */
         [=](int x) -> int { return x - mapRootIndex; }, 
+        base,
         transpose 
     };
     auto map = Map<int>(d);
