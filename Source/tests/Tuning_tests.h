@@ -135,6 +135,8 @@ private:
         test_table(params.tableSize, params.expectedFrequencyTable, tuning->getFrequencyTable(), "getFrequencyTable");
         test_table(params.tableSize, params.expectedMtsTable, tuning->getMTSTable(), "getMtsTable()");
 
+        Tuning copied = Tuning(*tuning);
+        expect(copied == *tuning, "Copied tuning failed with == operator");
 
         beginTest(testName + " Setters");
 

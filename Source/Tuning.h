@@ -17,34 +17,33 @@
 
 class Tuning
 {
-    std::unique_ptr<Map<double>> tuningMap;
-	
+	// Parameters
 	juce::Array<double> centsTable;
-	juce::Array<double> ratioTable;
-
-    juce::Array<double> frequencyTable;
-    juce::Array<double> mtsTable;
-
-	double dbgFreq[TUNING_TABLE_SIZE];
-	double dbgMts[TUNING_TABLE_SIZE];
-
 	double periodCents;
-	double periodRatio;
-	double periodMts;
-
-	double virtualPeriod; // Mainly for equal/rank-1 temperaments to record the divided period
-
+	double virtualPeriod = 0; // Mainly for equal/rank-1 temperaments to record the divided period
+	
 	int tuningSize;
-
-    int rootMidiNote;
+	
+	int rootMidiNote;
 	int rootMidiChannelIndex;
 	double rootFrequency;
-	double rootMts;
 
-    int transpose;
+	int transpose;
 
 	juce::String name;
 	juce::String description;
+
+	// Metadata
+	std::unique_ptr<Map<double>> tuningMap;
+
+	juce::Array<double> ratioTable;
+    juce::Array<double> frequencyTable;
+    juce::Array<double> mtsTable;
+
+	double periodRatio;
+	double periodMts;
+
+	double rootMts;
 
 private:
 
@@ -66,6 +65,13 @@ public:
 		int rootMidiChannel = 1;
 		double rootFrequency = 261.6255653;
 
+		bool operator==(const Reference& reference)
+		{
+			return rootMidiNote == reference.rootMidiNote
+				&& rootMidiChannel == reference.rootMidiChannel
+				&& rootFrequency == reference.rootFrequency;
+		}
+
         juce::String toString() const 
         {
             juce::StringArray arr =
@@ -85,6 +91,14 @@ public:
         int transpose = 0;
 		juce::String name = "";
 		juce::String description = "";
+
+		bool operator==(const Definition& definition)
+		{
+			return reference == definition.reference
+				&& transpose == definition.transpose
+				&& name == name
+				&& description == description;
+		}
 
         juce::String toString() const 
         {
@@ -147,6 +161,8 @@ public:
 	Tuning(CentsDefinition definition=CentsDefinition());
 
     Tuning(const Tuning&);
+
+	virtual bool operator==(const Tuning&);
     
 	virtual int getRootIndex() const { return midiIndex(rootMidiNote, rootMidiChannelIndex); }
 	virtual int getRootMidiNote() const { return rootMidiNote; }

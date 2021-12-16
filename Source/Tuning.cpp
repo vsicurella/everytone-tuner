@@ -92,11 +92,18 @@ void Tuning::rebuildTables()
         frequency = pow(periodRatio, periods) * intervalRatio * rootFrequency;
         
         frequencyTable.set(t, frequency);
-        dbgFreq[t] = frequency;
         double mts = roundN(10, frequencyToMTS(frequency));
         mtsTable.set(t, mts);
-        dbgMts[t] = mts;
     }
+}
+
+bool Tuning::operator==(const Tuning& tuning)
+{
+    return tuningSize == tuning.tuningSize
+        && centsTable == tuning.centsTable
+        && periodCents == tuning.periodCents
+        && virtualPeriod == tuning.virtualPeriod
+        && getDefinition() == tuning.getDefinition();
 }
 
 void Tuning::setName(juce::String nameIn)
