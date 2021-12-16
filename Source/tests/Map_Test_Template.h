@@ -61,6 +61,33 @@ public:
         : MultimapperUnitTest("Map " + nameOfType),
           params(testParams) {}
 
+    virtual ~Map_Test() override
+    {
+        if (params.definition.pattern != nullptr)
+        {
+            delete[] params.definition.pattern;
+            params.definition.pattern = nullptr;
+        }
+
+        if (params.expectedTable != nullptr)
+        {
+            delete[] params.expectedTable;
+            params.expectedTable = nullptr;
+        }
+
+        if (params.altExpectedTable != nullptr)
+        {
+            delete[] params.altExpectedTable;
+            params.altExpectedTable = nullptr;
+        }
+
+        if (params.altPatternRootExpectedTable != nullptr)
+        {
+            delete[] params.altPatternRootExpectedTable;
+            params.altPatternRootExpectedTable = nullptr;
+        }
+    }
+
     void runTest() override
     {
         auto definition = params.definition;

@@ -130,7 +130,7 @@ protected:
         {
             int e = expected[i];
             int t = table[i];
-            expect_exact(e, t, testErrorMessage(tableName + " at " + String(i), e, t));
+            expect_exact(e, t, tableName + " at " + String(i));
         }
     }
 
@@ -141,7 +141,7 @@ protected:
         {
             int e = expected[i];
             int t = table[i];
-            expect_exact(e, t, testErrorMessage(tableName + " at " + String(i), e, t));
+            expect_exact(e, t, tableName + " at " + String(i));
         }
     }
 };

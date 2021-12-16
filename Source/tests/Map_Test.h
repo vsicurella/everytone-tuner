@@ -13,30 +13,30 @@
 
 class Map_Test_Generator
 {
-    OwnedArray<Map_Test<int>> tests;
+    OwnedArray<Map_Test<int>> generatedTests;
 
 public:
 
     Map_Test_Generator()
     {
-        tests.add(NewMeantone12_31Test());
+        generatedTests.add(NewMeantone12_31Test());
     }
 
-    void addToTests(Array<UnitTest*> tests)
+    void addToTests(Array<UnitTest*>& tests)
     {
-        for (int i = 0; i < tests.size(); i++)
-            tests.add(dynamic_cast<UnitTest*>(tests[i]));
+        for (int i = 0; i < generatedTests.size(); i++)
+            tests.add(dynamic_cast<UnitTest*>(generatedTests[i]));
     }
 
 private:
 
     Map_Test<int>* NewMeantone12_31Test()
     {
-        const int pattern[] = { 0, 3, 5, 8, 10, 13, 16, 18, 21, 23, 26, 29 };
+        auto pattern = new int[] { 0, 3, 5, 8, 10, 13, 16, 18, 21, 23, 26, 29 };
 
         Map<int>::Definition definition = { 12, pattern, 31, 0, 0, 0 };
 
-        const int expectedTable[] = {
+        auto expectedTable = new int[] {
             0, 3, 5, 8, 10, 13, 16, 18, 21, 23,
             26, 29, 31, 34, 36, 39, 41, 44, 47, 49,
             52, 54, 57, 60, 62, 65, 67, 70, 72, 75,
@@ -52,7 +52,7 @@ private:
             310, 313, 315, 318, 320, 323, 326, 328
         };
 
-        const int altExpectedTable[] = {
+        auto altExpectedTable = new int[] {
             -95, -92, -90, -87, -85, -82, -79, -77, -74, -72, -69, -66,
             -64, -61, -59, -56, -54, -51, -48, -46, -43, -41, -38, -35,
             -33, -30, -28, -25, -23, -20, -17, -15, -12, -10, -7, -4,
@@ -76,7 +76,7 @@ private:
             60,
             altExpectedTable,
             1,
-            altExpectedTable
+            nullptr
         };
 
         return new Map_Test<int>("Int", params);
