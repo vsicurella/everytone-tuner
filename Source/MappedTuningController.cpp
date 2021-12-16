@@ -40,7 +40,11 @@ void MappedTuningController::setSourceTuning(const Tuning* tuning)
 void MappedTuningController::setTargetTuning(const Tuning* tuning, bool updateTuner)
 {
     tunings.add(std::make_unique<Tuning>(*tuning));
-    currentTuningTarget = tunings.getLast();
+    currentTuningTarget = tunings.getLast(); 
+
+    if (mappingMode == Multimapper::MappingMode::Auto)
+        updateAutoMapping(false);
+
     if (updateTuner)
         updateCurrentTuner();
 }
