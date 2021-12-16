@@ -131,8 +131,14 @@ void MidiVoiceController::setChannelDisabled(int midiChannel, bool disabled)
 int MidiVoiceController::nextAvailableVoiceIndex()
 {
     for (int i = 0; i < voices.size(); i++)
-        if (getVoice(i)->getAssignedChannel() < 1 && !midiChannelDisabled[i])
-            return i;
+    {
+        if (!midiChannelDisabled[i])
+        {
+            auto ch = getVoice(i)->getAssignedChannel();
+            if (ch < 1)
+                return i;
+        }
+    }
     return -1;
 }
 

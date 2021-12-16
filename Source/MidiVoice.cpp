@@ -39,11 +39,11 @@ void MidiVoice::updatePitch()
     auto input = "\t(" + ch + ", " + note + ") -> ";
     if (currentMappedNote.mapped && currentPitch.mapped)
     {
-        auto table = juce::String(currentMappedNote.tableIndex);
+        auto table = juce::String(currentMappedNote.tableIndex + 1);
         auto index = juce::String(currentMappedNote.noteIndex);
         auto coarse = juce::String(currentPitch.coarse);
         auto bend = juce::String(currentPitch.pitchbend);
-        juce::Logger::writeToLog(input + "(" + table + ", " + index + ") " + coarse + " + " + bend);
+        juce::Logger::writeToLog(input + coarse + " + " + bend);
     }
     else
     {
@@ -107,7 +107,7 @@ juce::MidiMessage MidiVoice::getNoteOff() const
     return juce::MidiMessage::noteOff(assignedChannel, currentPitch.coarse);
 }
 
-void MidiVoice::mapMidiMessage(juce::MidiMessage msg) const
+void MidiVoice::mapMidiMessage(juce::MidiMessage& msg) const
 {
     msg.setChannel(assignedChannel);
     msg.setNoteNumber(currentPitch.coarse);

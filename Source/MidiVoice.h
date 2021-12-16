@@ -77,5 +77,5 @@ public:
 
     juce::MidiMessage getNoteOff() const;
 
-    void mapMidiMessage(juce::MidiMessage msg) const;
+    void mapMidiMessage(juce::MidiMessage& msg) const;
 };
