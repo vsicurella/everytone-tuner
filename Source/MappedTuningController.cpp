@@ -27,6 +27,7 @@ void MappedTuningController::setSourceTuning(const Tuning* tuning, bool updateTu
 {
     tunings.add(std::make_unique<Tuning>(*tuning));
     currentTuningSource = tunings.getLast();
+    juce::Logger::writeToLog("Loaded new source tuning: " + tuning->getDescription());
     if (updateTuner)
         updateCurrentTuner();
 }
@@ -39,10 +40,13 @@ void MappedTuningController::setSourceTuning(const Tuning* tuning)
 
 void MappedTuningController::setTargetTuning(const Tuning* tuning, bool updateTuner)
 {
+    auto lastTuning = currentTuningTarget;
     tunings.add(std::make_unique<Tuning>(*tuning));
     currentTuningTarget = tunings.getLast(); 
 
-    if (mappingMode == Multimapper::MappingMode::Auto)
+    juce::Logger::writeToLog("Loaded new target tuning: " + tuning->getDescription());
+
+    if (mappingMode == Multimapper::MappingMode::Auto && *lastTuning != *currentTuningTarget)
         updateAutoMapping(false);
 
     if (updateTuner)
@@ -58,6 +62,7 @@ void MappedTuningController::setNoteMapping(const TuningTableMap* mapping, bool 
 {
     mappings.add(std::make_unique<TuningTableMap>(*mapping));
     currentMapping = mappings.getLast();
+    juce::Logger::writeToLog("Loaded new tuning table map.");
     if (updateTuner)
         updateCurrentTuner();
 }

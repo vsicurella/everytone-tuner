@@ -272,7 +272,6 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
     for (auto metadata : buffer)
     {
         auto msg = metadata.getMessage();
-        juce::Logger::writeToLog(msg.getDescription());
         auto status = msg.getRawData()[0];
         bool isVoice = status >= 0x80 && status < 0xb0;
 
@@ -290,7 +289,6 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
 
                 if (pbmsg.getPitchWheelValue() != 8192)
                 {
-                    juce::Logger::writeToLog(pbmsg.getDescription());
                     processedBuffer.addEvent(pbmsg, sample++);
                 }
             }
@@ -356,14 +354,12 @@ void MultimapperAudioProcessor::loadTuningSource(const Tuning& tuning)
 {
     tuningController.setSourceTuning(&tuning);
     tuningWatchers.call(&TuningWatcher::tuningSourceChanged, this, tuningController.readTuningSource());
-    juce::Logger::writeToLog("Loaded new source tuning: " + tuning.getDescription());
 }
 
 void MultimapperAudioProcessor::loadTuningTarget(const Tuning& tuning)
 {
     tuningController.setTargetTuning(&tuning);
     tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuningController.readTuningTarget());
-    juce::Logger::writeToLog("Loaded new target tuning: " + tuning.getDescription());
 }
 
 void MultimapperAudioProcessor::setTargetTuningReference(Tuning::Reference reference)
@@ -373,7 +369,7 @@ void MultimapperAudioProcessor::setTargetTuningReference(Tuning::Reference refer
     newTuning.setReference(reference);
     loadTuningTarget(newTuning);
     tuningWatchers.call(&TuningWatcher::tuningTargetReferenceChanged, this, reference);
-    juce::Logger::writeToLog("Loaded new target tuning reference: " + reference.toString());
+    //juce::Logger::writeToLog("Loaded new target tuning reference: " + reference.toString());
 }
 
 void MultimapperAudioProcessor::loadNoteMapping(const TuningTableMap& map)
