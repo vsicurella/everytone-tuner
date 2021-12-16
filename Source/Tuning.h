@@ -163,6 +163,7 @@ public:
     Tuning(const Tuning&);
 
 	virtual bool operator==(const Tuning&);
+	virtual bool operator!=(const Tuning&);
     
 	virtual int getRootIndex() const { return midiIndex(rootMidiNote, rootMidiChannelIndex); }
 	virtual int getRootMidiNote() const { return rootMidiNote; }

@@ -106,6 +106,11 @@ bool Tuning::operator==(const Tuning& tuning)
         && getDefinition() == tuning.getDefinition();
 }
 
+bool Tuning::operator!=(const Tuning& tuning)
+{
+    return !operator==(tuning);
+}
+
 void Tuning::setName(juce::String nameIn)
 {
     name = nameIn;
