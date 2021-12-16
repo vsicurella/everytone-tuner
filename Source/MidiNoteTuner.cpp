@@ -111,7 +111,7 @@ int MidiNoteTuner::pitchbendAmount(int pitchbendRange, double semitonesFrom, dou
 
 int MidiNoteTuner::semitonesToPitchbend(int pitchbendRange, double semitonesIn)
 {
-	return round((semitonesIn / pitchbendRange * 8192 + 8192));
+	return round((semitonesIn / pitchbendRange * 16384.0 + 8192));
 }
 
 double MidiNoteTuner::pitchbendToSemitones(int pitchbendRange, int pitchbendIn)
