@@ -224,9 +224,10 @@ public:
     void setTranspose(int transposeIn) { transpose = transposeIn; }
 };
 
-static Map<int> LinearMap(int mapRootIndex = 0, int base = 1, int transpose = 0)
+template <typename T>
+static Map<T> LinearMap(int mapRootIndex = 0, T base = 1, T transpose = 0)
 {
-    Map<int>::FunctionDefinition d = 
+    Map<T>::FunctionDefinition d = 
     { 
         1,             /* size */
         0,             /* start */
@@ -234,6 +235,6 @@ static Map<int> LinearMap(int mapRootIndex = 0, int base = 1, int transpose = 0)
         base,
         transpose 
     };
-    auto map = Map<int>(d);
+    auto map = Map<T>(d);
     return map;
 }
