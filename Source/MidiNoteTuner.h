@@ -41,7 +41,7 @@ class MidiNoteTuner
 
 	const TuningTableMap standardMap = MultichannelMap::CreatePeriodicMapping(12, 60);
 
-	int pitchbendRange = 2; // total range of pitchbend in semitones
+	int pitchbendRange; // total bipolar range of pitchbend in semitones
 
 	bool cached = false;
 	juce::Array<int> pitchbendTable;
@@ -51,7 +51,7 @@ public:
 	MidiNoteTuner(std::shared_ptr<Tuning> sourceTuning, 
 		          std::shared_ptr<Tuning> targetTuning, 
 		          std::shared_ptr<TuningTableMap> mapping,
-				  int pitchbendRange = 2);
+				  int pitchbendRange = 4);
     ~MidiNoteTuner();
 
 	const Tuning* tuningSource() const { return sourceTuning.get(); }
