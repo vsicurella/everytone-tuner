@@ -38,7 +38,7 @@ static bool testTable(const MultichannelMap& multimap, int* expectedIndices)
     void standardMapping()
     {
         beginTest("Standard Tuning table with repeated 128-note table, StandardTuning()");
-        auto stdMap = StandardMapping();
+        auto stdMap = TuningTableMap::StandardMapping();
 
         auto definition = stdMap.getDefinition();
         //expect(definition.numMaps == 16, "Should have 16 maps but has " + juce::String(definition.numMaps));

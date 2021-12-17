@@ -119,19 +119,22 @@ std::unique_ptr<TuningTableMap> MappedTuningController::newTuningMap(const Tunin
 
 std::unique_ptr<TuningTableMap> MappedTuningController::NewLinearMappingFromTuning(const Tuning* tuning)
 {
-    auto mapFunction = Map<int>::FunctionDefinition
-    {
-        2048,
-        tuning->getRootIndex(),
-        [&](int x) { return modulo(x - tuning->getRootIndex(), 2048); }
-    };
-    auto linearMap = Map<int>(mapFunction);
-    auto definition = TuningTableMap::Definition
-    {
-        tuning->getRootMidiNote(), tuning->getRootIndex(), &linearMap
-    };
+    //auto mapFunction = Map<int>::FunctionDefinition
+    //{
+    //    2048,
+    //    tuning->getRootIndex(),
+    //    [&](int x) { return modulo(x - tuning->getRootIndex(), 2048); }
+    //};
+    //auto linearMap = Map<int>(mapFunction);
+    //auto definition = TuningTableMap::Definition
+    //{
+    //    tuning->getRootMidiNote(), tuning->getRootIndex(), &linearMap
+    //};
    
-    return std::make_unique<TuningTableMap>(definition);
+    //return std::make_unique<TuningTableMap>(definition);
+
+    auto linearMap = TuningTableMap::CreateLinearMidiMapping(tuning->getRootMidiNote(), tuning->getRootMidiChannel());
+    return std::make_unique<TuningTableMap>(linearMap);
 }
 
 std::unique_ptr<TuningTableMap> MappedTuningController::NewPeriodicMappingFromTuning(const Tuning* tuning)

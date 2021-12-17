@@ -39,7 +39,7 @@ public:
     };
 
 protected:
-        
+
     // MIDI Note to align with tuning table root
     int rootMidiNote;
 
@@ -83,28 +83,57 @@ public:
     //int periodsAt(int channel, int note);
 
     TuningTableMap::Definition getDefinition() const;
-};
 
-/// <summary>
-/// Returns a 1:1 MIDI note to tuning table index mapping that repeats every 128 notes
-/// </summary>
-/// <returns></returns>
-static TuningTableMap StandardMapping()
-{
-    Map<int>::FunctionDefinition mapDefinition =
+public:
+
+    /// <summary>
+    /// Returns a 1:1 MIDI note to tuning table index mapping that repeats every 128 notes
+    /// </summary>
+    /// <returns></returns>
+    static TuningTableMap StandardMapping()
     {
-        128,
-        0,
-        [&](int x) { return x % 128; },
-        0,
-        0
-    };
+        Map<int>::FunctionDefinition mapDefinition =
+        {
+            128,
+            0,
+            [&](int x) { return x % 128; },
+            0,
+            0
+        };
 
-    auto map = Map<int>(mapDefinition);
-        
-    TuningTableMap::Definition definition;
-    definition.map = &map;
+        auto map = Map<int>(mapDefinition);
 
-    auto tuningTableMap = TuningTableMap(definition);
-    return tuningTableMap;
-}
+        TuningTableMap::Definition definition;
+        definition.map = &map;
+
+        auto tuningTableMap = TuningTableMap(definition);
+        return tuningTableMap;
+    }
+
+    /*
+    Creates a MultichannelMap that is linear, with a wraparound wherever note 2048 lands
+    The root MIDI Channel & Note marks 0 periods, and will output the rootTuningIndex parameter.
+    The rootTuningIndex is automatically set if it's argument is out of bounds, which is default.
+    */
+    static TuningTableMap CreateLinearMidiMapping(int rootMidiNote, int rootMidiChannel = 1, int rootTuningIndex = -1)
+    {
+        int midiIndex = mod((rootMidiChannel - 1) * 128 + rootMidiNote, 2048);
+        if (rootTuningIndex < 0)
+            rootTuningIndex = midiIndex;
+
+        auto mapFunction = Map<int>::FunctionDefinition
+        {
+            2048,
+            0,
+            [&](int x) { return mod(x - midiIndex + rootTuningIndex, 2048); },
+            0
+        };
+        auto linearMap = Map<int>(mapFunction);
+        auto definition = TuningTableMap::Definition
+        {
+            rootMidiNote, rootTuningIndex, &linearMap
+        };
+
+        return TuningTableMap(definition);
+    }
+};
