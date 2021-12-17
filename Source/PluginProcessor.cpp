@@ -11,7 +11,7 @@
 #include "TuningHelpers.h"
 
 #if RUN_MULTIMAPPER_TESTS
-    #include "./tests/Map_Test.h"
+    #include "./tests/Map_Test_Generator.h"
     #include "./tests/MultichannelMap_Test.h"
     #include "./tests/Tuning_tests.h"
     #include "./tests/MidiNoteTuner_tests.h"

@@ -24,7 +24,8 @@
               file="Source/tests/MidiNoteTuner_tests.h"/>
         <FILE id="Onui4N" name="TestsCommon.h" compile="0" resource="0" file="Source/tests/TestsCommon.h"/>
         <FILE id="P6b0jk" name="Tuning_tests.h" compile="0" resource="0" file="Source/tests/Tuning_tests.h"/>
-        <FILE id="aHOyma" name="Map_Test.h" compile="0" resource="0" file="Source/tests/Map_Test.h"/>
+        <FILE id="aHOyma" name="Map_Test_Generator.h" compile="0" resource="0"
+              file="Source/tests/Map_Test_Generator.h"/>
         <FILE id="LviRnL" name="Map_Test_Template.h" compile="0" resource="0"
               file="Source/tests/Map_Test_Template.h"/>
         <FILE id="hQLgt3" name="MultichannelMap_Test.h" compile="0" resource="0"
