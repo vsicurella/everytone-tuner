@@ -15,6 +15,9 @@ MidiVoiceController::MidiVoiceController(MappedTuningController& tuningControlle
 {
     for (int i = 0; i < MULTIMAPPER_MAX_VOICES; i++)
         voices.add(new MidiVoice());
+
+    midiChannelDisabled.resize(16);
+    midiChannelDisabled.fill(false);
 }
 
 MidiVoiceController::~MidiVoiceController()
