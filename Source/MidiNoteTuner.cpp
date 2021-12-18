@@ -50,14 +50,16 @@ MidiPitch MidiNoteTuner::getMidiPitch(const MappedNote& mapped) const
 	// First get target MTS note
 	auto targetMts = targetTuning->mtsTableAt(mapped.index);
 
-	if (targetMts < 0 || targetMts > 127)
+	if (targetMts < 0 || targetMts >= 128)
 		return MidiPitch();
 
 	// Then find closest source note
 	auto sourceNote = sourceTuning->closestNoteIndex(targetMts);
 
+	if (sourceNote < 0 || sourceNote >= 128)
+		return MidiPitch();
+
 	// Last, find discrepancy and convert to pitchbend
-	int newNote = sourceNote % 128;
 	auto sourceMts = sourceTuning->mtsTableAt(sourceNote);
 
 	if (sourceMts < 0 || sourceMts > 127)
