@@ -76,9 +76,10 @@ int MidiVoiceController::channelOfVoice(const juce::MidiMessage& msg) const
 
 const MidiVoice* MidiVoiceController::addVoice(int midiChannel, int midiNote, juce::uint8 velocity)
 {
-    auto newIndex = nextAvailableVoiceIndex();
+    auto newIndex = getNextVoiceIndex();
     if (newIndex >= 0 && newIndex < MULTIMAPPER_MAX_VOICES)
     {
+        lastChannelAssigned = newIndex;
         voices.set(newIndex, new MidiVoice(midiChannel, midiNote, velocity, newIndex + 1, tuningController.getTuner()));
         return getVoice(newIndex);
     }
@@ -93,8 +94,6 @@ const MidiVoice* MidiVoiceController::addVoice(const juce::MidiMessage& msg)
     auto velocity = msg.getVelocity();
     return addVoice(channel, note, velocity);
 }
-
-
 
 MidiVoice MidiVoiceController::removeVoice(int index)
 {
@@ -126,16 +125,31 @@ MidiVoice MidiVoiceController::removeVoice(const MidiVoice* voice)
     return removeVoice(index);
 }
 
+bool MidiVoiceController::channelIsFree(int channelNumber, MidiPitch pitchToAssign) const
+{
+    return !midiChannelDisabled[channelNumber];
+}
+
 void MidiVoiceController::setChannelDisabled(int midiChannel, bool disabled)
 {
     midiChannelDisabled.set(midiChannel - 1, disabled);
 }
 
-int MidiVoiceController::nextAvailableVoiceIndex()
+void MidiVoiceController::setChannelMode(Multimapper::ChannelMode mode)
+{
+    channelMode = mode;
+}
+
+void MidiVoiceController::setVoiceLimit(int limit)
+{
+    voiceLimit = limit;
+}
+
+int MidiVoiceController::nextAvailableVoiceIndex() const
 {
     for (int i = 0; i < voices.size(); i++)
     {
-        if (!midiChannelDisabled[i])
+        if (channelIsFree(i))
         {
             auto ch = getVoice(i)->getAssignedChannel();
             if (ch < 1)
@@ -144,6 +158,45 @@ int MidiVoiceController::nextAvailableVoiceIndex()
     }
     return -1;
 }
+
+int MidiVoiceController::nextRoundRobinVoiceIndex() const
+{
+    auto i = lastChannelAssigned;
+    int channelsChecked = 0;
+    while (channelsChecked < MULTIMAPPER_MAX_VOICES)
+    {
+        if (channelIsFree(i))
+        {
+            auto ch = getVoice(i)->getAssignedChannel();
+            if (ch < 1)
+                return i;
+        }
+
+        i = (i + 1) % MULTIMAPPER_MAX_VOICES;
+        channelsChecked++;
+    }
+}
+
+int MidiVoiceController::getNextVoiceIndex() const
+{
+    if (currentVoices >= voiceLimit)
+        return -1;
+
+    switch (channelMode)
+    {
+    case Multimapper::ChannelMode::FirstAvailable:
+        return nextAvailableVoiceIndex();
+
+    case Multimapper::ChannelMode::RoundRobin:
+        return nextRoundRobinVoiceIndex();
+
+    default:
+        jassertfalse;
+    }
+
+    return 0;
+}
+
 
 int MidiVoiceController::midiNoteIndex(int midiChannel, int midiNote) const
 {
@@ -166,3 +219,4 @@ int MidiVoiceController::indexOfVoice(const MidiVoice* voice) const
             return i;
     return -1;
 }
+

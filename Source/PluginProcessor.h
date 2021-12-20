@@ -80,6 +80,8 @@ public:
 
     const TuningTableMap* noteMapping() const { return tuningController.readMapping(); }
 
+    Multimapper::Options options() const;
+
     //==============================================================================
 
     void loadTuningSource(const Tuning& tuning);
@@ -89,7 +91,20 @@ public:
 
     void loadNoteMapping(const TuningTableMap& map);
 
+    //==============================================================================
+
     void setAutoMappingType(Multimapper::MappingType type);
+
+    void setMappingMode(Multimapper::MappingMode mode);
+
+    void setChannelMode(Multimapper::ChannelMode mode);
+
+    void setVoiceLimit(int voiceLimit);
+
+    void setOptions(Multimapper::Options optionsIn);
+
+    //==============================================================================
+
 
 private:
 

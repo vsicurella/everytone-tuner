@@ -23,9 +23,18 @@ class MidiVoiceController
 
     juce::Array<bool> midiChannelDisabled;
 
+    Multimapper::ChannelMode channelMode;
+
+    int voiceLimit = MULTIMAPPER_MAX_VOICES;
+
+    int currentVoices = 0;
+    int lastChannelAssigned = 0;
+
 private:
 
-    int nextAvailableVoiceIndex();
+    int nextAvailableVoiceIndex() const;
+    int nextRoundRobinVoiceIndex() const;
+    int getNextVoiceIndex() const;
 
     int midiNoteIndex(int midiChannel, int midiNote) const;
 
@@ -39,6 +48,11 @@ public:
 
     MidiVoiceController(MappedTuningController& tuningController);
     ~MidiVoiceController();
+
+    Multimapper::ChannelMode getChannelMode() const { return channelMode; }
+    
+    int getVoiceLimit() const { return voiceLimit; }
+
 
     const MidiVoice* getVoice(int midiChannel, int midiNote) const;
     const MidiVoice* getVoice(const juce::MidiMessage& msg) const;
@@ -58,6 +72,12 @@ public:
     MidiVoice removeVoice(const juce::MidiMessage& msg);
     MidiVoice removeVoice(const MidiVoice* voice);
 
+    bool channelIsFree(int channelNumber, MidiPitch pitchToAssign = MidiPitch()) const;
+
     void setChannelDisabled(int midiChannel, bool disabled);
+
+    void setChannelMode(Multimapper::ChannelMode mode);
+
+    void setVoiceLimit(int voiceLimit);
 
 };

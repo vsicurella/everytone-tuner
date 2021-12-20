@@ -18,10 +18,11 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     menuBar.reset(new juce::MenuBarComponent(&menuModel));
     addAndMakeVisible(*menuBar);
 
-    overviewPanel.reset(new OverviewPanel());
+    overviewPanel.reset(new OverviewPanel(audioProcessor.options()));
     addAndMakeVisible(overviewPanel.get());
     overviewPanel->setTuningDisplayed(tuningBackup.get());
-    overviewPanel->addMappingWatcher(this);
+    //overviewPanel->addMappingWatcher(this);
+    overviewPanel->addOptionsWatcher(this);
     overviewPanel->addTuningWatcher(this);
 
     contentComponent = overviewPanel.get();
@@ -86,10 +87,31 @@ void MultimapperAudioProcessorEditor::tuningTargetReferenceChanged(TuningChanger
         audioProcessor.setTargetTuningReference(reference);
 }
 
-void MultimapperAudioProcessorEditor::mappingTypeChanged(MappingChanger* changer, Multimapper::MappingType type)
+void MultimapperAudioProcessorEditor::mappingModeChanged(Multimapper::MappingMode mode)
+{
+    audioProcessor.setMappingMode(mode);
+}
+
+void MultimapperAudioProcessorEditor::mappingTypeChanged(Multimapper::MappingType type)
 {
     audioProcessor.setAutoMappingType(type);
 }
+
+void MultimapperAudioProcessorEditor::channelModeChanged(Multimapper::ChannelMode newChannelMode)
+{
+    audioProcessor.setChannelMode(newChannelMode);
+}
+
+void MultimapperAudioProcessorEditor::midiModeChanged(Multimapper::MidiMode newMidiMode)
+{
+    
+}
+
+void MultimapperAudioProcessorEditor::voiceLimitChanged(int newVoiceLimit)
+{
+    audioProcessor.setVoiceLimit(newVoiceLimit);
+}
+
 
 juce::ApplicationCommandTarget* MultimapperAudioProcessorEditor::getFirstCommandTarget(juce::CommandID commandID)
 {
@@ -114,7 +136,8 @@ void MultimapperAudioProcessorEditor::getAllCommands(juce::Array<juce::CommandID
         Multimapper::Back,
         Multimapper::Save,
         Multimapper::NewTuning,
-        Multimapper::OpenTuning
+        Multimapper::OpenTuning,
+        Multimapper::ShowOptions
     };
 }
 
@@ -126,6 +149,7 @@ void MultimapperAudioProcessorEditor::getCommandInfo(juce::CommandID commandID, 
         result = juce::ApplicationCommandInfo(Multimapper::Commands::Back);
         result.setInfo("Back", "Back to main window", "", 0);
         result.addDefaultKeypress(juce::KeyPress::escapeKey, juce::ModifierKeys::noModifiers);
+        result.setActive(contentComponent != overviewPanel.get());
         break;
 
     case Multimapper::Save:
@@ -144,6 +168,12 @@ void MultimapperAudioProcessorEditor::getCommandInfo(juce::CommandID commandID, 
         result = juce::ApplicationCommandInfo(Multimapper::Commands::OpenTuning);
         result.setInfo("Open Tuning", "Load a .scl or .tun file", "Scale", 0);
         result.addDefaultKeypress('o', juce::ModifierKeys::ctrlModifier);
+        break;
+
+    case Multimapper::ShowOptions:
+        result = juce::ApplicationCommandInfo(Multimapper::Commands::ShowOptions);
+        result.setInfo("Show Options", "Change some advanced midi tuning options", "Options", 0);
+        result.addDefaultKeypress('p', juce::ModifierKeys::ctrlModifier);
         break;
 
     default:
@@ -168,6 +198,9 @@ bool MultimapperAudioProcessorEditor::perform(const juce::ApplicationCommandTarg
     case Multimapper::OpenTuning:
         return performOpenTuning(info);
 
+    case Multimapper::ShowOptions:
+        return performShowOptions(info);
+
     default:
         // forgot to add command handler?
         jassertfalse;
@@ -178,6 +211,9 @@ bool MultimapperAudioProcessorEditor::perform(const juce::ApplicationCommandTarg
 
 bool MultimapperAudioProcessorEditor::performBack(const juce::ApplicationCommandTarget::InvocationInfo& info)
 {
+    if (contentComponent == overviewPanel.get())
+        return false;
+
     if (contentComponent == newTuningPanel.get())
     {
         // Revert tuning if preview is on
@@ -188,7 +224,6 @@ bool MultimapperAudioProcessorEditor::performBack(const juce::ApplicationCommand
     }
 
     setContentComponent(overviewPanel.get());
-
     return true;
 }
 
@@ -223,24 +258,35 @@ bool MultimapperAudioProcessorEditor::performNewTuning(const juce::ApplicationCo
 
 bool MultimapperAudioProcessorEditor::performOpenTuning(const juce::ApplicationCommandTarget::InvocationInfo& info)
 {
-    auto callback = [&](const juce::FileChooser& chooser)
-    {
-        auto result = chooser.getResult();
-        if (result.existsAsFile())
-        {
-            TuningFileParser parser(result);
-            commitTuning(parser.getTuning());
-        }
-    };
-
     fileChooser = std::make_unique<juce::FileChooser>("Choose a .scl or .tun file", juce::File() /* TODO */, "*.scl;*.tun");
     fileChooser->launchAsync(
         juce::FileBrowserComponent::FileChooserFlags::openMode | juce::FileBrowserComponent::FileChooserFlags::canSelectFiles,
-        callback
-    );
+        [&](const juce::FileChooser& chooser)
+        {
+            auto result = chooser.getResult();
+            if (result.existsAsFile())
+            {
+                TuningFileParser parser(result);
+                commitTuning(parser.getTuning());
+            }
+        });
 
     return true;
 }
+
+bool MultimapperAudioProcessorEditor::performShowOptions(const juce::ApplicationCommandTarget::InvocationInfo& info)
+{
+    if (optionsPanel == nullptr)
+    {
+        optionsPanel = std::make_unique<OptionsPanel>(audioProcessor.options());
+        optionsPanel->addOptionsWatcher(this);
+        addChildComponent(*optionsPanel);
+    }
+
+    setContentComponent(optionsPanel.get());
+    return true;
+}
+
 
 void MultimapperAudioProcessorEditor::commitTuning(const Tuning* tuning)
 {

@@ -15,11 +15,11 @@
 #include "../MappingChanger.h"
 #include "../MappedTuningController.h"
 
-class OverviewPanel  : public juce::Component, public MappingChanger, public TuningChanger
+class OverviewPanel  : public juce::Component, public TuningChanger, public OptionsChanger
 {
 public:
     //==============================================================================
-	OverviewPanel();
+	OverviewPanel(Multimapper::Options options = Multimapper::Options());
     ~OverviewPanel() override;
 
 public:

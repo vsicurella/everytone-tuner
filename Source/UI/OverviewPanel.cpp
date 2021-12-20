@@ -11,7 +11,7 @@
 #include "OverviewPanel.h"
 
 //==============================================================================
-OverviewPanel::OverviewPanel ()
+OverviewPanel::OverviewPanel (Multimapper::Options options)
 {
 	tuningNameBox.reset(new juce::Label("tuningNameBox"));
 	tuningNameBox->setJustificationType(juce::Justification::centredLeft);
@@ -93,7 +93,7 @@ OverviewPanel::OverviewPanel ()
 	linearMappingButton->setButtonText("Linear");
 	linearMappingButton->setConnectedEdges(juce::Button::ConnectedEdgeFlags::ConnectedOnRight);
 	linearMappingButton->setClickingTogglesState(true);
-	linearMappingButton->setToggleState(true, juce::NotificationType::dontSendNotification);
+	linearMappingButton->setToggleState(options.mappingType == Multimapper::MappingType::Linear, juce::NotificationType::dontSendNotification);
 	linearMappingButton->setRadioGroupId(10);
 	linearMappingButton->onClick = mappingButtonCallback;
 
@@ -102,7 +102,7 @@ OverviewPanel::OverviewPanel ()
 	periodicMappingButton->setButtonText("Periodic");
 	periodicMappingButton->setConnectedEdges(juce::Button::ConnectedEdgeFlags::ConnectedOnLeft);
 	periodicMappingButton->setClickingTogglesState(true);
-	periodicMappingButton->setToggleState(false, juce::NotificationType::dontSendNotification);
+	periodicMappingButton->setToggleState(options.mappingType == Multimapper::MappingType::Periodic, juce::NotificationType::dontSendNotification);
 	periodicMappingButton->setRadioGroupId(10);
 
 
@@ -253,7 +253,7 @@ void OverviewPanel::mappingTypeButtonClicked()
 		? Multimapper::MappingType::Linear
 		: Multimapper::MappingType::Periodic;
 
-	mappingWatchers.call(&MappingWatcher::mappingTypeChanged, this, type);
+	optionsWatchers.call(&OptionsWatcher::mappingTypeChanged, type);
 }
 
 void OverviewPanel::tuningReferenceEdited()

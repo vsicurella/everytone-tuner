@@ -224,6 +224,9 @@ void MultimapperAudioProcessor::getStateInformation (juce::MemoryBlock& destData
     auto targetNode = tuningToValueTree(tuningController.getTuningTarget().get(), Multimapper::ID::TuningTarget);
     state.addChild(targetNode, -1, nullptr);
 
+    auto optionsNode = options().toValueTree();
+    state.addChild(optionsNode, -1, nullptr);
+
     juce::MemoryOutputStream stream(destData, false);
     state.writeToStream(stream);
 }
@@ -249,6 +252,13 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     {
         auto target = parseTuningValueTree(targetTree);
         loadTuningTarget(target);
+    }
+
+    auto optionsTree = state.getChildWithName(Multimapper::ID::Options);
+    if (optionsTree.isValid())
+    {
+        auto options = Multimapper::Options::fromValueTree(optionsTree);
+        setOptions(options);
     }
 }
 
@@ -329,25 +339,20 @@ void MultimapperAudioProcessor::testMidi()
 
     auto audioDummy = juce::AudioSampleBuffer();
     processBlock(audioDummy, buffer);
+}
 
-    //int ch = 1;
-    //int n = 0;
-    //for (auto metadata : buffer)
-    //{
-    //    auto msg = metadata.getMessage();
-    //    if (msg.isNoteOn())
-    //    {
-    //        jassert(msg.getChannel() == ch);
-    //        jassert(msg.getNoteNumber() == n);
-
-    //        n++;
-    //        if (n == 128)
-    //        {
-    //            ch++;
-    //            n = 0;
-    //        }
-    //    }
-    //}
+Multimapper::Options MultimapperAudioProcessor::options() const
+{
+    return Multimapper::Options
+    {
+        tuningController.getMappingMode(),
+        tuningController.getMappingType(),
+        voiceController.getChannelMode(),
+        Multimapper::MpeZone::Lower,
+        Multimapper::MidiMode::Mono,
+        Multimapper::VoiceRule::Ignore,
+        voiceController.getVoiceLimit()
+    };
 }
 
 void MultimapperAudioProcessor::loadTuningSource(const Tuning& tuning)
@@ -382,3 +387,25 @@ void MultimapperAudioProcessor::setAutoMappingType(Multimapper::MappingType type
     tuningController.setMappingType(type);
 }
 
+void MultimapperAudioProcessor::setMappingMode(Multimapper::MappingMode mode)
+{
+    tuningController.setMappingMode(mode);
+}
+
+void MultimapperAudioProcessor::setChannelMode(Multimapper::ChannelMode mode)
+{
+    voiceController.setChannelMode(mode);
+}
+
+void MultimapperAudioProcessor::setVoiceLimit(int voiceLimit)
+{
+    voiceController.setVoiceLimit(voiceLimit);
+}
+
+void MultimapperAudioProcessor::setOptions(Multimapper::Options optionsIn)
+{
+    setAutoMappingType(optionsIn.mappingType);
+    setMappingMode(optionsIn.mappingMode);
+    setChannelMode(optionsIn.channelMode);
+    setVoiceLimit(optionsIn.voiceLimit);
+}

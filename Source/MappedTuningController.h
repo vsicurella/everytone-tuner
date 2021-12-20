@@ -48,6 +48,10 @@ public:
 
     const TuningTableMap* readMapping() const { return currentMapping.get(); }
 
+    Multimapper::MappingMode getMappingMode() const { return mappingMode; }
+
+    Multimapper::MappingType getMappingType() const { return mappingType; }
+
 
     void setSourceTuning(const Tuning* tuning);
     
@@ -57,6 +61,8 @@ public:
 
     void setTunings(const Tuning* sourceTuning, const Tuning* targetTuning, const TuningTableMap* mapping=nullptr);
    
+    void setMappingMode(Multimapper::MappingMode mode);
+
     void setMappingType(Multimapper::MappingType type);
 
 

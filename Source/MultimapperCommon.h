@@ -9,9 +9,51 @@
 */
 
 #pragma once
+#include <JuceHeader.h>
 
 namespace Multimapper
 {
+	namespace ID
+	{
+		static juce::Identifier State("Multimapper");
+
+		// Tuning
+		static juce::Identifier TuningSource("TuningSource");
+		static juce::Identifier TuningTarget("TuningTarget");
+		static juce::Identifier Tuning("Tuning");
+		static juce::Identifier Name("Name");
+		static juce::Identifier Description("Description");
+		static juce::Identifier Transpose("Transpose");
+		static juce::Identifier IntervalTable("IntervalTable");
+		static juce::Identifier Cents("Cents");
+		static juce::Identifier RootMidiNote("rootMidiNote");
+		static juce::Identifier RootMidiChannel("rootMidiChannel");
+		static juce::Identifier RootFrequency("rootFrequency");
+
+		// Mapping
+		static juce::Identifier TuningTableMidiMap("TuningTableMidiMap");
+		static juce::Identifier RootTuningIndex("RootTuningIndex");
+		static juce::Identifier Period("MapPeriod");
+		static juce::Identifier Pattern("Pattern");
+		static juce::Identifier PatternRoot("PatternRoot");
+		static juce::Identifier MapRoot("MapRoot");
+
+		// Options
+		static juce::Identifier Options("Options");
+		static juce::Identifier MappingMode("MappingMode");
+		static juce::Identifier MappingType("MappingType");
+		static juce::Identifier ChannelMode("ChannelMode");
+		static juce::Identifier MidiMode("MidiMode");
+		static juce::Identifier MpeZone("MpeZone");
+		static juce::Identifier MpeChannels("MpeChannels");
+		static juce::Identifier VoiceRules("VoiceRules");
+		static juce::Identifier VoiceLimit("VoiceLimit");
+
+
+		static juce::Identifier Value("Value");
+	}
+
+
 	enum Commands
 	{
 		Back = 1,
@@ -38,8 +80,7 @@ namespace Multimapper
 
 	enum class ChannelMode
 	{
-		Mono = 1,		// Voice limit of 1
-		FirstAvailable,	// Finds the first available voice from Channel 1
+		FirstAvailable = 1,	// Finds the first available voice from Channel 1
 		RoundRobin,		// Finds the first available voice from last channel assigned
 	};
 
@@ -56,9 +97,74 @@ namespace Multimapper
 		Poly = 3, // Multiple notes on a channel, but only if the pitchbend is the same
 	};
 
-	enum class VoiceLimit
+	enum class VoiceRule
 	{
 		Ignore,		// Ignore new notes if voice limit is met
 		Overwrite,	// Overwrite oldest note if voice limit is met
 	};
+
+	struct Options
+	{
+		MappingMode mappingMode;
+		MappingType mappingType;
+		ChannelMode channelMode;
+		MpeZone		mpeZone;
+		MidiMode	midiMode;
+		VoiceRule	voiceRule;
+		int			voiceLimit = 16;
+
+		juce::ValueTree toValueTree() const
+		{
+			auto tree = juce::ValueTree(ID::Options);
+			tree.setProperty(ID::MappingMode,	(int)mappingMode,	nullptr);
+			tree.setProperty(ID::MappingType,	(int)mappingType,	nullptr);
+			tree.setProperty(ID::ChannelMode,	(int)channelMode,	nullptr);
+			tree.setProperty(ID::MpeZone,		(int)mpeZone,		nullptr);
+			tree.setProperty(ID::MidiMode,		(int)midiMode,		nullptr);
+			tree.setProperty(ID::VoiceRules,	(int)voiceRule,		nullptr);
+			tree.setProperty(ID::VoiceLimit,	(int)voiceLimit,	nullptr);
+			return tree;
+		}
+
+		static Options fromValueTree(juce::ValueTree tree)
+		{
+			return Options
+			{
+				MappingMode((int)tree[ID::MappingMode]),
+				MappingType((int)tree[ID::MappingType]),
+				ChannelMode((int)tree[ID::ChannelMode]),
+				MpeZone((int)tree[ID::MpeZone]),
+				MidiMode((int)tree[ID::MidiMode]),
+				VoiceRule((int)tree[ID::VoiceRules]),
+				(int)tree[ID::VoiceLimit]
+			};
+		}
+
+	};
+
 }
+
+
+class OptionsChanger;
+class OptionsWatcher
+{
+public:
+	virtual void mappingModeChanged(Multimapper::MappingMode mode) = 0;
+	virtual void mappingTypeChanged(Multimapper::MappingType type) = 0;
+	virtual void channelModeChanged(Multimapper::ChannelMode newChannelMode) = 0;
+	virtual void midiModeChanged(Multimapper::MidiMode newMidiMode) = 0;
+	virtual void voiceLimitChanged(int newVoiceLimit) = 0;
+};
+
+class OptionsChanger
+{
+protected:
+	juce::ListenerList<OptionsWatcher> optionsWatchers;
+
+public:
+	virtual ~OptionsChanger() {}
+
+	void addOptionsWatcher(OptionsWatcher* watcher) { optionsWatchers.add(watcher); }
+
+	void removeOptionsWatcher(OptionsWatcher* watcher) { optionsWatchers.remove(watcher); }
+};

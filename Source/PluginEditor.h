@@ -14,6 +14,7 @@
 #include "ui/OverviewPanel.h"
 #include "ui/MenuBar.h"
 #include "ui/NewTuningPanel.h"
+#include "ui/OptionsPanel.h"
 #include "io/TuningFileParser.h"
 #include "./mapping/MultichannelMap.h"
 
@@ -25,7 +26,7 @@ class MultimapperAudioProcessorEditor  : public juce::AudioProcessorEditor,
                                          public juce::ApplicationCommandTarget,
                                          public TuningWatcher,
                                          public TuningChanger,
-                                         public MappingWatcher
+                                         public OptionsWatcher
 {
 public:
     MultimapperAudioProcessorEditor (MultimapperAudioProcessor&);
@@ -45,7 +46,16 @@ public:
     //==============================================================================
     // MappingWatcher implementation
 
-    void mappingTypeChanged(MappingChanger* changer, Multimapper::MappingType type) override;
+    //void mappingTypeChanged(MappingChanger* changer, Multimapper::MappingType type) override;
+
+    //==============================================================================
+    // OptionsWatcher implementation
+
+    void mappingModeChanged(Multimapper::MappingMode mode) override;
+    void mappingTypeChanged(Multimapper::MappingType type) override;
+    void channelModeChanged(Multimapper::ChannelMode newChannelMode) override;
+    void midiModeChanged(Multimapper::MidiMode newMidiMode) override;
+    void voiceLimitChanged(int newVoiceLimit) override;
 
     //==============================================================================
     // ApplicationCommandManager implementation
@@ -69,6 +79,8 @@ public:
     bool performNewTuning(const juce::ApplicationCommandTarget::InvocationInfo& info);
 
     bool performOpenTuning(const juce::ApplicationCommandTarget::InvocationInfo& info);
+
+    bool performShowOptions(const juce::ApplicationCommandTarget::InvocationInfo& info);
 
     //==============================================================================
 
@@ -94,6 +106,7 @@ private:
     juce::Component* contentComponent = nullptr;
     std::unique_ptr<OverviewPanel> overviewPanel;
     std::unique_ptr<NewTuningPanel> newTuningPanel;
+    std::unique_ptr<OptionsPanel> optionsPanel;
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 

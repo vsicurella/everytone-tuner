@@ -8,6 +8,9 @@
       <FILE id="oMI0GT" name="MultimapperCommon.h" compile="0" resource="0"
             file="Source/MultimapperCommon.h"/>
       <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="ui">
+        <FILE id="DXxR6P" name="OptionsPanel.cpp" compile="1" resource="0"
+              file="Source/ui/OptionsPanel.cpp"/>
+        <FILE id="oLdiNj" name="OptionsPanel.h" compile="0" resource="0" file="Source/ui/OptionsPanel.h"/>
         <FILE id="whyaXp" name="EqualTemperamentInterface.h" compile="0" resource="0"
               file="Source/UI/EqualTemperamentInterface.h"/>
         <FILE id="L2UxsU" name="OverviewPanel.cpp" compile="1" resource="0"

@@ -98,6 +98,11 @@ void MappedTuningController::updateCurrentTuner()
     currentTuner = tuners.getLast();
 }
 
+void MappedTuningController::setMappingMode(Multimapper::MappingMode mode)
+{
+    mappingMode = mode;
+}
+
 void MappedTuningController::setMappingType(Multimapper::MappingType type)
 {
     mappingType = type;

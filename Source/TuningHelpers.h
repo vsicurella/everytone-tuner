@@ -12,38 +12,7 @@
 
 #include <JuceHeader.h>
 #include "Tuning.h"
-
-namespace Multimapper
-{
-    namespace ID
-    {
-        static juce::Identifier State("Multimapper");
-
-        // Tuning
-        static juce::Identifier TuningSource("TuningSource");
-        static juce::Identifier TuningTarget("TuningTarget");
-        static juce::Identifier Tuning("Tuning");
-        static juce::Identifier Name("Name");
-        static juce::Identifier Description("Description");
-        static juce::Identifier Transpose("Transpose");
-        static juce::Identifier IntervalTable("IntervalTable");
-        static juce::Identifier Cents("Cents");
-        static juce::Identifier RootMidiNote("rootMidiNote");
-        static juce::Identifier RootMidiChannel("rootMidiChannel");
-        static juce::Identifier RootFrequency("rootFrequency");
-
-        // Mapping
-        static juce::Identifier TuningTableMidiMap("TuningTableMidiMap");
-        static juce::Identifier RootTuningIndex("RootTuningIndex");
-        static juce::Identifier Period("MapPeriod");
-        static juce::Identifier Pattern("Pattern");
-        static juce::Identifier PatternRoot("PatternRoot");
-        static juce::Identifier MapRoot("MapRoot");
-
-        
-        static juce::Identifier Value("Value");
-    }
-}
+#include "MultimapperCommon.h"
 
 template <typename ARR>
 static juce::ValueTree arrayToValueTree(ARR array, juce::Identifier id, juce::Identifier nodeId, juce::Identifier valueId = Multimapper::ID::Value)

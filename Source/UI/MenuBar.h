@@ -42,6 +42,7 @@ public:
             menu.addCommandItem(cmdManager, Multimapper::Commands::OpenTuning, "Open Tuning (.scl, .tun)");
             menu.addCommandItem(cmdManager, Multimapper::Commands::NewMapping, "New Mapping");
             menu.addCommandItem(cmdManager, Multimapper::Commands::ShowOptions, "Preferences");
+            menu.addCommandItem(cmdManager, Multimapper::Commands::Back, "Back");
         default:
             break;
         }
