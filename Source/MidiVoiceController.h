@@ -23,7 +23,7 @@ class MidiVoiceController
 
     juce::Array<bool> midiChannelDisabled;
 
-    Everytone::ChannelMode channelMode;
+    Everytone::ChannelMode channelMode = Everytone::ChannelMode::FirstAvailable;
 
     int voiceLimit = MULTIMAPPER_MAX_VOICES;
 
