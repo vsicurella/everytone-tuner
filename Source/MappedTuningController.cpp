@@ -46,7 +46,7 @@ void MappedTuningController::setTargetTuning(const Tuning* tuning, bool updateTu
 
     juce::Logger::writeToLog("Loaded new target tuning: " + tuning->getDescription());
 
-    if (mappingMode == Multimapper::MappingMode::Auto && *lastTuning != *currentTuningTarget)
+    if (mappingMode == Everytone::MappingMode::Auto && *lastTuning != *currentTuningTarget)
         updateAutoMapping(false);
 
     if (updateTuner)
@@ -98,15 +98,15 @@ void MappedTuningController::updateCurrentTuner()
     currentTuner = tuners.getLast();
 }
 
-void MappedTuningController::setMappingMode(Multimapper::MappingMode mode)
+void MappedTuningController::setMappingMode(Everytone::MappingMode mode)
 {
     mappingMode = mode;
 }
 
-void MappedTuningController::setMappingType(Multimapper::MappingType type)
+void MappedTuningController::setMappingType(Everytone::MappingType type)
 {
     mappingType = type;
-    if (mappingMode == Multimapper::MappingMode::Auto)
+    if (mappingMode == Everytone::MappingMode::Auto)
         updateAutoMapping(true);
 }
 
@@ -149,16 +149,16 @@ std::unique_ptr<TuningTableMap> MappedTuningController::NewPeriodicMappingFromTu
     return std::make_unique<TuningTableMap>(periodicMap);
 }
 
-std::unique_ptr<TuningTableMap> MappedTuningController::newTuningMap(const Tuning* tuning, Multimapper::MappingType mappingType)
+std::unique_ptr<TuningTableMap> MappedTuningController::newTuningMap(const Tuning* tuning, Everytone::MappingType mappingType)
 {
     switch (mappingType)
     {
-    case Multimapper::MappingType::Linear:
+    case Everytone::MappingType::Linear:
     {
         return NewLinearMappingFromTuning(tuning);
     }
 
-    case Multimapper::MappingType::Periodic:
+    case Everytone::MappingType::Periodic:
     {
         return NewPeriodicMappingFromTuning(tuning);
     }

@@ -38,11 +38,11 @@ public:
         switch (topLevelMenuIndex)
         {
         case MenuNames::File:
-            menu.addCommandItem(cmdManager, Multimapper::Commands::NewTuning, "New Tuning");
-            menu.addCommandItem(cmdManager, Multimapper::Commands::OpenTuning, "Open Tuning (.scl, .tun)");
-            menu.addCommandItem(cmdManager, Multimapper::Commands::NewMapping, "New Mapping");
-            menu.addCommandItem(cmdManager, Multimapper::Commands::ShowOptions, "Preferences");
-            menu.addCommandItem(cmdManager, Multimapper::Commands::Back, "Back");
+            menu.addCommandItem(cmdManager, Everytone::Commands::NewTuning, "New Tuning");
+            menu.addCommandItem(cmdManager, Everytone::Commands::OpenTuning, "Open Tuning (.scl, .tun)");
+            menu.addCommandItem(cmdManager, Everytone::Commands::NewMapping, "New Mapping");
+            menu.addCommandItem(cmdManager, Everytone::Commands::ShowOptions, "Preferences");
+            menu.addCommandItem(cmdManager, Everytone::Commands::Back, "Back");
         default:
             break;
         }

@@ -39,7 +39,7 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
 
     setupCommands();
 
-    getKeyMappings()->addKeyPress(Multimapper::Commands::Back, juce::KeyPress::createFromDescription("ctrl + -"));
+    getKeyMappings()->addKeyPress(Everytone::Commands::Back, juce::KeyPress::createFromDescription("ctrl + -"));
 
     addKeyListener(getKeyMappings());
 }
@@ -87,22 +87,22 @@ void MultimapperAudioProcessorEditor::tuningTargetReferenceChanged(TuningChanger
         audioProcessor.setTargetTuningReference(reference);
 }
 
-void MultimapperAudioProcessorEditor::mappingModeChanged(Multimapper::MappingMode mode)
+void MultimapperAudioProcessorEditor::mappingModeChanged(Everytone::MappingMode mode)
 {
     audioProcessor.setMappingMode(mode);
 }
 
-void MultimapperAudioProcessorEditor::mappingTypeChanged(Multimapper::MappingType type)
+void MultimapperAudioProcessorEditor::mappingTypeChanged(Everytone::MappingType type)
 {
     audioProcessor.setAutoMappingType(type);
 }
 
-void MultimapperAudioProcessorEditor::channelModeChanged(Multimapper::ChannelMode newChannelMode)
+void MultimapperAudioProcessorEditor::channelModeChanged(Everytone::ChannelMode newChannelMode)
 {
     audioProcessor.setChannelMode(newChannelMode);
 }
 
-void MultimapperAudioProcessorEditor::midiModeChanged(Multimapper::MidiMode newMidiMode)
+void MultimapperAudioProcessorEditor::midiModeChanged(Everytone::MidiMode newMidiMode)
 {
     
 }
@@ -133,11 +133,11 @@ void MultimapperAudioProcessorEditor::getAllCommands(juce::Array<juce::CommandID
 {
     commands =
     {
-        Multimapper::Back,
-        Multimapper::Save,
-        Multimapper::NewTuning,
-        Multimapper::OpenTuning,
-        Multimapper::ShowOptions
+        Everytone::Back,
+        Everytone::Save,
+        Everytone::NewTuning,
+        Everytone::OpenTuning,
+        Everytone::ShowOptions
     };
 }
 
@@ -145,33 +145,33 @@ void MultimapperAudioProcessorEditor::getCommandInfo(juce::CommandID commandID, 
 {
     switch (commandID)
     {
-    case Multimapper::Back:
-        result = juce::ApplicationCommandInfo(Multimapper::Commands::Back);
+    case Everytone::Back:
+        result = juce::ApplicationCommandInfo(Everytone::Commands::Back);
         result.setInfo("Back", "Back to main window", "", 0);
         result.addDefaultKeypress(juce::KeyPress::escapeKey, juce::ModifierKeys::noModifiers);
         result.setActive(contentComponent != overviewPanel.get());
         break;
 
-    case Multimapper::Save:
-        result = juce::ApplicationCommandInfo(Multimapper::Commands::Save);
+    case Everytone::Save:
+        result = juce::ApplicationCommandInfo(Everytone::Commands::Save);
         result.setInfo("Save", "Save currently edited tuning", "", 0);
         result.addDefaultKeypress('s', juce::ModifierKeys::ctrlModifier);
         break;
 
-    case Multimapper::NewTuning:
-        result = juce::ApplicationCommandInfo(Multimapper::Commands::NewTuning);
+    case Everytone::NewTuning:
+        result = juce::ApplicationCommandInfo(Everytone::Commands::NewTuning);
         result.setInfo("New Tuning", "Create new tuning", "Scale", 0);
         result.addDefaultKeypress('n', juce::ModifierKeys::ctrlModifier);
         break;
 
-    case Multimapper::OpenTuning:
-        result = juce::ApplicationCommandInfo(Multimapper::Commands::OpenTuning);
+    case Everytone::OpenTuning:
+        result = juce::ApplicationCommandInfo(Everytone::Commands::OpenTuning);
         result.setInfo("Open Tuning", "Load a .scl or .tun file", "Scale", 0);
         result.addDefaultKeypress('o', juce::ModifierKeys::ctrlModifier);
         break;
 
-    case Multimapper::ShowOptions:
-        result = juce::ApplicationCommandInfo(Multimapper::Commands::ShowOptions);
+    case Everytone::ShowOptions:
+        result = juce::ApplicationCommandInfo(Everytone::Commands::ShowOptions);
         result.setInfo("Show Options", "Change some advanced midi tuning options", "Options", 0);
         result.addDefaultKeypress('p', juce::ModifierKeys::ctrlModifier);
         break;
@@ -186,19 +186,19 @@ bool MultimapperAudioProcessorEditor::perform(const juce::ApplicationCommandTarg
 {
     switch (info.commandID)
     {
-    case Multimapper::Back:
+    case Everytone::Back:
         return performBack(info);
 
-    case Multimapper::Save:
+    case Everytone::Save:
         return performSave(info);
 
-    case Multimapper::NewTuning:
+    case Everytone::NewTuning:
         return performNewTuning(info);
     
-    case Multimapper::OpenTuning:
+    case Everytone::OpenTuning:
         return performOpenTuning(info);
 
-    case Multimapper::ShowOptions:
+    case Everytone::ShowOptions:
         return performShowOptions(info);
 
     default:

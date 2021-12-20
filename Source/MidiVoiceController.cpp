@@ -135,7 +135,7 @@ void MidiVoiceController::setChannelDisabled(int midiChannel, bool disabled)
     midiChannelDisabled.set(midiChannel - 1, disabled);
 }
 
-void MidiVoiceController::setChannelMode(Multimapper::ChannelMode mode)
+void MidiVoiceController::setChannelMode(Everytone::ChannelMode mode)
 {
     channelMode = mode;
 }
@@ -184,10 +184,10 @@ int MidiVoiceController::getNextVoiceIndex() const
 
     switch (channelMode)
     {
-    case Multimapper::ChannelMode::FirstAvailable:
+    case Everytone::ChannelMode::FirstAvailable:
         return nextAvailableVoiceIndex();
 
-    case Multimapper::ChannelMode::RoundRobin:
+    case Everytone::ChannelMode::RoundRobin:
         return nextRoundRobinVoiceIndex();
 
     default:

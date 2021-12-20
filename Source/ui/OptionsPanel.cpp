@@ -12,15 +12,15 @@
 #include "OptionsPanel.h"
 
 //==============================================================================
-OptionsPanel::OptionsPanel(Multimapper::Options options)
+OptionsPanel::OptionsPanel(Everytone::Options options)
 {
     channelModeBox = std::make_unique<juce::ComboBox>("ChannelModeBox");
-    channelModeBox->addItem("First Available", (int)Multimapper::ChannelMode::FirstAvailable);
-    channelModeBox->addItem("Round Robin", (int)Multimapper::ChannelMode::RoundRobin);
+    channelModeBox->addItem("First Available", (int)Everytone::ChannelMode::FirstAvailable);
+    channelModeBox->addItem("Round Robin", (int)Everytone::ChannelMode::RoundRobin);
     channelModeBox->setSelectedId((int)options.channelMode, juce::NotificationType::dontSendNotification);
     channelModeBox->onChange = [&]() 
     { 
-        optionsWatchers.call(&OptionsWatcher::channelModeChanged, Multimapper::ChannelMode(channelModeBox->getSelectedId())); 
+        optionsWatchers.call(&OptionsWatcher::channelModeChanged, Everytone::ChannelMode(channelModeBox->getSelectedId())); 
     };
     addAndMakeVisible(*channelModeBox);
 
@@ -30,12 +30,12 @@ OptionsPanel::OptionsPanel(Multimapper::Options options)
 
 
     channelRulesBox = std::make_unique<juce::ComboBox>("ChannelRulesBox");
-    channelRulesBox->addItem("One note per channel", (int)Multimapper::MidiMode::Mono);
-    channelRulesBox->addItem("Poly channels if pitchbend match", (int)Multimapper::MidiMode::Poly);
+    channelRulesBox->addItem("One note per channel", (int)Everytone::MidiMode::Mono);
+    channelRulesBox->addItem("Poly channels if pitchbend match", (int)Everytone::MidiMode::Poly);
     channelRulesBox->setSelectedId((int)options.midiMode, juce::NotificationType::dontSendNotification);
     channelRulesBox->onChange = [&]()
     {
-        optionsWatchers.call(&OptionsWatcher::midiModeChanged, Multimapper::MidiMode(channelRulesBox->getSelectedId()));
+        optionsWatchers.call(&OptionsWatcher::midiModeChanged, Everytone::MidiMode(channelRulesBox->getSelectedId()));
     };
     addAndMakeVisible(*channelRulesBox);
     

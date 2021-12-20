@@ -20,7 +20,7 @@ public:
 
     LogWindow(std::function<juce::String(void)> getLogCallback)
         : callback(getLogCallback),
-          juce::DocumentWindow("Multimapper Log", 
+          juce::DocumentWindow("Everytone Log", 
             juce::Colours::black, 
             juce::DocumentWindow::TitleBarButtons::minimiseButton,
             true)

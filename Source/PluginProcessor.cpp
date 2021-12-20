@@ -216,12 +216,12 @@ void MultimapperAudioProcessor::getStateInformation (juce::MemoryBlock& destData
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
-    juce::ValueTree state(Multimapper::ID::State);
+    juce::ValueTree state(Everytone::ID::State);
 
-    //auto sourceNode = tuningToValueTree(*midiBrain->getTuningSource(), Multimapper::ID::TuningSource);
+    //auto sourceNode = tuningToValueTree(*midiBrain->getTuningSource(), Everytone::ID::TuningSource);
     //state.addChild(sourceNode, -1, nullptr);
     
-    auto targetNode = tuningToValueTree(tuningController.getTuningTarget().get(), Multimapper::ID::TuningTarget);
+    auto targetNode = tuningToValueTree(tuningController.getTuningTarget().get(), Everytone::ID::TuningTarget);
     state.addChild(targetNode, -1, nullptr);
 
     auto optionsNode = options().toValueTree();
@@ -240,24 +240,24 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     
     auto state = juce::ValueTree::readFromStream(juce::MemoryInputStream(data, (size_t)sizeInBytes, false));
 
-    //auto sourceTree = state.getChildWithName(Multimapper::ID::TuningSource);
+    //auto sourceTree = state.getChildWithName(Everytone::ID::TuningSource);
     //if (sourceTree.isValid())
     //{
     //    auto source = parseTuningValueTree(state.getChild(0));
     //    loadTuningSource(source);
     //}
 
-    auto targetTree = state.getChildWithName(Multimapper::ID::TuningTarget);
+    auto targetTree = state.getChildWithName(Everytone::ID::TuningTarget);
     if (targetTree.isValid())
     {
         auto target = parseTuningValueTree(targetTree);
         loadTuningTarget(target);
     }
 
-    auto optionsTree = state.getChildWithName(Multimapper::ID::Options);
+    auto optionsTree = state.getChildWithName(Everytone::ID::Options);
     if (optionsTree.isValid())
     {
-        auto options = Multimapper::Options::fromValueTree(optionsTree);
+        auto options = Everytone::Options::fromValueTree(optionsTree);
         setOptions(options);
     }
 }
@@ -341,16 +341,16 @@ void MultimapperAudioProcessor::testMidi()
     processBlock(audioDummy, buffer);
 }
 
-Multimapper::Options MultimapperAudioProcessor::options() const
+Everytone::Options MultimapperAudioProcessor::options() const
 {
-    return Multimapper::Options
+    return Everytone::Options
     {
         tuningController.getMappingMode(),
         tuningController.getMappingType(),
         voiceController.getChannelMode(),
-        Multimapper::MpeZone::Lower,
-        Multimapper::MidiMode::Mono,
-        Multimapper::VoiceRule::Ignore,
+        Everytone::MpeZone::Lower,
+        Everytone::MidiMode::Mono,
+        Everytone::VoiceRule::Ignore,
         voiceController.getVoiceLimit()
     };
 }
@@ -382,17 +382,17 @@ void MultimapperAudioProcessor::loadNoteMapping(const TuningTableMap& map)
     tuningController.setNoteMapping(&map);
 }
 
-void MultimapperAudioProcessor::setAutoMappingType(Multimapper::MappingType type)
+void MultimapperAudioProcessor::setAutoMappingType(Everytone::MappingType type)
 {
     tuningController.setMappingType(type);
 }
 
-void MultimapperAudioProcessor::setMappingMode(Multimapper::MappingMode mode)
+void MultimapperAudioProcessor::setMappingMode(Everytone::MappingMode mode)
 {
     tuningController.setMappingMode(mode);
 }
 
-void MultimapperAudioProcessor::setChannelMode(Multimapper::ChannelMode mode)
+void MultimapperAudioProcessor::setChannelMode(Everytone::ChannelMode mode)
 {
     voiceController.setChannelMode(mode);
 }
@@ -402,7 +402,7 @@ void MultimapperAudioProcessor::setVoiceLimit(int voiceLimit)
     voiceController.setVoiceLimit(voiceLimit);
 }
 
-void MultimapperAudioProcessor::setOptions(Multimapper::Options optionsIn)
+void MultimapperAudioProcessor::setOptions(Everytone::Options optionsIn)
 {
     setAutoMappingType(optionsIn.mappingType);
     setMappingMode(optionsIn.mappingMode);

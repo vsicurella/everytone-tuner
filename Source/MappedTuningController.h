@@ -11,7 +11,7 @@
 #pragma once
 #include "MidiNoteTuner.h"
 #include "./mapping/MultichannelMap.h"
-#include "MultimapperCommon.h"
+#include "Common.h"
 
 class MappedTuningController
 {
@@ -25,8 +25,8 @@ class MappedTuningController
     juce::Array<std::shared_ptr<MidiNoteTuner>> tuners;
     std::shared_ptr<MidiNoteTuner> currentTuner;
 
-    Multimapper::MappingMode mappingMode = Multimapper::MappingMode::Auto;
-    Multimapper::MappingType mappingType = Multimapper::MappingType::Linear;
+    Everytone::MappingMode mappingMode = Everytone::MappingMode::Auto;
+    Everytone::MappingType mappingType = Everytone::MappingType::Linear;
 
 public:
 
@@ -48,9 +48,9 @@ public:
 
     const TuningTableMap* readMapping() const { return currentMapping.get(); }
 
-    Multimapper::MappingMode getMappingMode() const { return mappingMode; }
+    Everytone::MappingMode getMappingMode() const { return mappingMode; }
 
-    Multimapper::MappingType getMappingType() const { return mappingType; }
+    Everytone::MappingType getMappingType() const { return mappingType; }
 
 
     void setSourceTuning(const Tuning* tuning);
@@ -61,9 +61,9 @@ public:
 
     void setTunings(const Tuning* sourceTuning, const Tuning* targetTuning, const TuningTableMap* mapping=nullptr);
    
-    void setMappingMode(Multimapper::MappingMode mode);
+    void setMappingMode(Everytone::MappingMode mode);
 
-    void setMappingType(Multimapper::MappingType type);
+    void setMappingType(Everytone::MappingType type);
 
 
 private:
@@ -82,7 +82,7 @@ private:
 
 public:
 
-    static std::unique_ptr<TuningTableMap> newTuningMap(const Tuning* tuning, Multimapper::MappingType mappingType);
+    static std::unique_ptr<TuningTableMap> newTuningMap(const Tuning* tuning, Everytone::MappingType mappingType);
 
     static std::unique_ptr<TuningTableMap> NewLinearMappingFromTuning(const Tuning* tuning);
 

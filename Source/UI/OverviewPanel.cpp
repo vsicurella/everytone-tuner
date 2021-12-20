@@ -11,7 +11,7 @@
 #include "OverviewPanel.h"
 
 //==============================================================================
-OverviewPanel::OverviewPanel (Multimapper::Options options)
+OverviewPanel::OverviewPanel (Everytone::Options options)
 {
 	tuningNameBox.reset(new juce::Label("tuningNameBox"));
 	tuningNameBox->setJustificationType(juce::Justification::centredLeft);
@@ -93,7 +93,7 @@ OverviewPanel::OverviewPanel (Multimapper::Options options)
 	linearMappingButton->setButtonText("Linear");
 	linearMappingButton->setConnectedEdges(juce::Button::ConnectedEdgeFlags::ConnectedOnRight);
 	linearMappingButton->setClickingTogglesState(true);
-	linearMappingButton->setToggleState(options.mappingType == Multimapper::MappingType::Linear, juce::NotificationType::dontSendNotification);
+	linearMappingButton->setToggleState(options.mappingType == Everytone::MappingType::Linear, juce::NotificationType::dontSendNotification);
 	linearMappingButton->setRadioGroupId(10);
 	linearMappingButton->onClick = mappingButtonCallback;
 
@@ -102,7 +102,7 @@ OverviewPanel::OverviewPanel (Multimapper::Options options)
 	periodicMappingButton->setButtonText("Periodic");
 	periodicMappingButton->setConnectedEdges(juce::Button::ConnectedEdgeFlags::ConnectedOnLeft);
 	periodicMappingButton->setClickingTogglesState(true);
-	periodicMappingButton->setToggleState(options.mappingType == Multimapper::MappingType::Periodic, juce::NotificationType::dontSendNotification);
+	periodicMappingButton->setToggleState(options.mappingType == Everytone::MappingType::Periodic, juce::NotificationType::dontSendNotification);
 	periodicMappingButton->setRadioGroupId(10);
 
 
@@ -250,8 +250,8 @@ void OverviewPanel::setTuningDisplayed(const Tuning* tuning)
 void OverviewPanel::mappingTypeButtonClicked()
 {
 	auto type = (linearMappingButton->getToggleState())
-		? Multimapper::MappingType::Linear
-		: Multimapper::MappingType::Periodic;
+		? Everytone::MappingType::Linear
+		: Everytone::MappingType::Periodic;
 
 	optionsWatchers.call(&OptionsWatcher::mappingTypeChanged, type);
 }

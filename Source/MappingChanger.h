@@ -9,14 +9,14 @@
 */
 
 #pragma once
-#include "MultimapperCommon.h"
+#include "Common.h"
 #include <JuceHeader.h>
 
 struct MappingChanger;
 
 struct MappingWatcher
 {
-    virtual void mappingTypeChanged(MappingChanger* changer, Multimapper::MappingType type) {};
+    virtual void mappingTypeChanged(MappingChanger* changer, Everytone::MappingType type) {};
 };
 
 class MappingChanger

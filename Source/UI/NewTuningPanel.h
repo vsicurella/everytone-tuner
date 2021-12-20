@@ -11,7 +11,7 @@
 #pragma once
 
 #include "../TuningChanger.h"
-#include "../MultimapperCommon.h"
+#include "../Common.h"
 #include "EqualTemperamentInterface.h"
 
 

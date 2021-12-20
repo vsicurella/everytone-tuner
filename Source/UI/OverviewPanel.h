@@ -19,7 +19,7 @@ class OverviewPanel  : public juce::Component, public TuningChanger, public Opti
 {
 public:
     //==============================================================================
-	OverviewPanel(Multimapper::Options options = Multimapper::Options());
+	OverviewPanel(Everytone::Options options = Everytone::Options());
     ~OverviewPanel() override;
 
 public:

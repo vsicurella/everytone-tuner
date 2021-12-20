@@ -80,7 +80,7 @@ public:
 
     const TuningTableMap* noteMapping() const { return tuningController.readMapping(); }
 
-    Multimapper::Options options() const;
+    Everytone::Options options() const;
 
     //==============================================================================
 
@@ -93,15 +93,15 @@ public:
 
     //==============================================================================
 
-    void setAutoMappingType(Multimapper::MappingType type);
+    void setAutoMappingType(Everytone::MappingType type);
 
-    void setMappingMode(Multimapper::MappingMode mode);
+    void setMappingMode(Everytone::MappingMode mode);
 
-    void setChannelMode(Multimapper::ChannelMode mode);
+    void setChannelMode(Everytone::ChannelMode mode);
 
     void setVoiceLimit(int voiceLimit);
 
-    void setOptions(Multimapper::Options optionsIn);
+    void setOptions(Everytone::Options optionsIn);
 
     //==============================================================================
 

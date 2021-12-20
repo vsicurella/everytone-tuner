@@ -23,7 +23,7 @@ class MidiVoiceController
 
     juce::Array<bool> midiChannelDisabled;
 
-    Multimapper::ChannelMode channelMode;
+    Everytone::ChannelMode channelMode;
 
     int voiceLimit = MULTIMAPPER_MAX_VOICES;
 
@@ -49,7 +49,7 @@ public:
     MidiVoiceController(MappedTuningController& tuningController);
     ~MidiVoiceController();
 
-    Multimapper::ChannelMode getChannelMode() const { return channelMode; }
+    Everytone::ChannelMode getChannelMode() const { return channelMode; }
     
     int getVoiceLimit() const { return voiceLimit; }
 
@@ -76,7 +76,7 @@ public:
 
     void setChannelDisabled(int midiChannel, bool disabled);
 
-    void setChannelMode(Multimapper::ChannelMode mode);
+    void setChannelMode(Everytone::ChannelMode mode);
 
     void setVoiceLimit(int voiceLimit);
 

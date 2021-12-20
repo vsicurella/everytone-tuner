@@ -94,6 +94,9 @@ void Tuning::rebuildTables()
         frequencyTable.set(t, frequency);
         double mts = roundN(10, frequencyToMTS(frequency));
         mtsTable.set(t, mts);
+
+        dbgFreqTable[t] = frequency;
+        dbgMtsTable[t] = mts;
     }
 }
 

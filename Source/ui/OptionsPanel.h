@@ -11,7 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "../MultimapperCommon.h"
+#include "../Common.h"
 
 //==============================================================================
 /*
@@ -20,7 +20,7 @@
 class OptionsPanel  : public juce::Component, public OptionsChanger
 {
 public:
-    OptionsPanel(Multimapper::Options optionsIn = Multimapper::Options());
+    OptionsPanel(Everytone::Options optionsIn = Everytone::Options());
     ~OptionsPanel() override;
 
     void paint (juce::Graphics&) override;

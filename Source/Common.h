@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    MultimapperCommon.h
+    Common.h
     Created: 12 Dec 2021 5:51:24pm
     Author:  Vincenzo
 
@@ -11,11 +11,11 @@
 #pragma once
 #include <JuceHeader.h>
 
-namespace Multimapper
+namespace Everytone
 {
 	namespace ID
 	{
-		static juce::Identifier State("Multimapper");
+		static juce::Identifier State("Everytone");
 
 		// Tuning
 		static juce::Identifier TuningSource("TuningSource");
@@ -149,10 +149,10 @@ class OptionsChanger;
 class OptionsWatcher
 {
 public:
-	virtual void mappingModeChanged(Multimapper::MappingMode mode) = 0;
-	virtual void mappingTypeChanged(Multimapper::MappingType type) = 0;
-	virtual void channelModeChanged(Multimapper::ChannelMode newChannelMode) = 0;
-	virtual void midiModeChanged(Multimapper::MidiMode newMidiMode) = 0;
+	virtual void mappingModeChanged(Everytone::MappingMode mode) = 0;
+	virtual void mappingTypeChanged(Everytone::MappingType type) = 0;
+	virtual void channelModeChanged(Everytone::ChannelMode newChannelMode) = 0;
+	virtual void midiModeChanged(Everytone::MidiMode newMidiMode) = 0;
 	virtual void voiceLimitChanged(int newVoiceLimit) = 0;
 };
 

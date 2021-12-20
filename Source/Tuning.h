@@ -45,6 +45,10 @@ class Tuning
 
 	double rootMts;
 
+	// Debug
+	double dbgFreqTable[2048];
+	double dbgMtsTable[2048];
+
 private:
 
 	void setupTuning(const juce::Array<double>& cents);

@@ -46,15 +46,15 @@ public:
     //==============================================================================
     // MappingWatcher implementation
 
-    //void mappingTypeChanged(MappingChanger* changer, Multimapper::MappingType type) override;
+    //void mappingTypeChanged(MappingChanger* changer, Everytone::MappingType type) override;
 
     //==============================================================================
     // OptionsWatcher implementation
 
-    void mappingModeChanged(Multimapper::MappingMode mode) override;
-    void mappingTypeChanged(Multimapper::MappingType type) override;
-    void channelModeChanged(Multimapper::ChannelMode newChannelMode) override;
-    void midiModeChanged(Multimapper::MidiMode newMidiMode) override;
+    void mappingModeChanged(Everytone::MappingMode mode) override;
+    void mappingTypeChanged(Everytone::MappingType type) override;
+    void channelModeChanged(Everytone::ChannelMode newChannelMode) override;
+    void midiModeChanged(Everytone::MidiMode newMidiMode) override;
     void voiceLimitChanged(int newVoiceLimit) override;
 
     //==============================================================================
