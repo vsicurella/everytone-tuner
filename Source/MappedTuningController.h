@@ -28,6 +28,8 @@ class MappedTuningController
     Everytone::MappingMode mappingMode = Everytone::MappingMode::Auto;
     Everytone::MappingType mappingType = Everytone::MappingType::Linear;
 
+    int pitchbendRange = 4;
+
 public:
 
     MappedTuningController();
@@ -52,6 +54,7 @@ public:
 
     Everytone::MappingType getMappingType() const { return mappingType; }
 
+    int getPitchbendRange() const { return pitchbendRange; }
 
     void setSourceTuning(const Tuning* tuning);
     
@@ -65,6 +68,7 @@ public:
 
     void setMappingType(Everytone::MappingType type);
 
+    void setPitchbendRange(int pitchbendRange);
 
 private:
 

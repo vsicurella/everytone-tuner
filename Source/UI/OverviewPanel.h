@@ -47,6 +47,8 @@ private:
 	void setTuningPeriodLabel(juce::String periodIn);
 	void setDescriptionText(juce::String descIn);
 
+	void setPitchbendRangeText(int pitchbendRange);
+
 	void setRootMidiChannelLabel(juce::String channel);
 	void setRootMidiNoteLabel(juce::String note);
 	void setRootFrequencyLabel(juce::String frequency);
@@ -71,6 +73,8 @@ private:
 
 	std::unique_ptr<juce::TextButton> linearMappingButton;
 	std::unique_ptr<juce::TextButton> periodicMappingButton;
+
+	std::unique_ptr<juce::Label> pitchbendRangeValue;
 
 	juce::OwnedArray<juce::Label> labels;
 

@@ -19,8 +19,8 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 
 	auto tuningNameLabel = labels.add(new juce::Label("tuningNameLabel", juce::translate("Name") + ":"));
 	tuningNameLabel->setJustificationType(juce::Justification::centredRight);
-	addAndMakeVisible(tuningNameLabel);
 	tuningNameLabel->attachToComponent(tuningNameBox.get(), true);
+	addAndMakeVisible(tuningNameLabel);
 
 	tuningSizeBox.reset(new juce::Label("tuningSizeBox"));
 	tuningSizeBox->setJustificationType(juce::Justification::centredLeft);
@@ -28,8 +28,8 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 
 	auto tuningSizeLabel = labels.add(new juce::Label("tuningSizeLabel", juce::translate("Size") + ":"));
 	tuningSizeLabel->setJustificationType(juce::Justification::centredRight);
-	addAndMakeVisible(tuningSizeLabel);
 	tuningSizeLabel->attachToComponent(tuningSizeBox.get(), true);
+	addAndMakeVisible(tuningSizeLabel);
 
 	tuningPeriodBox.reset(new juce::Label("tuningPeriodBox"));
 	tuningPeriodBox->setJustificationType(juce::Justification::centredLeft);
@@ -37,8 +37,8 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 
 	auto tuningPeriodLabel = labels.add(new juce::Label("tuningPeriodLabel", juce::translate("Period") + ":"));
 	tuningPeriodLabel->setJustificationType(juce::Justification::centredRight);
-	addAndMakeVisible(tuningPeriodLabel);
 	tuningPeriodLabel->attachToComponent(tuningPeriodBox.get(), true);
+	addAndMakeVisible(tuningPeriodLabel);
 
     descriptionEditor.reset (new juce::TextEditor ("descriptionEditor"));
     addAndMakeVisible (descriptionEditor.get());
@@ -61,8 +61,8 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 
 	auto rootChannelLabel = labels.add(new juce::Label("rootChannelLabel", "Root MIDI Channel:"));
 	rootChannelLabel->setJustificationType(juce::Justification::centredRight);
-	addAndMakeVisible(rootChannelLabel);
 	rootChannelLabel->attachToComponent(rootMidiChannelBox.get(), true);
+	addAndMakeVisible(rootChannelLabel);
 
 	rootMidiNoteBox.reset(new juce::Label("rootMidiNoteBox", "60"));
 	addAndMakeVisible(rootMidiNoteBox.get());
@@ -72,8 +72,8 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 
 	auto rootNoteLabel = labels.add(new juce::Label("rootNoteLabel", "Root MIDI Note:"));
 	rootNoteLabel->setJustificationType(juce::Justification::centredRight);
-	addAndMakeVisible(rootNoteLabel);
 	rootNoteLabel->attachToComponent(rootMidiNoteBox.get(), true);
+	addAndMakeVisible(rootNoteLabel);
 
 	rootFrequencyBox.reset(new juce::Label("rootFrequencyBox", "263"));
 	addAndMakeVisible(rootFrequencyBox.get());
@@ -83,8 +83,8 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 
 	auto rootFrequencyLabel = labels.add(new juce::Label("rootFrequencyLabel", "Root Frequency:"));
 	rootFrequencyLabel->setJustificationType(juce::Justification::centredRight);
-	addAndMakeVisible(rootFrequencyLabel);
 	rootFrequencyLabel->attachToComponent(rootFrequencyBox.get(), true);
+	addAndMakeVisible(rootFrequencyLabel);
 
 	auto mappingButtonCallback = [&]() { mappingTypeButtonClicked(); };
 
@@ -105,11 +105,35 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 	periodicMappingButton->setToggleState(options.mappingType == Everytone::MappingType::Periodic, juce::NotificationType::dontSendNotification);
 	periodicMappingButton->setRadioGroupId(10);
 
-
 	auto mappingLabel = labels.add(new juce::Label("mappingLabel", "Mapping:"));
 	mappingLabel->setJustificationType(juce::Justification::centredRight);
-	addAndMakeVisible(mappingLabel);
 	mappingLabel->attachToComponent(linearMappingButton.get(), true);
+	addAndMakeVisible(mappingLabel);
+
+	pitchbendRangeValue = std::make_unique<juce::Label>("pitchbendRangeValue");
+	pitchbendRangeValue->setEditable(false, true);
+	addAndMakeVisible(*pitchbendRangeValue);
+	pitchbendRangeValue->onEditorShow = [&]()
+	{
+		auto editor = pitchbendRangeValue->getCurrentTextEditor();
+		if (editor)
+		{
+			auto pitchbendText = pitchbendRangeValue->getText();
+			auto range = juce::StringArray::fromTokens(pitchbendText, false)[1];
+			editor->setText(range, juce::NotificationType::dontSendNotification);
+		}
+	};
+	pitchbendRangeValue->onTextChange = [&]() 
+	{ 
+		auto newRange = pitchbendRangeValue->getText().getIntValue();
+		optionsWatchers.call(&OptionsWatcher::pitchbendRangeChanged, newRange); 
+		setPitchbendRangeText(newRange);
+	};
+	setPitchbendRangeText(options.pitchbendRange / 2);
+
+	auto pitchbendLabel = labels.add(new juce::Label("pitchbendLabel", "Pitchbend Range:"));
+	pitchbendLabel->attachToComponent(pitchbendRangeValue.get(), true);
+	addAndMakeVisible(pitchbendLabel);
 }
 
 OverviewPanel::~OverviewPanel()
@@ -187,7 +211,7 @@ void OverviewPanel::resized()
 	mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *periodicMappingButton));
 
 	referenceInfo.items.add(juce::FlexItem(buttonWidth * 2, buttonHeight, mappingRow).withMargin(referenceMargin));
-
+	referenceInfo.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *pitchbendRangeValue).withMargin(referenceMargin));
 
 	juce::FlexBox main;
 	main.justifyContent = juce::FlexBox::JustifyContent::flexStart;
@@ -307,6 +331,11 @@ void OverviewPanel::tuningReferenceEdited()
 	tuningWatchers.call(&TuningWatcher::tuningTargetReferenceChanged, this, newReference);
 }
 
+void OverviewPanel::setPitchbendRangeText(int pitchbendRange)
+{
+	auto value = "+/- " + juce::String(pitchbendRange) + " semitones";
+	pitchbendRangeValue->setText(value, juce::NotificationType::dontSendNotification);
+}
 
 void OverviewPanel::setTuningNameLabel(juce::String nameIn)
 {

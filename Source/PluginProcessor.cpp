@@ -351,7 +351,8 @@ Everytone::Options MultimapperAudioProcessor::options() const
         Everytone::MpeZone::Lower,
         Everytone::MidiMode::Mono,
         Everytone::VoiceRule::Ignore,
-        voiceController.getVoiceLimit()
+        voiceController.getVoiceLimit(),
+        tuningController.getPitchbendRange()
     };
 }
 
@@ -402,10 +403,16 @@ void MultimapperAudioProcessor::setVoiceLimit(int voiceLimit)
     voiceController.setVoiceLimit(voiceLimit);
 }
 
+void MultimapperAudioProcessor::setPitchbendRange(int pitchbendRange)
+{
+    tuningController.setPitchbendRange(pitchbendRange);
+}
+
 void MultimapperAudioProcessor::setOptions(Everytone::Options optionsIn)
 {
     setAutoMappingType(optionsIn.mappingType);
     setMappingMode(optionsIn.mappingMode);
     setChannelMode(optionsIn.channelMode);
     setVoiceLimit(optionsIn.voiceLimit);
+    setPitchbendRange(optionsIn.pitchbendRange);
 }

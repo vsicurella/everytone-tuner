@@ -48,6 +48,7 @@ namespace Everytone
 		static juce::Identifier MpeChannels("MpeChannels");
 		static juce::Identifier VoiceRules("VoiceRules");
 		static juce::Identifier VoiceLimit("VoiceLimit");
+		static juce::Identifier PitchbendRange("PitchbendRange");
 
 
 		static juce::Identifier Value("Value");
@@ -112,6 +113,7 @@ namespace Everytone
 		MidiMode	midiMode;
 		VoiceRule	voiceRule;
 		int			voiceLimit = 16;
+		int			pitchbendRange = 96; // Unsure if this should be +/- 2 or MPE default
 
 		juce::ValueTree toValueTree() const
 		{
@@ -123,6 +125,7 @@ namespace Everytone
 			tree.setProperty(ID::MidiMode,		(int)midiMode,		nullptr);
 			tree.setProperty(ID::VoiceRules,	(int)voiceRule,		nullptr);
 			tree.setProperty(ID::VoiceLimit,	(int)voiceLimit,	nullptr);
+			tree.setProperty(ID::PitchbendRange,(int)pitchbendRange,nullptr);
 			return tree;
 		}
 
@@ -136,7 +139,8 @@ namespace Everytone
 				MpeZone((int)tree[ID::MpeZone]),
 				MidiMode((int)tree[ID::MidiMode]),
 				VoiceRule((int)tree[ID::VoiceRules]),
-				(int)tree[ID::VoiceLimit]
+				(int)tree[ID::VoiceLimit],
+				(int)tree[ID::PitchbendRange]
 			};
 		}
 
@@ -154,6 +158,7 @@ public:
 	virtual void channelModeChanged(Everytone::ChannelMode newChannelMode) = 0;
 	virtual void midiModeChanged(Everytone::MidiMode newMidiMode) = 0;
 	virtual void voiceLimitChanged(int newVoiceLimit) = 0;
+	virtual void pitchbendRangeChanged(int newPitchbendRange) = 0;
 };
 
 class OptionsChanger

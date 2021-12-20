@@ -112,6 +112,11 @@ void MultimapperAudioProcessorEditor::voiceLimitChanged(int newVoiceLimit)
     audioProcessor.setVoiceLimit(newVoiceLimit);
 }
 
+void MultimapperAudioProcessorEditor::pitchbendRangeChanged(int pitchbendRange)
+{
+    // User inputs bipolar form, so multiply for absolute range
+    audioProcessor.setPitchbendRange(pitchbendRange * 2);
+}
 
 juce::ApplicationCommandTarget* MultimapperAudioProcessorEditor::getFirstCommandTarget(juce::CommandID commandID)
 {

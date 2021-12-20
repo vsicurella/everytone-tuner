@@ -94,7 +94,7 @@ void MappedTuningController::setTunings(const Tuning* sourceTuning, const Tuning
 
 void MappedTuningController::updateCurrentTuner()
 {
-    tuners.add(std::make_shared<MidiNoteTuner>(currentTuningSource, currentTuningTarget, currentMapping));
+    tuners.add(std::make_shared<MidiNoteTuner>(currentTuningSource, currentTuningTarget, currentMapping, pitchbendRange));
     currentTuner = tuners.getLast();
 }
 
@@ -110,9 +110,17 @@ void MappedTuningController::setMappingType(Everytone::MappingType type)
         updateAutoMapping(true);
 }
 
+void MappedTuningController::setPitchbendRange(int pitchbendRangeIn)
+{
+    if (pitchbendRangeIn > 0 && pitchbendRangeIn < 128)
+    {
+        pitchbendRange = pitchbendRangeIn;
+        updateCurrentTuner();
+    }
+}
+
 void MappedTuningController::updateAutoMapping(bool updateTuner)
 {
-    
     auto mapping = newTuningMap(currentTuningTarget.get());
     setNoteMapping(mapping.get(), updateTuner);
 }
@@ -124,20 +132,6 @@ std::unique_ptr<TuningTableMap> MappedTuningController::newTuningMap(const Tunin
 
 std::unique_ptr<TuningTableMap> MappedTuningController::NewLinearMappingFromTuning(const Tuning* tuning)
 {
-    //auto mapFunction = Map<int>::FunctionDefinition
-    //{
-    //    2048,
-    //    tuning->getRootIndex(),
-    //    [&](int x) { return modulo(x - tuning->getRootIndex(), 2048); }
-    //};
-    //auto linearMap = Map<int>(mapFunction);
-    //auto definition = TuningTableMap::Definition
-    //{
-    //    tuning->getRootMidiNote(), tuning->getRootIndex(), &linearMap
-    //};
-   
-    //return std::make_unique<TuningTableMap>(definition);
-
     auto linearMap = TuningTableMap::CreateLinearMidiMapping(tuning->getRootMidiNote(), tuning->getRootMidiChannel());
     return std::make_unique<TuningTableMap>(linearMap);
 }

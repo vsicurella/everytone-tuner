@@ -101,6 +101,8 @@ public:
 
     void setVoiceLimit(int voiceLimit);
 
+    void setPitchbendRange(int pitchbendRange);
+
     void setOptions(Everytone::Options optionsIn);
 
     //==============================================================================
