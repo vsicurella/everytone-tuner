@@ -125,9 +125,29 @@ MidiVoice MidiVoiceController::removeVoice(const MidiVoice* voice)
     return removeVoice(index);
 }
 
-bool MidiVoiceController::channelIsFree(int channelNumber, MidiPitch pitchToAssign) const
+bool MidiVoiceController::channelIsFree(int channelIndex, MidiPitch pitchToAssign) const
 {
-    return !midiChannelDisabled[channelNumber];
+    bool notAvailable = midiChannelDisabled[channelIndex];
+
+    switch (mpeZone)
+    {
+    case Everytone::MpeZone::Lower:
+        notAvailable |= channelIndex == 0;
+        break;
+
+    case Everytone::MpeZone::Upper:
+        notAvailable |= channelIndex == 15;
+        break;
+    }
+
+    if (!notAvailable)
+    {
+        auto ch = getVoice(channelIndex)->getAssignedChannel();
+        if (ch < 1)
+            return true;
+    }
+
+    return false;
 }
 
 void MidiVoiceController::setChannelDisabled(int midiChannel, bool disabled)
@@ -140,6 +160,11 @@ void MidiVoiceController::setChannelMode(Everytone::ChannelMode mode)
     channelMode = mode;
 }
 
+void MidiVoiceController::setMpeZone(Everytone::MpeZone zone)
+{
+    mpeZone = zone;
+}
+
 void MidiVoiceController::setVoiceLimit(int limit)
 {
     voiceLimit = limit;
@@ -150,27 +175,19 @@ int MidiVoiceController::nextAvailableVoiceIndex() const
     for (int i = 0; i < voices.size(); i++)
     {
         if (channelIsFree(i))
-        {
-            auto ch = getVoice(i)->getAssignedChannel();
-            if (ch < 1)
-                return i;
-        }
+            return i;
     }
     return -1;
 }
 
 int MidiVoiceController::nextRoundRobinVoiceIndex() const
 {
-    auto i = lastChannelAssigned;
+    auto i = lastChannelAssigned + 1;
     int channelsChecked = 0;
     while (channelsChecked < MULTIMAPPER_MAX_VOICES)
     {
         if (channelIsFree(i))
-        {
-            auto ch = getVoice(i)->getAssignedChannel();
-            if (ch < 1)
-                return i;
-        }
+            return i;
 
         i = (i + 1) % MULTIMAPPER_MAX_VOICES;
         channelsChecked++;

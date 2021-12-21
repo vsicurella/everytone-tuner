@@ -99,6 +99,8 @@ public:
 
     void setChannelMode(Everytone::ChannelMode mode);
 
+    void setMpeZone(Everytone::MpeZone zone);
+
     void setVoiceLimit(int voiceLimit);
 
     void setPitchbendRange(int pitchbendRange);

@@ -28,12 +28,13 @@ public:
 
 private:
 
-    juce::OwnedArray<juce::Label> labels;
-
     std::unique_ptr<juce::ComboBox> channelModeBox;
     std::unique_ptr<juce::ComboBox> channelRulesBox;
     
+    std::unique_ptr<juce::ComboBox> mpeZoneBox;
     std::unique_ptr<juce::Label> voiceLimitValueLabel;
+
+    juce::OwnedArray<juce::Label> labels;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionsPanel)
 };

@@ -87,9 +87,9 @@ namespace Everytone
 
 	enum class MpeZone
 	{
-		Omnichannel,	// Legacy mode, use all 16 MIDI channels
-		Lower,			// Channel 1 is the global channel
-		Upper			// Channel 16 is the global channel
+		Lower = 1,		// Channel 1 is the global channel
+		Upper,			// Channel 16 is the global channel
+		Omnichannel  	// Legacy mode, use all 16 MIDI channels
 	};
 
 	enum class MidiMode
@@ -156,6 +156,7 @@ public:
 	virtual void mappingModeChanged(Everytone::MappingMode mode) = 0;
 	virtual void mappingTypeChanged(Everytone::MappingType type) = 0;
 	virtual void channelModeChanged(Everytone::ChannelMode newChannelMode) = 0;
+	virtual void mpeZoneChanged(Everytone::MpeZone zone) = 0;
 	virtual void midiModeChanged(Everytone::MidiMode newMidiMode) = 0;
 	virtual void voiceLimitChanged(int newVoiceLimit) = 0;
 	virtual void pitchbendRangeChanged(int newPitchbendRange) = 0;

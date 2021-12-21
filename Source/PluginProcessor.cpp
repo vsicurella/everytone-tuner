@@ -398,6 +398,11 @@ void MultimapperAudioProcessor::setChannelMode(Everytone::ChannelMode mode)
     voiceController.setChannelMode(mode);
 }
 
+void MultimapperAudioProcessor::setMpeZone(Everytone::MpeZone zone)
+{
+    voiceController.setMpeZone(zone);
+}
+
 void MultimapperAudioProcessor::setVoiceLimit(int voiceLimit)
 {
     voiceController.setVoiceLimit(voiceLimit);

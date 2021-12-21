@@ -43,6 +43,20 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     channelRulesBoxLabel->attachToComponent(channelRulesBox.get(), false);
     addAndMakeVisible(*channelRulesBoxLabel);
 
+
+    mpeZoneBox = std::make_unique<juce::ComboBox>("mpeZoneBox");
+    mpeZoneBox->addItem("Lower", (int)Everytone::MpeZone::Lower);
+    mpeZoneBox->addItem("Upper", (int)Everytone::MpeZone::Upper);
+    mpeZoneBox->addItem("Omnichannel", (int)Everytone::MpeZone::Omnichannel);
+    mpeZoneBox->setSelectedId((int)options.mpeZone, juce::NotificationType::dontSendNotification);
+    mpeZoneBox->onChange = [&]() { optionsWatchers.call(&OptionsWatcher::mpeZoneChanged, Everytone::MpeZone(mpeZoneBox->getSelectedId())); };
+    addAndMakeVisible(*mpeZoneBox);
+
+    auto mpeZoneLabel = labels.add(new juce::Label("MpeZoneLabel", "MPE Zone:"));
+    mpeZoneLabel->attachToComponent(mpeZoneBox.get(), false);
+    addAndMakeVisible(*mpeZoneLabel);
+
+
     voiceLimitValueLabel = std::make_unique<juce::Label>("VoiceLimitValue");
     voiceLimitValueLabel->setEditable(true);
     voiceLimitValueLabel->setText(juce::String(options.voiceLimit), juce::NotificationType::dontSendNotification);
@@ -59,6 +73,11 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
 
 OptionsPanel::~OptionsPanel()
 {
+    labels.clear();
+    voiceLimitValueLabel = nullptr;
+    mpeZoneBox = nullptr;
+    channelRulesBox = nullptr;
+    channelModeBox = nullptr;
 }
 
 void OptionsPanel::paint (juce::Graphics& g)
@@ -88,6 +107,7 @@ void OptionsPanel::resized()
     juce::FlexBox rightHalf;
     rightHalf.flexDirection = juce::FlexBox::Direction::column;
     rightHalf.alignItems = juce::FlexBox::AlignItems::flexEnd;
+    rightHalf.items.add(juce::FlexItem(halfWidth, controlHeight, *mpeZoneBox).withMargin(controlMargin));
     rightHalf.items.add(juce::FlexItem(w * 0.1, controlHeight, *voiceLimitValueLabel).withMargin(controlMargin));
 
     juce::FlexBox flexBox;

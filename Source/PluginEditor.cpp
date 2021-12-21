@@ -102,6 +102,11 @@ void MultimapperAudioProcessorEditor::channelModeChanged(Everytone::ChannelMode 
     audioProcessor.setChannelMode(newChannelMode);
 }
 
+void MultimapperAudioProcessorEditor::mpeZoneChanged(Everytone::MpeZone zone)
+{
+    audioProcessor.setMpeZone(zone);
+}
+
 void MultimapperAudioProcessorEditor::midiModeChanged(Everytone::MidiMode newMidiMode)
 {
     

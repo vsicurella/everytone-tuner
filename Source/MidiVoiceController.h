@@ -24,6 +24,7 @@ class MidiVoiceController
     juce::Array<bool> midiChannelDisabled;
 
     Everytone::ChannelMode channelMode = Everytone::ChannelMode::FirstAvailable;
+    Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower;
 
     int voiceLimit = MULTIMAPPER_MAX_VOICES;
 
@@ -50,7 +51,8 @@ public:
     ~MidiVoiceController();
 
     Everytone::ChannelMode getChannelMode() const { return channelMode; }
-    
+    Everytone::MpeZone getMpeZone() const { return mpeZone; }
+
     int getVoiceLimit() const { return voiceLimit; }
 
 
@@ -75,9 +77,9 @@ public:
     bool channelIsFree(int channelNumber, MidiPitch pitchToAssign = MidiPitch()) const;
 
     void setChannelDisabled(int midiChannel, bool disabled);
-
+    
     void setChannelMode(Everytone::ChannelMode mode);
-
+    void setMpeZone(Everytone::MpeZone zone);
     void setVoiceLimit(int voiceLimit);
 
 };

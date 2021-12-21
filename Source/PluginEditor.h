@@ -54,6 +54,7 @@ public:
     void mappingModeChanged(Everytone::MappingMode mode) override;
     void mappingTypeChanged(Everytone::MappingType type) override;
     void channelModeChanged(Everytone::ChannelMode newChannelMode) override;
+    void mpeZoneChanged(Everytone::MpeZone zone) override;
     void midiModeChanged(Everytone::MidiMode newMidiMode) override;
     void voiceLimitChanged(int newVoiceLimit) override;
     void pitchbendRangeChanged(int pitchbendRange) override;
