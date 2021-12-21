@@ -47,6 +47,9 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
 MultimapperAudioProcessorEditor::~MultimapperAudioProcessorEditor()
 {
     logger = nullptr;
+
+    audioProcessor.removeTuningWatcher(this);
+
     overviewPanel = nullptr;
 }
 
