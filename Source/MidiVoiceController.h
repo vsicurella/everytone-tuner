@@ -42,6 +42,8 @@ private:
     int indexOfVoice(int midiChannel, int midiNote) const;
     int indexOfVoice(const MidiVoice* voice) const;
 
+    int effectiveVoiceLimit() const;
+
     const MidiVoice* getVoice(int index) const;
     MidiVoice removeVoice(int index);
 
