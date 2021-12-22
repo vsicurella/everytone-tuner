@@ -14,17 +14,22 @@
 
 class MultimapperLog : public juce::Logger
 {
-    std::function<void(juce::StringRef msg)> callback;
+    juce::StringArray log;
+    std::function<void(juce::StringRef msg)> callback = [](juce::StringRef) {};
 
 public:
-    MultimapperLog(std::function<void(juce::StringRef msg)> logCallback)
-        : callback(logCallback) {}
+    MultimapperLog() {}
 
     void logMessage(const juce::String& msg) override
     {
         DBG(msg);
+        log.add(msg);
         callback(msg);
     }
+
+    juce::StringArray getAllMessages() const { return log; }
+
+    void setCallback(std::function<void(juce::StringRef)> callbackIn) { callback = callbackIn; }
 };
 
 //==============================================================================
@@ -70,7 +75,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    juce::String getLog() const;
+    MultimapperLog* getLog() const;
 
     //==============================================================================
 
@@ -122,8 +127,6 @@ private:
     MappedTuningController tuningController;
     MidiVoiceController voiceController;
     
-    
-    juce::String dbgLog;
     std::unique_ptr<MultimapperLog> logger;
 
     //==============================================================================

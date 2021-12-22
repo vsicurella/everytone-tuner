@@ -35,7 +35,7 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
 #endif
 {
 #if JUCE_DEBUG
-    logger.reset(new MultimapperLog([&](juce::StringRef msg) { dbgLog += msg + '\n'; }));
+    logger = std::make_unique<MultimapperLog>();
     juce::Logger::setCurrentLogger(logger.get());
 #endif
 
@@ -269,9 +269,9 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new MultimapperAudioProcessor();
 }
 
-juce::String MultimapperAudioProcessor::getLog() const
+MultimapperLog* MultimapperAudioProcessor::getLog() const
 {
-    return dbgLog;
+    return logger.get();
 }
 
 void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)

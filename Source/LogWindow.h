@@ -13,27 +13,28 @@
 
 class LogWindow : public juce::DocumentWindow, private juce::Timer
 {
-    juce::TextEditor* textBox;
-    std::function<juce::String(void)> callback;
+    juce::StringArray msgsToLog;
 
 public:
 
-    LogWindow(std::function<juce::String(void)> getLogCallback)
-        : callback(getLogCallback),
-          juce::DocumentWindow("Everytone Log", 
+    LogWindow(juce::StringArray previousLogs=juce::StringArray())
+        : juce::DocumentWindow("Everytone Log", 
             juce::Colours::black, 
             juce::DocumentWindow::TitleBarButtons::minimiseButton,
             true)
     {
-        textBox = new juce::TextEditor();
+        auto textBox = new juce::TextEditor();
         textBox->setMultiLine(true, false);
         textBox->setReadOnly(true);
         textBox->setSize(800, 600);
         setContentOwned(textBox, true);
 
+        for (auto msg : previousLogs)
+            textBox->insertTextAtCaret(msg + juce::newLine);
+
         setSize(800, 600);
 
-        startTimer(50);
+        startTimer(100);
     }
 
     ~LogWindow()
@@ -46,9 +47,24 @@ public:
         
     }
 
+    juce::TextEditor* getEditor() const
+    {
+        return dynamic_cast<juce::TextEditor*>(getContentComponent());
+    }
+
+    void addMessage(juce::String string)
+    {
+        msgsToLog.add(string);
+    }
+
     void timerCallback() override
     {
-        textBox->setText(callback(), false);
-        textBox->moveCaretToEnd();
+        auto editor = getEditor();
+
+        for (auto msg : msgsToLog)
+            editor->insertTextAtCaret(msg + juce::newLine);
+
+        msgsToLog.clear();
+        // i think there is still a race condition issue here
     }
 };

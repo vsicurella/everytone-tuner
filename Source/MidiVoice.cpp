@@ -41,13 +41,15 @@ void MidiVoice::updatePitch()
     {
         auto table = juce::String(currentMappedNote.tableIndex + 1);
         auto index = juce::String(currentMappedNote.noteIndex);
+        auto mapping = "(" + table + ", " + index + ")";
         auto coarse = juce::String(currentPitch.coarse);
         auto bend = juce::String(currentPitch.pitchbend);
-        juce::Logger::writeToLog(input + coarse + " + " + bend);
+        juce::Logger::writeToLog(input + " -> " + mapping);
+        //juce::Logger::writeToLog(input + coarse + " + " + bend);
     }
     else
     {
-        juce::Logger::writeToLog(input + "unmapped");
+        //juce::Logger::writeToLog(input + "unmapped");
     }
 #endif
 }

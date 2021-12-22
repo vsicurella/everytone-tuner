@@ -112,7 +112,7 @@ private:
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 
-    std::unique_ptr<LogWindow> logger;
+    std::unique_ptr<LogWindow> logWindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultimapperAudioProcessorEditor)
 };

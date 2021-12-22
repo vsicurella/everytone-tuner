@@ -32,9 +32,11 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     setSize (600, 250);
 
 #if JUCE_DEBUG
-    logger.reset(new LogWindow([&]() -> juce::StringRef { return audioProcessor.getLog(); }));
-    logger->setSize(800, 600);
-    logger->setVisible(true);
+    auto logger = audioProcessor.getLog();
+    logWindow.reset(new LogWindow(logger->getAllMessages()));
+    logWindow->setSize(800, 600);
+    logWindow->setVisible(true);
+    logger->setCallback([&](juce::StringRef msg) { logWindow->addMessage(msg); });
 #endif
 
     setupCommands();
@@ -46,7 +48,12 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
 
 MultimapperAudioProcessorEditor::~MultimapperAudioProcessorEditor()
 {
-    logger = nullptr;
+#if JUCE_DEBUG
+    auto logger = audioProcessor.getLog();
+    logger->setCallback([](juce::StringRef) {});
+#endif
+
+    logWindow = nullptr;
 
     audioProcessor.removeTuningWatcher(this);
 
