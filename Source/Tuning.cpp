@@ -16,8 +16,7 @@ Tuning::Tuning(CentsDefinition definition)
       rootMidiChannelIndex(definition.reference.rootMidiChannel - 1),
       rootFrequency(definition.reference.rootFrequency),
       transpose(definition.transpose),
-      name(definition.name),
-      description(definition.description)
+      TuningBase(definition.name, definition.description)
 {
 	setupTuning(definition.intervalCents);
 }
@@ -29,8 +28,7 @@ Tuning::Tuning(const Tuning& tuning)
       rootFrequency(tuning.rootFrequency),
       periodCents(tuning.periodCents),
       transpose(tuning.transpose),
-      name(tuning.name),
-      description(tuning.description)
+      TuningBase(tuning.name, tuning.description)
 {
     setupTuning(tuning.getIntervalCentsTable());
 }
@@ -112,16 +110,6 @@ bool Tuning::operator==(const Tuning& tuning)
 bool Tuning::operator!=(const Tuning& tuning)
 {
     return !operator==(tuning);
-}
-
-void Tuning::setName(juce::String nameIn)
-{
-    name = nameIn;
-}
-
-void Tuning::setDescription(juce::String descIn)
-{
-	description = descIn;
 }
 
 void Tuning::setRootFrequency(double frequency)

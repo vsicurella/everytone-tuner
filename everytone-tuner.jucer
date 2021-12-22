@@ -99,6 +99,7 @@
             file="Source/MidiNoteTuner.cpp"/>
       <FILE id="DfAwtl" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
       <FILE id="pYwkia" name="TuningHelpers.h" compile="0" resource="0" file="Source/TuningHelpers.h"/>
+      <FILE id="ERq0Yu" name="TuningBase.h" compile="0" resource="0" file="Source/TuningBase.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

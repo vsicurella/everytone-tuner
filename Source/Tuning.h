@@ -10,12 +10,13 @@
 
 #pragma once
 
+#include "TuningBase.h"
 #include "TuningMath.h"
 #include "./mapping/Map.h"
 
 #define TUNING_TABLE_SIZE 2048
 
-class Tuning
+class Tuning : public TuningBase
 {
 	// Parameters
 	juce::Array<double> centsTable;
@@ -169,23 +170,16 @@ public:
 	virtual bool operator==(const Tuning&);
 	virtual bool operator!=(const Tuning&);
     
-	virtual int getRootIndex() const { return midiIndex(rootMidiNote, rootMidiChannelIndex); }
-	virtual int getRootMidiNote() const { return rootMidiNote; }
+	virtual int getRootIndex() const override { return midiIndex(rootMidiNote, rootMidiChannelIndex); }
+	virtual int getRootMidiNote() const  { return rootMidiNote; }
 	virtual int getRootMidiChannel() const { return rootMidiChannelIndex + 1; }
 
 	virtual double getRootFrequency() const { return rootFrequency; }
 	virtual Reference getReference() const;
 
-	virtual int getTuningSize() const { return tuningSize; }
+	virtual int getTuningSize() const override { return tuningSize; }
 
-	virtual juce::String getName() const { return name; }
-	virtual juce::String getDescription() const { return description; }
-	
 	virtual Definition getDefinition() const;
-	
-	
-	virtual void setName(juce::String nameIn);
-	virtual void setDescription(juce::String descIn);
 	
 	virtual void setRootFrequency(double frequency);
 	virtual void setRootMidiNote(int midiNote);
@@ -195,10 +189,10 @@ public:
 	virtual double getPeriodCents() const;
 	virtual double getPeriodSemitones() const;
 	
-    virtual double getNoteInCents(int noteNumber, int channel = 1) const;
-    virtual double getNoteInSemitones(int noteNumber, int channel = 1) const;
+    virtual double getNoteInCents(int noteNumber, int channel = 1) const override;
+    virtual double getNoteInSemitones(int noteNumber, int channel = 1) const override;
 
-	virtual double getNoteFrequency(int noteNumber, int channel = 1) const;
+	virtual double getNoteFrequency(int noteNumber, int channel = 1) const override;
 	virtual double frequencyTableAt(int tableIndex) const;
 
 	virtual double getNoteInMTS(int noteNumber, int channel = 1) const;
@@ -222,8 +216,8 @@ public:
 	/*
 		Returns the closest MTS note to the one passed in
 	*/
-	int closestNoteIndex(double mtsIn) const;
-	int closestMtsNote(double mtsIn) const;
+	virtual int closestNoteIndex(double mtsIn) const override;
+	virtual int closestMtsNote(double mtsIn) const override;
 
 public:
 
