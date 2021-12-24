@@ -39,7 +39,10 @@ public:
 	virtual double getNoteFrequency(int noteNumber, int channel = 1) const = 0;
 	virtual double getNoteInMTS(int noteNumber, int channel = 1) const = 0;
 
+	virtual double calculateFrequencyFromRoot(int stepsFromRoot) const = 0;
+	virtual double calculateMtsFromRoot(int stepsFromRoot) const = 0;
+
+
 	virtual int closestNoteIndex(double mtsIn) const = 0;
 	virtual int closestMtsNote(double mtsIn) const = 0;
-
 };

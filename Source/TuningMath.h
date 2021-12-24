@@ -11,6 +11,9 @@
 #pragma once
 #include <JuceHeader.h>
 
+#define MTS_LOWEST_FREQ 8.1757989156437
+#define MTS_HIGHEST_FREQ 12543.85395141598
+
 static int modulo(int num, int mod)
 {
     return ((num % mod) + mod) % mod; 

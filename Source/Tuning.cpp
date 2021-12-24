@@ -84,10 +84,12 @@ void Tuning::rebuildTables()
     for (int t = 0; t < TUNING_TABLE_SIZE; t++)
     {
         offset = t - root;
-        degree = modulo(offset, tuningSize);
-        intervalRatio = ratioTable[degree];
-        periods = floor((double)offset / size);
-        frequency = pow(periodRatio, periods) * intervalRatio * rootFrequency;
+        //degree = modulo(offset, tuningSize);
+        //intervalRatio = ratioTable[degree];
+        //periods = floor((double)offset / size);
+        //frequency = pow(periodRatio, periods) * intervalRatio * rootFrequency;
+
+        frequency = calculateFrequencyFromRoot(offset);
         
         frequencyTable.set(t, frequency);
         double mts = roundN(10, frequencyToMTS(frequency));
@@ -140,6 +142,25 @@ void Tuning::setReference(Reference reference)
     rebuildTables();
 }
 
+void Tuning::resetReferenceToMtsRange()
+{
+    int root = rootMidiIndex();
+    int lowestToNewRoot = root - closestNoteIndex(0, false);
+    //int highestToNewRoot = root - closestNoteIndex(127, false);
+    //int tableSize = lowestToNewRoot - highestToNewRoot;
+
+    //juce::Logger::writeToLog("Best mapping, root: " + juce::String(lowestToNewRoot) + ", size: " + juce::String(tableSize));
+
+    Reference newReference =
+    {
+        mod(lowestToNewRoot, 128),
+        floor(lowestToNewRoot / 128) + 1,
+        rootFrequency
+    };
+
+    setReference(newReference);
+}
+
 double Tuning::getPeriodCents() const
 {
 	return periodCents;
@@ -168,6 +189,20 @@ double Tuning::getNoteFrequency(int noteNumber, int channel) const
 double Tuning::frequencyTableAt(int tableIndex) const
 {
     return frequencyTable[modulo(tableIndex, TUNING_TABLE_SIZE)];
+}
+
+double Tuning::calculateFrequencyFromRoot(int stepsFromRoot) const
+{
+    int degree = modulo(stepsFromRoot, tuningSize);
+    double intervalRatio = ratioTable[degree];
+    double periods = floor((double)stepsFromRoot / (double)tuningSize);
+    return pow(periodRatio, periods) * intervalRatio * rootFrequency;
+}
+
+double Tuning::calculateMtsFromRoot(int stepsFromRoot) const
+{
+    auto freq = calculateFrequencyFromRoot(stepsFromRoot);
+    return frequencyToMTS(freq);
 }
 
 double Tuning::getNoteInMTS(int noteNumber, int channel) const
@@ -274,24 +309,34 @@ int Tuning::getScaleDegree(int noteNumber) const
 
 int Tuning::closestNoteIndex(double mts) const
 {
+    return closestNoteIndex(mts, true);
+}
+
+int Tuning::closestNoteIndex(double mts, bool useTable) const
+{
     int root = rootMidiIndex();
 
     if (tuningSize == 1)
     {
-        return root + (int)round((mts - rootMts) / (periodCents * 0.01));
+        return root + (int)round((mts - rootMts) / periodMts);
     }
-    
+
     // This assumes the scale pattern doesn't have intervals that jump beyond the period
 
     int rootPeriods = floor((mts - rootMts) / 12.0);
     int rootOffset = rootPeriods * tuningSize;
 
-    int closestIndex = root + rootOffset;
+    int searchOffset, index, closestIndex = root + rootOffset;
     double difference = periodCents;
     for (int i = 0; i <= tuningSize; i++)
     {
-        int index = root + rootOffset + i;
-        auto note = mtsTableAt(index);
+        searchOffset = rootOffset + i;
+        index = root + searchOffset;
+
+        auto note = (useTable)
+            ? mtsTableAt(index)
+            : calculateMtsFromRoot(searchOffset);
+        
         auto dif = abs(note - mts);
         if (dif < difference)
         {
@@ -303,12 +348,17 @@ int Tuning::closestNoteIndex(double mts) const
             break;
     }
 
-    return  closestIndex;
+    return closestIndex;
+}
+
+int Tuning::closestMtsNote(double mts, bool useTable) const
+{
+    int index = closestNoteIndex(mts, useTable);
+    index = (index < 0) ? 0 : (index > 2047) ? 2047 : index;
+    return mtsTable[index];
 }
 
 int Tuning::closestMtsNote(double mtsIn) const
 {
-    int index = closestNoteIndex(mtsIn);
-    index = (index < 0) ? 0 : (index > 2047) ? 2047 : index;
-    return mtsTable[index];
+    return closestMtsNote(mtsIn);
 }

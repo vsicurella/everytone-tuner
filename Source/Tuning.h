@@ -31,9 +31,6 @@ class Tuning : public TuningBase
 
 	int transpose;
 
-	juce::String name;
-	juce::String description;
-
 	// Metadata
 	std::unique_ptr<Map<double>> tuningMap;
 
@@ -185,6 +182,9 @@ public:
 	virtual void setRootMidiNote(int midiNote);
 	virtual void setRootMidiChannel(int rootMidiChannel);
 	virtual void setReference(Reference reference);
+
+	// Position root tuning index so the first index is the lowest supported MTS frequency
+	virtual void resetReferenceToMtsRange();
 	
 	virtual double getPeriodCents() const;
 	virtual double getPeriodSemitones() const;
@@ -194,6 +194,9 @@ public:
 
 	virtual double getNoteFrequency(int noteNumber, int channel = 1) const override;
 	virtual double frequencyTableAt(int tableIndex) const;
+
+	virtual double calculateFrequencyFromRoot(int stepsFromRoot) const override;
+	virtual double calculateMtsFromRoot(int stepsFromRoot) const override;
 
 	virtual double getNoteInMTS(int noteNumber, int channel = 1) const;
 	virtual double mtsTableAt(int tableIndex) const;
@@ -217,7 +220,10 @@ public:
 		Returns the closest MTS note to the one passed in
 	*/
 	virtual int closestNoteIndex(double mtsIn) const override;
+	virtual int closestNoteIndex(double mtsIn, bool useTable) const;
+
 	virtual int closestMtsNote(double mtsIn) const override;
+	virtual int closestMtsNote(double mtsIn, bool useTable) const;
 
 public:
 
