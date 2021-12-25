@@ -63,10 +63,9 @@
       <GROUP id="{87ACF7E4-7B32-6A29-CBBF-AA6868BFAE75}" name="tuning">
         <FILE id="aeGIzT" name="CentsDefinition.h" compile="0" resource="0"
               file="Source/tuning/CentsDefinition.h"/>
-        <FILE id="Nngy9R" name="MappedMtsTuning.cpp" compile="1" resource="0"
-              file="Source/tuning/MappedMtsTuning.cpp"/>
-        <FILE id="s88CZB" name="MappedMtsTuning.h" compile="0" resource="0"
-              file="Source/tuning/MappedMtsTuning.h"/>
+        <FILE id="Nngy9R" name="MappedTuning.cpp" compile="1" resource="0"
+              file="Source/tuning/MappedTuning.cpp"/>
+        <FILE id="s88CZB" name="MappedTuning.h" compile="0" resource="0" file="Source/tuning/MappedTuning.h"/>
         <FILE id="v6Aewu" name="Tuning.cpp" compile="1" resource="0" file="Source/tuning/Tuning.cpp"/>
         <FILE id="XTKcHj" name="Tuning.h" compile="0" resource="0" file="Source/tuning/Tuning.h"/>
         <FILE id="qm6q5L" name="TuningBase.h" compile="0" resource="0" file="Source/tuning/TuningBase.h"/>
