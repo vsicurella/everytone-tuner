@@ -222,6 +222,34 @@ public:
     void setMapRoot(int rootIndexIn) { mapRootIndex = rootIndexIn; }
 
     void setTranspose(int transposeIn) { transpose = transposeIn; }
+
+    int closestIndexTo(T value) /* needs testing */
+    {
+        int valuePeriod = (patternBase == 0)
+            ? 0
+            : floor(value / patternBase);
+
+        T baseOffset = valuePeriod * patternBase;
+        int indexOffset = normalizedIndex(valuePeriod * mapSize);
+
+        T discrepancy = 10e12, difference = 0;
+        int closestIndex = 0;
+        for (int i = 0; i <= mapSize; i++)
+        {
+            T mapValue = (i < mapSize)
+                ? baseOffset + mapPattern[i]
+                : baseOffset + patternBase + mapPattern[0];
+
+            difference = abs(value - mapValue);
+            if (difference < discrepancy)
+            {
+                discrepancy = difference;
+                closestIndex = indexOffset + i;
+            }
+        }
+
+        return closestIndex;
+    }
 };
 
 template <typename T>
