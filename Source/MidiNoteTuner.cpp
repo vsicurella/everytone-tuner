@@ -11,14 +11,22 @@
 #include "MidiNoteTuner.h"
 
 
-MidiNoteTuner::MidiNoteTuner(std::shared_ptr<Tuning> sourceTuningIn, std::shared_ptr<Tuning> targetTuningIn, std::shared_ptr<TuningTableMap> mapping, int pitchbendRangeIn)
-	: sourceTuning(sourceTuningIn), targetTuning(targetTuningIn), tuningTableMap(mapping), pitchbendRange(pitchbendRangeIn)
-{
-}
+MidiNoteTuner::MidiNoteTuner(
+	std::shared_ptr<Tuning> sourceTuningIn, 
+	std::shared_ptr<TuningTableMap> sourceMappingIn,
+	std::shared_ptr<Tuning> targetTuningIn, 
+	std::shared_ptr<TuningTableMap> targetMappingIn, 
+	int pitchbendRangeIn
+)	: sourceTuning(std::make_unique<MappedTuning>(sourceTuningIn, sourceMappingIn)),
+      targetTuning(std::make_unique<MappedTuning>(targetTuningIn, targetMappingIn)), 
+      pitchbendRange(pitchbendRangeIn) {}
 
-MidiNoteTuner::~MidiNoteTuner()
-{
-}
+MidiNoteTuner::MidiNoteTuner(const MappedTuning& mappedSource, const MappedTuning& mappedTarget, int pitchbendRangeIn)
+	: sourceTuning(std::make_unique<MappedTuning>(mappedSource.shareTuning(), mappedSource.shareMapping())),
+	  targetTuning(std::make_unique<MappedTuning>(mappedTarget.shareTuning(), mappedTarget.shareMapping())),
+	  pitchbendRange(pitchbendRangeIn) {}
+
+MidiNoteTuner::~MidiNoteTuner() {}
 
 juce::Array<int> MidiNoteTuner::getPitchbendTable() const
 {
@@ -35,60 +43,90 @@ void MidiNoteTuner::setPitchbendRange(int pitchbendMaxIn)
     pitchbendRange = pitchbendMaxIn;
 }
 
-MappedNote MidiNoteTuner::getNoteMapping(int midiChannel, int midiNote) const
-{
-	return tuningTableMap->getMappedNote(midiChannel, midiNote);
-}
+//MappedNote MidiNoteTuner::getNoteMapping(int midiChannel, int midiNote) const
+//{
+//	return tuningTableMap->getMappedNote(midiChannel, midiNote);
+//}
+//
+//MappedNote MidiNoteTuner::getNoteMapping(const juce::MidiMessage& msg) const
+//{
+//	return getNoteMapping(msg.getChannel(), msg.getNoteNumber());
+//}
 
-MappedNote MidiNoteTuner::getNoteMapping(const juce::MidiMessage& msg) const
-{
-	return getNoteMapping(msg.getChannel(), msg.getNoteNumber());
-}
+//MidiPitch MidiNoteTuner::getMidiPitch(const MappedNote& mapped) const
+//{
+//	// First get target MTS note
+//	auto targetMts = targetTuning->mtsTableAt(mapped.index);
+//
+//	if (targetMts < 0 || targetMts >= 128)
+//		return MidiPitch();
+//
+//	// Then find closest source note
+//	auto sourceNote = sourceTuning->closestNoteIndex(targetMts);
+//
+//	if (sourceNote < 0 || sourceNote >= 128)
+//		return MidiPitch();
+//
+//	// Last, find discrepancy and convert to pitchbend
+//	auto sourceMts = sourceTuning->mtsTableAt(sourceNote);
+//
+//	if (sourceMts < 0 || sourceMts > 127)
+//		return MidiPitch();
+//
+//	double discrepancy = targetMts - sourceMts;
+//
+//	int pitchbend = 8192;
+//	if (abs(discrepancy) >= 1e-6)
+//	{
+//		pitchbend = semitonesToPitchbend(discrepancy);
+//		jassert(pitchbend >= 0 && pitchbend < (1 << 14));
+//	}
+//
+//	MidiPitch pitch = { sourceNote, pitchbend, true };
+//	return pitch;
+//}
 
-MidiPitch MidiNoteTuner::getMidiPitch(const MappedNote& mapped) const
+MidiPitch MidiNoteTuner::getMidiPitch(int midiChannel, int midiNote) const
 {
 	// First get target MTS note
-	auto targetMts = targetTuning->mtsTableAt(mapped.index);
-
+	auto targetMts = targetTuning->mtsAt(midiNote, midiChannel);
+	
 	if (targetMts < 0 || targetMts >= 128)
 		return MidiPitch();
-
+	
 	// Then find closest source note
-	auto sourceNote = sourceTuning->closestNoteIndex(targetMts);
+	auto sourceIndex = sourceTuning->closestIndexToMts(targetMts);
+	auto sourceMts = sourceTuning->mtsAt(sourceIndex);
 
-	if (sourceNote < 0 || sourceNote >= 128)
-		return MidiPitch();
-
+	//if (sourceNote < 0 || sourceNote >= 128)
+	//	return MidiPitch();
+	//
+	//auto sourceMts = sourceTuning->mtsTableAt(sourceNote);
 	// Last, find discrepancy and convert to pitchbend
-	auto sourceMts = sourceTuning->mtsTableAt(sourceNote);
-
+	
 	if (sourceMts < 0 || sourceMts > 127)
 		return MidiPitch();
-
+	
 	double discrepancy = targetMts - sourceMts;
-
+	
 	int pitchbend = 8192;
 	if (abs(discrepancy) >= 1e-6)
 	{
 		pitchbend = semitonesToPitchbend(discrepancy);
 		jassert(pitchbend >= 0 && pitchbend < (1 << 14));
 	}
-
-	MidiPitch pitch = { sourceNote, pitchbend, true };
+	
+	// TODO sourceIndex may not be desired for non-standard source tunings
+	MidiPitch pitch = { sourceIndex, pitchbend, true };
 	return pitch;
 }
+
 
 MidiPitch MidiNoteTuner::getMidiPitch(const juce::MidiMessage& msg) const
 {
 	auto ch = msg.getChannel();
 	auto note = msg.getNoteNumber();
 	return getMidiPitch(ch, note);
-}
-
-MidiPitch MidiNoteTuner::getMidiPitch(int midiChannel, int midiNote) const
-{
-	auto mapped = getNoteMapping(midiChannel, midiNote);
-	return getMidiPitch(mapped);
 }
 
 int MidiNoteTuner::semitonesToPitchbend(double semitonesIn) const

@@ -9,11 +9,8 @@
 */
 
 #pragma once
-#include "../JuceLibraryCode/JuceHeader.h"
-// #include "CommonFunctions.h"
-#include "TuningMath.h"
-#include "Tuning.h"
-#include "./mapping/MultichannelMap.h"
+#include <JuceHeader.h>
+#include "./tuning/MappedTuning.h"
 
 struct MidiPitch
 {
@@ -31,34 +28,32 @@ struct MidiPitch
 
 class MidiNoteTuner
 {
-	// Source Tuning Parameters
-	const std::shared_ptr<Tuning> sourceTuning;
-
-	// Target Tuning Parameters
-	const std::shared_ptr<Tuning> targetTuning;
-
-	const std::shared_ptr<TuningTableMap> tuningTableMap;
-
-	const TuningTableMap standardMap = MultichannelMap::CreatePeriodicMapping(12, 60);
+	const std::unique_ptr<MappedTuning> sourceTuning;
+	const std::unique_ptr<MappedTuning> targetTuning;
 
 	int pitchbendRange; // total bipolar range of pitchbend in semitones
 
-	bool cached = false;
+	bool cached = false; // TODO
 	juce::Array<int> pitchbendTable;
 
 public:
     
 	MidiNoteTuner(std::shared_ptr<Tuning> sourceTuning, 
+				  std::shared_ptr<TuningTableMap> sourceMapping,
 		          std::shared_ptr<Tuning> targetTuning, 
-		          std::shared_ptr<TuningTableMap> mapping,
+		          std::shared_ptr<TuningTableMap> targetMapping,
 				  int pitchbendRange = 4);
+	MidiNoteTuner(const MappedTuning& mappedSource, const MappedTuning& mappedTarget, int pitchbendRange = 4);
     ~MidiNoteTuner();
 
-	const Tuning* tuningSource() const { return sourceTuning.get(); }
+	const Tuning* tuningSource() const { return sourceTuning->getTuning(); }
+	const Tuning* tuningTarget() const { return targetTuning->getTuning(); }
 
-	const Tuning* tuningTarget() const { return targetTuning.get(); }
+	const TuningTableMap* mappingSource() const { return sourceTuning->getMapping(); }
+	const TuningTableMap* mappingTarget() const { return targetTuning->getMapping(); }
 
-	const TuningTableMap* mapping() const { return tuningTableMap.get(); }
+	const MappedTuning* mappedSource() const { return sourceTuning.get(); }
+	const MappedTuning* mappedTarget() const { return targetTuning.get(); }
     
     juce::Array<int> getPitchbendTable() const;
 
@@ -66,10 +61,10 @@ public:
     
     void setPitchbendRange(int pitchBendMaxIn);
 
-	MappedNote getNoteMapping(int midiChannel, int midiNote) const;
-	MappedNote getNoteMapping(const juce::MidiMessage& msg) const;
+	//MappedNote getNoteMapping(int midiChannel, int midiNote) const;
+	//MappedNote getNoteMapping(const juce::MidiMessage& msg) const;
 
-	MidiPitch getMidiPitch(const MappedNote& mappedNote) const;
+	//MidiPitch getMidiPitch(const MappedNote& mappedNote) const;
 	MidiPitch getMidiPitch(int midiChannel, int midiNote) const;
 	MidiPitch getMidiPitch(const juce::MidiMessage& msg) const;
 
