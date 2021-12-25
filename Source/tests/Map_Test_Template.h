@@ -13,7 +13,7 @@
 
 
 template <typename T>
-class Map_Test : public MultimapperUnitTest
+class Map_Test : public EverytoneTunerUnitTest
 {
 private:
 
@@ -68,7 +68,7 @@ private:
 public:
 
     Map_Test(String nameOfType, Parameters testParams) 
-        : MultimapperUnitTest("Map " + nameOfType),
+        : EverytoneTunerUnitTest("Map " + nameOfType),
           params(testParams) {}
 
     virtual ~Map_Test() override

@@ -12,7 +12,7 @@
 #include "TestsCommon.h"
 #include "../MidiNoteTuner.h"
 
-class MidiNoteTuner_Test : public MultimapperUnitTest
+class MidiNoteTuner_Test : public EverytoneTunerUnitTest
 {
 private:
 
@@ -61,7 +61,7 @@ public:
         const int* expectedMpeDefaultPitchbends = nullptr; // MPE default pitchbend range is 48 semitones
     };
 
-    MidiNoteTuner_Test() : MultimapperUnitTest("MidiNoteTuner") {};
+    MidiNoteTuner_Test() : EverytoneTunerUnitTest("MidiNoteTuner") {};
 
     void runTest() override
     {

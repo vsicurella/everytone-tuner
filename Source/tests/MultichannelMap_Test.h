@@ -11,7 +11,7 @@
 #pragma once
 #include "TestsCommon.h"
 
-class MultichannelMap_Test : public MultimapperUnitTest
+class MultichannelMap_Test : public EverytoneTunerUnitTest
 {
 public:
 
@@ -26,7 +26,7 @@ static bool testTable(const MultichannelMap& multimap, int* expectedIndices)
     return true;
 }
 
-    MultichannelMap_Test() : MultimapperUnitTest("MultichannelMap") {}
+    MultichannelMap_Test() : EverytoneTunerUnitTest("MultichannelMap") {}
 
     void runTest() override
     {

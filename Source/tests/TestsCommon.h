@@ -53,16 +53,16 @@ static String arrayToString(T const* array, int size, bool newLines = true)
 //    return str;
 //}
 
-class MultimapperUnitTest : public UnitTest
+class EverytoneTunerUnitTest : public UnitTest
 {
 protected:
     String name;
 
 public:
 
-    MultimapperUnitTest(String className) : name(className), UnitTest(className) {}
+    EverytoneTunerUnitTest(String className) : name(className), UnitTest(className) {}
 
-    virtual ~MultimapperUnitTest() override {}
+    virtual ~EverytoneTunerUnitTest() override {}
 
     virtual void runTest() = 0;
 
