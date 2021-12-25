@@ -88,8 +88,8 @@ public:
 
     static std::unique_ptr<TuningTableMap> newTuningMap(const Tuning* tuning, Everytone::MappingType mappingType);
 
+    // For use in "Auto Mapping" mode with tunings created in the app
     static std::unique_ptr<TuningTableMap> NewLinearMappingFromTuning(const Tuning* tuning);
-
     static std::unique_ptr<TuningTableMap> NewPeriodicMappingFromTuning(const Tuning* tuning);
 };
 

@@ -113,14 +113,14 @@ double Tuning::centsAt(int index) const
 
 double Tuning::frequencyAt(int index) const
 {
-    auto index = mod(index, lookupTableSize);
-    return frequencyTable[index];
+    auto tableIndex = mod(index, lookupTableSize);
+    return frequencyTable[tableIndex];
 }
 
 double Tuning::mtsAt(int index) const
 {
-    auto index = mod(index, lookupTableSize);
-    return mtsTable[index];
+    auto tableIndex = mod(index, lookupTableSize);
+    return mtsTable[tableIndex];
 }
 
 int Tuning::closestIndexToFrequency(double frequency) const

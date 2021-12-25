@@ -368,13 +368,13 @@ void MultimapperAudioProcessor::loadTuningTarget(const Tuning& tuning)
     tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuningController.readTuningTarget());
 }
 
-void MultimapperAudioProcessor::setTargetTuningReference(Tuning::Reference reference)
+void MultimapperAudioProcessor::setTargetTuningRootFrequency(double frequency)
 {
     auto oldTuning = tuningController.getTuningTarget();
     auto newTuning = Tuning(*oldTuning.get());
-    newTuning.setReference(reference);
+    newTuning.setRootFrequency(frequency);
     loadTuningTarget(newTuning);
-    tuningWatchers.call(&TuningWatcher::tuningTargetReferenceChanged, this, reference);
+    tuningWatchers.call(&TuningWatcher::tuningTargetRootFrequency, this, frequency);
     //juce::Logger::writeToLog("Loaded new target tuning reference: " + reference.toString());
 }
 

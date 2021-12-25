@@ -11,7 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Tuning.h"
+#include "./tuning/Tuning.h"
 #include "Common.h"
 
 template <typename ARR>
@@ -34,14 +34,11 @@ static juce::ValueTree tuningToValueTree(const Tuning* tuning, juce::Identifier 
     
     tree.setProperty(Everytone::ID::Name, tuning->getName(), nullptr);
     tree.setProperty(Everytone::ID::Description, tuning->getDescription(), nullptr);
-    //tree.setProperty(Everytone::ID::Transpose, tuning->tranpose)
 
     auto intervals = tuning->getIntervalCentsTable();
     auto intervalTree = arrayToValueTree(intervals, Everytone::ID::IntervalTable, Everytone::ID::Cents);
     tree.addChild(intervalTree, 0, nullptr);
 
-    tree.setProperty(Everytone::ID::RootMidiNote, tuning->getRootMidiNote(), nullptr);
-    tree.setProperty(Everytone::ID::RootMidiChannel, tuning->getRootMidiChannel(), nullptr);
     tree.setProperty(Everytone::ID::RootFrequency, tuning->getRootFrequency(), nullptr);
 
     return tree;
@@ -49,7 +46,7 @@ static juce::ValueTree tuningToValueTree(const Tuning* tuning, juce::Identifier 
 
 static Tuning parseTuningValueTree(juce::ValueTree tree)
 {
-    auto definition = Tuning::CentsDefinition();
+    auto definition = CentsDefinition();
     
     juce::Array<double> cents;
 
@@ -62,10 +59,7 @@ static Tuning parseTuningValueTree(juce::ValueTree tree)
 
     definition.name =                       tree.getProperty(Everytone::ID::Name, "");
     definition.description =                tree.getProperty(Everytone::ID::Description, "");
-    definition.transpose =                  tree.getProperty(Everytone::ID::Transpose, 0);
-    definition.reference.rootMidiNote =     tree.getProperty(Everytone::ID::RootMidiNote, 60);
-    definition.reference.rootMidiChannel =  tree.getProperty(Everytone::ID::RootMidiChannel, 1);
-    definition.reference.rootFrequency =    tree.getProperty(Everytone::ID::RootFrequency, 256);
+    definition.rootFrequency =    tree.getProperty(Everytone::ID::RootFrequency, 440);
 
     return Tuning(definition);
 }

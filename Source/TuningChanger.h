@@ -11,7 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Tuning.h"
+#include "./tuning/Tuning.h"
 
 class TuningChanger;
 
@@ -20,8 +20,8 @@ class TuningWatcher
 public:
     virtual void tuningSourceChanged(TuningChanger* changer, const Tuning* newTuning) {}
     virtual void tuningTargetChanged(TuningChanger* changer, const Tuning* newTuning) {}
-    virtual void tuningSourceReferenceChanged(TuningChanger* changer, Tuning::Reference reference) {}
-    virtual void tuningTargetReferenceChanged(TuningChanger* changer, Tuning::Reference reference) {}
+    virtual void tuningSourceRootFrequency(TuningChanger* changer, double frequency) {}
+    virtual void tuningTargetRootFrequency(TuningChanger* changer, double frequency) {}
 };
 
 class TuningChanger

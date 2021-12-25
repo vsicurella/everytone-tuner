@@ -23,25 +23,27 @@ MidiVoice::MidiVoice(int channelIn, int noteIn, juce::uint8 velocityIn, int assi
 
 void MidiVoice::updateMapping()
 {
-    auto previousMappedNote = currentMappedNote;
-    currentMappedNote = tuner->getNoteMapping(midiChannel, midiNote);
-
+    //auto previousMappedNote = currentMappedNote;
+    //currentMappedNote = tuner->getNoteMapping(midiChannel, midiNote);
+    //auto previousTuningIndex = currentTuningIndex;
+    //currentTuningIndex = tuner->get
 }
 
 void MidiVoice::updatePitch()
 {
     auto previousPitch = currentPitch;
-    currentPitch = tuner->getMidiPitch(currentMappedNote);
+    currentPitch = tuner->getMidiPitch(midiChannel, midiNote);
 
 #if JUCE_DEBUG
     auto ch = juce::String(midiChannel);
     auto note = juce::String(midiNote);
     auto input = "\t(" + ch + ", " + note + ") -> ";
-    if (currentMappedNote.mapped && currentPitch.mapped)
+    if (currentPitch.mapped)
     {
-        auto table = juce::String(currentMappedNote.tableIndex + 1);
-        auto index = juce::String(currentMappedNote.noteIndex);
-        auto mapping = "(" + table + ", " + index + ")";
+        //auto table = juce::String(currentMappedNote.tableIndex + 1);
+        auto index = juce::String(tuner->mappedTarget()->tuningIndexAt(midiChannel, midiNote));
+        //auto mapping = "(" + table + ", " + index + ")";
+        auto mapping = juce::String(index);
         auto coarse = juce::String(currentPitch.coarse);
         auto bend = juce::String(currentPitch.pitchbend);
         juce::Logger::writeToLog(input + " -> " + mapping);

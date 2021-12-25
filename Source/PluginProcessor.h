@@ -92,7 +92,7 @@ public:
     void loadTuningSource(const Tuning& tuning);
     void loadTuningTarget(const Tuning& tuning);
 
-    void setTargetTuningReference(Tuning::Reference reference);
+    void setTargetTuningRootFrequency(double frequency);
 
     void loadNoteMapping(const TuningTableMap& map);
 

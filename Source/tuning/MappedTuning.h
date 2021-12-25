@@ -53,12 +53,11 @@ public:
     std::shared_ptr<TuningTableMap> shareMapping() const { return mapping; }
 
 
+    virtual int tuningIndexAt(int midiNote, int midiChannel) const;
 
-    virtual int tuningIndexAt(int midiNote, int midiChannel);
+    virtual double centsAt(int midiNote, int midiChannel) const;
 
-    virtual double centsAt(int midiNote, int midiChannel);
+    virtual double frequencyAt(int midiNote, int midiChannel) const;
 
-    virtual double frequencyAt(int midiNote, int midiChannel);
-
-    virtual double mtsAt(int midiNote, int midiChannel);
+    virtual double mtsAt(int midiNote, int midiChannel) const;
 };

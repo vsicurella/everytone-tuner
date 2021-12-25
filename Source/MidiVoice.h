@@ -9,9 +9,6 @@
 */
 
 #pragma once
-
-#include "Tuning.h"
-#include "./mapping/TuningTableMap.h"
 #include "MidiNoteTuner.h"
 
 struct LinkedController
@@ -34,7 +31,8 @@ class MidiVoice
 
     std::shared_ptr<MidiNoteTuner> tuner;
 
-    MappedNote currentMappedNote;
+    //MappedNote currentMappedNote;
+    int currentTuningIndex;
     MidiPitch currentPitch;
 
 private:

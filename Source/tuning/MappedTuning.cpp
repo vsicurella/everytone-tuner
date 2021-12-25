@@ -60,25 +60,25 @@ double MappedTuning::mtsAt(int index) const
     return tuning->mtsAt(index);
 }
 
-int MappedTuning::tuningIndexAt(int midiNote, int midiChannel)
+int MappedTuning::tuningIndexAt(int midiNote, int midiChannel) const
 {
     auto mapped = mapping->getMappedNote(midiChannel, midiNote);
     return mapped.index;
 }
 
-double MappedTuning::centsAt(int midiNote, int midiChannel)
+double MappedTuning::centsAt(int midiNote, int midiChannel) const
 {
     auto index = tuningIndexAt(midiNote, midiChannel);
     return tuning->centsAt(index);
 }
 
-double MappedTuning::frequencyAt(int midiNote, int midiChannel)
+double MappedTuning::frequencyAt(int midiNote, int midiChannel) const
 {
     auto index = tuningIndexAt(midiNote, midiChannel);
     return tuning->frequencyAt(index);
 }
 
-double MappedTuning::mtsAt(int midiNote, int midiChannel)
+double MappedTuning::mtsAt(int midiNote, int midiChannel) const
 {
     auto index = tuningIndexAt(midiNote, midiChannel);
     return tuning->mtsAt(index);

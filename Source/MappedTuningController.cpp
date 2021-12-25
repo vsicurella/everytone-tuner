@@ -132,14 +132,13 @@ std::unique_ptr<TuningTableMap> MappedTuningController::newTuningMap(const Tunin
 
 std::unique_ptr<TuningTableMap> MappedTuningController::NewLinearMappingFromTuning(const Tuning* tuning)
 {
-    auto linearMap = TuningTableMap::CreateLinearMidiMapping(tuning->getRootMidiNote(), tuning->getRootMidiChannel());
+    auto linearMap = TuningTableMap::CreateLinearMidiMapping(tuning->getRootIndex());
     return std::make_unique<TuningTableMap>(linearMap);
 }
 
 std::unique_ptr<TuningTableMap> MappedTuningController::NewPeriodicMappingFromTuning(const Tuning* tuning)
 {
-    // gotta fix this keytographer factory function
-    auto periodicMap = MultichannelMap::CreatePeriodicMapping(tuning->getTuningSize(), tuning->getRootMidiNote(), tuning->getRootMidiChannel());
+    auto periodicMap = MultichannelMap::CreatePeriodicMapping((int)tuning->getVirtualSize(), tuning->getRootIndex());
     return std::make_unique<TuningTableMap>(periodicMap);
 }
 
