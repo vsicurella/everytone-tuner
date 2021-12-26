@@ -33,6 +33,7 @@ public:
     // input: rootMidiNote, output: rootTuningIndex
     struct Definition
     {
+        int rootMidiChannel = 1;
         int rootMidiNote = 60;
         int rootTuningIndex = 60;
         Map<int>* map;
@@ -40,7 +41,8 @@ public:
 
 protected:
 
-    // MIDI Note to align with tuning table root
+    // MIDI Channel and Note combine to align with tuning table root
+    int rootMidiChannel;
     int rootMidiNote;
 
     // Tuning table index to align with map root
@@ -67,6 +69,10 @@ public:
     virtual ~TuningTableMap() {}
 
     void operator=(const TuningTableMap& mapToCopy);
+
+    int getRootMidiChannel() const { return rootMidiChannel; }
+    int getRootMidiNote() const { return rootMidiNote; }
+    int getRootMidiIndex() const { return midiIndex(rootMidiChannel, rootMidiNote); }
 
     int period() const;
 
@@ -129,10 +135,7 @@ public:
             0
         };
         auto linearMap = Map<int>(mapFunction);
-        auto definition = TuningTableMap::Definition
-        {
-            rootMidiNote, rootTuningIndex, &linearMap
-        };
+        TuningTableMap::Definition definition { rootMidiChannel, rootMidiNote, rootTuningIndex, &linearMap };
 
         return TuningTableMap(definition);
     }

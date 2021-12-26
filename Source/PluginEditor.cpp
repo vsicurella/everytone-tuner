@@ -13,21 +13,20 @@
 MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p), menuModel(static_cast<juce::ApplicationCommandManager*>(this))
 {
-    tuningBackup.reset(new Tuning(*audioProcessor.activeTargetTuning()));
+    tuningBackup = std::make_unique<MappedTuning>(*audioProcessor.currentTarget());
 
     menuBar.reset(new juce::MenuBarComponent(&menuModel));
     addAndMakeVisible(*menuBar);
 
     overviewPanel.reset(new OverviewPanel(audioProcessor.options()));
     addAndMakeVisible(overviewPanel.get());
-    overviewPanel->setTuningDisplayed(tuningBackup.get());
-    //overviewPanel->addMappingWatcher(this);
+    overviewPanel->setTuningDisplayed(audioProcessor.currentTarget());
     overviewPanel->addOptionsWatcher(this);
-    overviewPanel->addTuningWatcher(this);
+    
+    overviewPanel->addMappingWatcher(this);
+    audioProcessor.addTunerControllerWatcher(this);
 
     contentComponent = overviewPanel.get();
-
-    audioProcessor.addTuningWatcher(this);
 
     setSize (600, 250);
 
@@ -53,11 +52,11 @@ MultimapperAudioProcessorEditor::~MultimapperAudioProcessorEditor()
     logger->setCallback([](juce::StringRef) {});
 #endif
 
+    newTuningPanel = nullptr;
+    overviewPanel = nullptr;
     logWindow = nullptr;
 
-    audioProcessor.removeTuningWatcher(this);
-
-    overviewPanel = nullptr;
+    audioProcessor.removeTunerControllerWatcher(this);
 }
 
 //==============================================================================
@@ -81,30 +80,45 @@ void MultimapperAudioProcessorEditor::resized()
 
 }
 
-void MultimapperAudioProcessorEditor::tuningTargetChanged(TuningChanger* changer, const Tuning* tuning)
+void MultimapperAudioProcessorEditor::sourceTuningChanged(const MappedTuning& source)
 {
-    if (changer == &audioProcessor)
-        overviewPanel->setTuningDisplayed(tuning);
-    else
-        audioProcessor.loadTuningTarget(*tuning);
+
 }
 
-void MultimapperAudioProcessorEditor::tuningTargetReferenceChanged(TuningChanger* changer, Tuning::Reference reference)
+void MultimapperAudioProcessorEditor::targetTuningChanged(const MappedTuning& target)
 {
-    if (changer == &audioProcessor)
-        overviewPanel->setTuningDisplayed(audioProcessor.activeTargetTuning());
-    else
-        audioProcessor.setTargetTuningReference(reference);
+    overviewPanel->setTuningDisplayed(&target);
 }
 
-void MultimapperAudioProcessorEditor::mappingModeChanged(Everytone::MappingMode mode)
+
+void MultimapperAudioProcessorEditor::targetDefinitionLoaded(TuningChanger* changer, CentsDefinition definition)
 {
-    audioProcessor.setMappingMode(mode);
+    audioProcessor.loadTuningTarget(definition);
+}
+
+void MultimapperAudioProcessorEditor::targetMappedTuningLoaded(TuningChanger* changer, CentsDefinition tuningDefinition, TuningTableMap::Definition mapDefinition)
+{
+    
+}
+
+void MultimapperAudioProcessorEditor::targetRootFrequencyChanged(TuningChanger* changer, double frequency)
+{
+    audioProcessor.setTargetTuningRootFrequency(frequency);
 }
 
 void MultimapperAudioProcessorEditor::mappingTypeChanged(Everytone::MappingType type)
 {
     audioProcessor.setAutoMappingType(type);
+}
+
+void MultimapperAudioProcessorEditor::mappingRootChanged(int rootMidiChannel, int rootMidiNote)
+{
+    audioProcessor.setTargetMappingRoot(rootMidiChannel, rootMidiNote);
+}
+
+void MultimapperAudioProcessorEditor::mappingModeChanged(Everytone::MappingMode mode)
+{
+    audioProcessor.setMappingMode(mode);
 }
 
 void MultimapperAudioProcessorEditor::channelModeChanged(Everytone::ChannelMode newChannelMode)
@@ -236,11 +250,13 @@ bool MultimapperAudioProcessorEditor::performBack(const juce::ApplicationCommand
 
     if (contentComponent == newTuningPanel.get())
     {
+        // TODO: finish preview implementation
         // Revert tuning if preview is on
-        if (newTuningPanel->previewOn())
-        {
-            audioProcessor.loadTuningTarget(*tuningBackup);
-        }
+        //if (newTuningPanel->previewOn())
+        //{
+        //    auto definition
+        //    audioProcessor.loadTuningTarget(*tuningBackup);
+        //}
     }
 
     setContentComponent(overviewPanel.get());
@@ -287,7 +303,7 @@ bool MultimapperAudioProcessorEditor::performOpenTuning(const juce::ApplicationC
             if (result.existsAsFile())
             {
                 TuningFileParser parser(result);
-                commitTuning(parser.getTuning());
+                commitTuning(parser.getTuningDefinition());
             }
         });
 
@@ -307,13 +323,10 @@ bool MultimapperAudioProcessorEditor::performShowOptions(const juce::Application
     return true;
 }
 
-
-void MultimapperAudioProcessorEditor::commitTuning(const Tuning* tuning)
+void MultimapperAudioProcessorEditor::commitTuning(CentsDefinition tuningDefinition)
 {
-    audioProcessor.loadTuningTarget(*tuning);
-    auto savedTuning = audioProcessor.activeTargetTuning();
-    tuningBackup.reset(new Tuning(*savedTuning));
-    overviewPanel->setTuningDisplayed(savedTuning);
+    audioProcessor.loadTuningTarget(tuningDefinition);
+    tuningBackup = std::make_unique<MappedTuning>(*audioProcessor.currentTarget());
 }
 
 void MultimapperAudioProcessorEditor::setContentComponent(juce::Component* component)

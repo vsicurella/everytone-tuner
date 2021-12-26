@@ -28,7 +28,7 @@ struct CentsDefinition
 	double virtualPeriod = 0;
 	double virtualSize = 0;
 
-	static juce::String getEqualDivisionsNameAndDescription(juce::String& name, juce::String& description, double divisions, double period, bool isCents = false)
+	static void getEqualDivisionsNameAndDescription(juce::String& name, juce::String& description, double divisions, double period, bool isCents = false)
 	{
 		bool integerDivisions = (int)divisions == divisions;
 		auto strDivisions = (integerDivisions)

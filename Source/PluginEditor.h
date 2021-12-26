@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "LogWindow.h"
 #include "ui/OverviewPanel.h"
@@ -16,7 +15,6 @@
 #include "ui/NewTuningPanel.h"
 #include "ui/OptionsPanel.h"
 #include "io/TuningFileParser.h"
-#include "./mapping/MultichannelMap.h"
 
 //==============================================================================
 /**
@@ -24,8 +22,10 @@
 class MultimapperAudioProcessorEditor  : public juce::AudioProcessorEditor, 
                                          public juce::ApplicationCommandManager,
                                          public juce::ApplicationCommandTarget,
+                                         public TunerController::Watcher,
                                          public TuningWatcher,
                                          public TuningChanger,
+                                          public MappingWatcher,
                                          public OptionsWatcher
 {
 public:
@@ -37,16 +37,26 @@ public:
     void resized() override;
 
     //==============================================================================
+    // TunerController::Watcher implementation
+
+    void sourceTuningChanged(const MappedTuning& source) override;
+
+    void targetTuningChanged(const MappedTuning& target) override;
+
+
+    //==============================================================================
     // TuningWatcher implementation
 
-    void tuningTargetChanged(TuningChanger* changer, const Tuning* tuning) override;
+    void targetDefinitionLoaded(TuningChanger* changer, CentsDefinition definition) override;
 
-    void tuningTargetReferenceChanged(TuningChanger* changer, Tuning::Reference reference) override;
+    void targetMappedTuningLoaded(TuningChanger* changer, CentsDefinition tuningDefinition, TuningTableMap::Definition mapDefinition) override;
+
+    void targetRootFrequencyChanged(TuningChanger* changer, double frequency) override;
 
     //==============================================================================
     // MappingWatcher implementation
 
-    //void mappingTypeChanged(MappingChanger* changer, Everytone::MappingType type) override;
+    void mappingRootChanged(int rootMidiChannel, int rootMidiNote) override;
 
     //==============================================================================
     // OptionsWatcher implementation
@@ -86,7 +96,7 @@ public:
 
     //==============================================================================
 
-    void commitTuning(const Tuning* tuning);
+    void commitTuning(CentsDefinition tuningDefinition);
 
     void setContentComponent(juce::Component* component);
 
@@ -99,7 +109,7 @@ private:
     // access the processor object that created it.
     MultimapperAudioProcessor& audioProcessor;
 
-    std::unique_ptr<Tuning> tuningBackup;
+    std::unique_ptr<MappedTuning> tuningBackup;
 
     MenuBarModel menuModel;
 

@@ -42,7 +42,7 @@ NewTuningPanel::~NewTuningPanel()
 
 void NewTuningPanel::saveTuning()
 {
-    tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuningStaged.get());
+    tuningWatchers.call(&TuningWatcher::targetDefinitionLoaded, this, *tuningStaged);
 }
 
 void NewTuningPanel::resized()
@@ -73,10 +73,10 @@ void NewTuningPanel::resized()
     previewButton->setBounds(saveButton->getBounds().translated(buttonWidth, 0));
 }
 
-void NewTuningPanel::tuningTargetChanged(TuningChanger* changer, const Tuning* tuning)
+void NewTuningPanel::targetDefinitionLoaded(TuningChanger* changer, CentsDefinition definition)
 {
-    tuningStaged.reset(new Tuning(*tuning));
+    tuningStaged = std::make_unique<CentsDefinition>(definition);
 
     if (previewOn())
-        tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuningStaged.get());
+        tuningWatchers.call(&TuningWatcher::targetDefinitionLoaded, this, *tuningStaged);
 }

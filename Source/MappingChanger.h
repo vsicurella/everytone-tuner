@@ -16,7 +16,7 @@ struct MappingChanger;
 
 struct MappingWatcher
 {
-    virtual void mappingTypeChanged(MappingChanger* changer, Everytone::MappingType type) {};
+    virtual void mappingRootChanged(int rootMidiChannel, int rootMidiNote) {};
 };
 
 class MappingChanger

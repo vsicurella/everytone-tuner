@@ -84,10 +84,10 @@
       </GROUP>
       <FILE id="TlWn9G" name="MidiVoice.cpp" compile="1" resource="0" file="Source/MidiVoice.cpp"/>
       <FILE id="cdGlcX" name="MidiVoice.h" compile="0" resource="0" file="Source/MidiVoice.h"/>
-      <FILE id="h3R26G" name="MappedTuningController.h" compile="0" resource="0"
-            file="Source/MappedTuningController.h"/>
-      <FILE id="QKYQ2p" name="MappedTuningController.cpp" compile="1" resource="0"
-            file="Source/MappedTuningController.cpp"/>
+      <FILE id="h3R26G" name="TunerController.h" compile="0" resource="0"
+            file="Source/TunerController.h"/>
+      <FILE id="QKYQ2p" name="TunerController.cpp" compile="1" resource="0"
+            file="Source/TunerController.cpp"/>
       <FILE id="HhASYm" name="TuningChanger.h" compile="0" resource="0" file="Source/TuningChanger.h"/>
       <FILE id="oYq05H" name="MappingChanger.h" compile="0" resource="0"
             file="Source/MappingChanger.h"/>

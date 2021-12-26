@@ -33,6 +33,7 @@ TuningTableMap::Definition MultichannelMap::initializePattern(MultichannelMap::D
 
     TuningTableMap::Definition d =
     {
+        definition.rootMidiChannel,
         definition.rootMidiNote,
         definition.rootTuningIndex,
         new Map<int>(multimap)

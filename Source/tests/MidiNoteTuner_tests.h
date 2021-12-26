@@ -136,7 +136,7 @@ public:
     {
         auto stdTuning = Tuning::StandardTuning();
 
-        Tuning::CentsDefinition ode22def(22.0);
+        CentsDefinition ode22def(22.0);
         int ch = 4;
         int note = 0;
         ode22def.reference = { note, ch, 261.6255653 };
@@ -172,7 +172,7 @@ public:
     {
         auto stdTuning = Tuning::StandardTuning();
 
-        Tuning::CentsDefinition ode31def(31.0);
+        auto ode31def = CentsDefinition::CentsDivisions(31.0, 1200.0, 440);
         ode31def.reference = { 23, 5, 440 };
         auto ode31atCh5Note23 = Tuning(ode31def);
 

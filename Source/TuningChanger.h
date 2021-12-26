@@ -12,16 +12,25 @@
 
 #include <JuceHeader.h>
 #include "./tuning/Tuning.h"
+#include "./mapping/TuningTableMap.h"
 
 class TuningChanger;
 
 class TuningWatcher
 {
 public:
-    virtual void tuningSourceChanged(TuningChanger* changer, const Tuning* newTuning) {}
-    virtual void tuningTargetChanged(TuningChanger* changer, const Tuning* newTuning) {}
-    virtual void tuningSourceRootFrequency(TuningChanger* changer, double frequency) {}
-    virtual void tuningTargetRootFrequency(TuningChanger* changer, double frequency) {}
+
+    // Used when a new tuning is loaded in Auto-Mapping mode
+    virtual void sourceDefinitionLoaded(TuningChanger* changer, CentsDefinition definition) {}
+    virtual void targetDefinitionLoaded(TuningChanger* changer, CentsDefinition definition) {}
+
+    // Used with a new tuning in Manual-Mapping mode
+    virtual void sourceMappedTuningLoaded(TuningChanger* changer, CentsDefinition tuningDefinition, TuningTableMap::Definition mapDefinition) {}
+    virtual void targetMappedTuningLoaded(TuningChanger* changer, CentsDefinition tuningDefinition, TuningTableMap::Definition mapDefinition) {}
+
+    // Used when only the tuning's root frequency changes - mapping stays the same in either Auto or Manual mode
+    virtual void sourceRootFrequencyChanged(TuningChanger* changer, double frequency) {}
+    virtual void targetRootFrequencyChanged(TuningChanger* changer, double frequency) {}
 };
 
 class TuningChanger

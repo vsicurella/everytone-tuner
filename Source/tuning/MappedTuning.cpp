@@ -18,6 +18,10 @@ MappedTuning::MappedTuning(std::shared_ptr<Tuning> tuningIn, std::shared_ptr<Tun
     : tuning(tuningIn),
       mapping(mappingIn) {}
 
+MappedTuning::MappedTuning(const MappedTuning& mappedTuning)
+    : tuning(mappedTuning.shareTuning()),
+      mapping(mappedTuning.shareMapping()) {}
+
 MappedTuning::~MappedTuning()
 {
     mapping = nullptr;

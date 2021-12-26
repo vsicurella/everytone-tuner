@@ -32,22 +32,21 @@ static juce::ValueTree tuningToValueTree(const Tuning* tuning, juce::Identifier 
 {
     auto tree = juce::ValueTree(name);
     
-    tree.setProperty(Everytone::ID::Name, tuning->getName(), nullptr);
-    tree.setProperty(Everytone::ID::Description, tuning->getDescription(), nullptr);
-
     auto intervals = tuning->getIntervalCentsTable();
     auto intervalTree = arrayToValueTree(intervals, Everytone::ID::IntervalTable, Everytone::ID::Cents);
     tree.addChild(intervalTree, 0, nullptr);
 
-    tree.setProperty(Everytone::ID::RootFrequency, tuning->getRootFrequency(), nullptr);
-
+    tree.setProperty(Everytone::ID::RootFrequency,  tuning->getRootFrequency(), nullptr);
+    tree.setProperty(Everytone::ID::Name,           tuning->getName(), nullptr);
+    tree.setProperty(Everytone::ID::Description,    tuning->getDescription(), nullptr);
+    tree.setProperty(Everytone::ID::VirtualPeriod,  tuning->getVirtualPeriod(), nullptr);
+    tree.setProperty(Everytone::ID::VirtualSize,    tuning->getVirtualSize(), nullptr);
+    
     return tree;
 }
 
-static Tuning parseTuningValueTree(juce::ValueTree tree)
+static CentsDefinition parseTuningValueTree(juce::ValueTree tree)
 {
-    auto definition = CentsDefinition();
-    
     juce::Array<double> cents;
 
     for (auto node : tree.getChild(0))
@@ -55,13 +54,22 @@ static Tuning parseTuningValueTree(juce::ValueTree tree)
         cents.add(node[Everytone::ID::Value]);
     }
 
-    definition.intervalCents = cents;
+    if (cents.size() == 0)
+    {
+        return CentsDefinition();
+    }
 
-    definition.name =                       tree.getProperty(Everytone::ID::Name, "");
-    definition.description =                tree.getProperty(Everytone::ID::Description, "");
-    definition.rootFrequency =    tree.getProperty(Everytone::ID::RootFrequency, 440);
-
-    return Tuning(definition);
+    CentsDefinition definition =
+    {
+        cents,
+        (double)tree.getProperty(Everytone::ID::RootFrequency, 440.0),
+        tree.getProperty(Everytone::ID::Name, "").toString(),
+        tree.getProperty(Everytone::ID::Description, "").toString(),
+        (double)tree.getProperty(Everytone::ID::VirtualPeriod, 2.0),
+        (double)tree.getProperty(Everytone::ID::VirtualSize, 12.0)
+    };
+    
+    return definition;
 }
 
 static juce::ValueTree tuningTableMapToValueTree(const TuningTableMap& midiMap)
@@ -113,11 +121,13 @@ static TuningTableMap parseTuningTableMapTree(juce::ValueTree tree)
 
     auto map = Map<int>(mapDefinition);
 
+    int rootMidiChannel = tree.getProperty(Everytone::ID::RootMidiChannel);
     int rootMidiNote = tree.getProperty(Everytone::ID::RootMidiNote);
     int rootTuningIndex = tree.getProperty(Everytone::ID::RootTuningIndex);
 
-    auto definition = TuningTableMap::Definition
+    TuningTableMap::Definition definition
     {
+        rootMidiChannel,
         rootMidiNote,
         rootTuningIndex,
         &map

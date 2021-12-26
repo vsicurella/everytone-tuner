@@ -22,7 +22,7 @@ TuningFileParser::TuningFileParser(juce::File file)
 
 TuningFileParser::~TuningFileParser()
 {
-	tuningLoaded = nullptr;
+	tuningDefinition = nullptr;
 }
 
 void TuningFileParser::loadFile(juce::String absoluteFilePath)
@@ -38,14 +38,9 @@ void TuningFileParser::readFile(juce::File file)
 	parseTuning(file);
 }
 
-Tuning::Definition TuningFileParser::getTuningDefinition() const
+CentsDefinition TuningFileParser::getTuningDefinition() const
 {
-	return tuningLoaded->getDefinition();
-}
-
-const Tuning* TuningFileParser::getTuning() const
-{
-	return tuningLoaded.get();
+	return *tuningDefinition;
 }
 
 TuningFileParser::TuningType TuningFileParser::getTuningType() const
@@ -70,7 +65,7 @@ int TuningFileParser::determineTuningType(juce::File tuningFileIn)
 	return type;
 }
 
-Tuning::CentsDefinition TuningFileParser::parseScalaFileDefinition(juce::File scalaFile)
+CentsDefinition TuningFileParser::parseScalaFileDefinition(juce::File scalaFile)
 {
 	std::string path = scalaFile.getFullPathName().toStdString();
 
@@ -92,7 +87,7 @@ Tuning::CentsDefinition TuningFileParser::parseScalaFileDefinition(juce::File sc
 		centsTable.add(sclImport.GetLineInCents(i));
 	}
 
-	auto reference = Tuning::Reference{ 1, baseNote, baseFreq };
+	//auto reference = Tuning::Reference{ 1, baseNote, baseFreq };
 
 	auto name = juce::String(sclImport.GetTuningName());
 	if (juce::File::isAbsolutePath(name))
@@ -102,19 +97,18 @@ Tuning::CentsDefinition TuningFileParser::parseScalaFileDefinition(juce::File sc
 	}
 	auto description = juce::String(sclImport.GetScaleDescription());
 
-	Tuning::CentsDefinition centsDefinition(centsTable);
-	centsDefinition = Tuning::Definition 
+	CentsDefinition definition =	
 	{
-		reference,
-		0,
+		centsTable,
+		baseFreq,
 		name,
-		description		
+		description
 	};
 
-	return centsDefinition;
+	return definition;
 }
 
-Tuning::CentsDefinition TuningFileParser::parseTunFileDefinition(juce::File tunFile)
+CentsDefinition TuningFileParser::parseTunFileDefinition(juce::File tunFile)
 {
 	TUN::CSingleScale tunSingleScale;
 	std::string path = tunFile.getFullPathName().toStdString();
@@ -130,9 +124,6 @@ Tuning::CentsDefinition TuningFileParser::parseTunFileDefinition(juce::File tunF
 			centsTable.add(ratioToCents(freq / baseFreq));
 		}
 
-		Tuning::Reference reference = { 1, baseNote, baseFreq };
-		Tuning::CentsDefinition definition(centsTable);
-
 		auto name = juce::String(tunSingleScale.GetKeys()[TUN::CSingleScale::KEY_Name]);
 		if (juce::File::isAbsolutePath(name))
 		{
@@ -141,10 +132,10 @@ Tuning::CentsDefinition TuningFileParser::parseTunFileDefinition(juce::File tunF
 		}
 		auto description = juce::String(tunSingleScale.GetKeys()[TUN::CSingleScale::KEY_Description]);
 
-		definition = Tuning::Definition
+		CentsDefinition definition =
 		{
-			reference,
-			0,
+			centsTable,
+			baseFreq,
 			name,
 			description
 		};
@@ -152,22 +143,19 @@ Tuning::CentsDefinition TuningFileParser::parseTunFileDefinition(juce::File tunF
 		return definition;
 	}
 
-	return Tuning::CentsDefinition();
+	return CentsDefinition();
 }
 
 void TuningFileParser::parseTuning(juce::File fileLoaded)
 {
-	auto tuningDefinition = Tuning::CentsDefinition();
 	switch (type)
 	{
 	case TuningType::SCL:
-		tuningDefinition = parseScalaFileDefinition(fileLoaded);
+		tuningDefinition = std::make_unique<CentsDefinition>(parseScalaFileDefinition(fileLoaded));
 		break;
 
 	case TuningType::TUN:
-		tuningDefinition = parseTunFileDefinition(fileLoaded);
+		tuningDefinition = std::make_unique<CentsDefinition>(parseTunFileDefinition(fileLoaded));
 		break;
 	}
-
-	tuningLoaded = std::make_unique<Tuning>(tuningDefinition);
 }

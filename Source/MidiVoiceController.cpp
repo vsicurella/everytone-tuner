@@ -10,7 +10,7 @@
 
 #include "MidiVoiceController.h"
 
-MidiVoiceController::MidiVoiceController(MappedTuningController& tuningControllerIn)
+MidiVoiceController::MidiVoiceController(TunerController& tuningControllerIn)
     : tuningController(tuningControllerIn)
 {
     for (int i = 0; i < MULTIMAPPER_MAX_VOICES; i++)

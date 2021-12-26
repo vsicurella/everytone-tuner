@@ -23,7 +23,8 @@ namespace Everytone
 		static juce::Identifier Tuning("Tuning");
 		static juce::Identifier Name("Name");
 		static juce::Identifier Description("Description");
-		static juce::Identifier Transpose("Transpose");
+		static juce::Identifier VirtualPeriod("VirtualPeriod");
+		static juce::Identifier VirtualSize("VirtualSize");
 		static juce::Identifier IntervalTable("IntervalTable");
 		static juce::Identifier Cents("Cents");
 		static juce::Identifier RootMidiNote("rootMidiNote");
@@ -37,6 +38,7 @@ namespace Everytone
 		static juce::Identifier Pattern("Pattern");
 		static juce::Identifier PatternRoot("PatternRoot");
 		static juce::Identifier MapRoot("MapRoot");
+		static juce::Identifier Transpose("Transpose");
 
 		// Options
 		static juce::Identifier Options("Options");

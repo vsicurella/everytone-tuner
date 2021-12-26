@@ -40,8 +40,6 @@ private:
     
     PeriodType periodType = PeriodType::Cents;
 
-    std::unique_ptr<Tuning> tuning;
-
 public:
 
     void setPeriodType(PeriodType typeIn)
@@ -78,29 +76,53 @@ public:
     // can be abstracted
     void recalculateTuning()
     {
-        juce::String description = juce::String(divisionsSlider->getValue()) + " equal divisions of ";
+        //juce::String description = juce::String(divisionsSlider->getValue()) + " equal divisions of ";
 
-        double periodCents = periodSlider->getValue();
-        description += juce::String(periodCents);
+        //double periodCents = periodSlider->getValue();
+        //description += juce::String(periodCents);
 
-        if (periodType == PeriodType::Ratio)
+        //if (periodType == PeriodType::Ratio)
+        //{
+        //    periodCents = ratioToCents(periodCents);
+        //}
+        //else
+        //{
+        //    description += " cents.";
+        //}
+
+        //double cents = periodCents / divisionsSlider->getValue();
+
+
+
+        //CentsDefinition definition
+        //{   
+        //    definition.intervalCents = { cents };
+        //    definition.name = juce::String(roundN(3, cents)) + " cET";
+        //    definition.description = description;
+
+        //tuning.reset(new Tuning(definition));
+        //tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuning.get());
+
+        double divisions = divisionsSlider->getValue();
+        double period = periodSlider->getValue();
+
+        std::unique_ptr<CentsDefinition> definition;
+
+        switch (periodType)
         {
-            periodCents = ratioToCents(periodCents);
+        case PeriodType::Cents:
+            definition = std::make_unique<CentsDefinition>(CentsDefinition::CentsDivisions(divisions, period));
+            break;
+
+        case PeriodType::Ratio:
+            definition = std::make_unique<CentsDefinition>(CentsDefinition::RatioDivisions(divisions, period));
+            break;
+
+        default:
+            jassertfalse;
         }
-        else
-        {
-            description += " cents.";
-        }
 
-        double cents = periodCents / divisionsSlider->getValue();
-
-        auto definition = Tuning::CentsDefinition();
-        definition.intervalCents = { cents };
-        definition.name = juce::String(roundN(3, cents)) + " cET";
-        definition.description = description;
-
-        tuning.reset(new Tuning(definition));
-        tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuning.get());
+        tuningWatchers.call(&TuningWatcher::targetDefinitionLoaded, this, *definition);
     }
 
 public:
@@ -136,7 +158,6 @@ public:
 
     ~EqualTemperamentInterface() override
     {
-        tuning = nullptr;
         periodSlider = nullptr;
         divisionsSlider = nullptr;
     }

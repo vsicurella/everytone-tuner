@@ -241,33 +241,28 @@ void OverviewPanel::resized()
 }
 
 
-void OverviewPanel::setTuningDisplayed(const Tuning* tuning)
+void OverviewPanel::setTuningDisplayed(const MappedTuning* mappedTuning)
 {
+	auto tuning = mappedTuning->getTuning();
 	setTuningNameLabel(tuning->getName());
 	setDescriptionText(tuning->getDescription());
-	setTuningSizeLabel(juce::String(tuning->getTuningSize()));
 
-	//double period = ;
-	//if (tuningOutDefinition[TuneUpIDs::functionalId])
-	//{
-	//	period = tuningOutDefinition.getChildWithName(TuneUpIDs::generatorListId).getChild(0)[TuneUpIDs::generatorValueId];
-	//}
-	//else
-	//{
-		//juce::ValueTree intervalList = tuningOutDefinition.getChild(0);
-		//period = intervalList.getChild(intervalList.getNumChildren() - 1)[TuneUpIDs::intervalValueId];
-	//}
+	auto periodLabel = juce::String(tuning->getPeriodCents());
+	auto virtualPeriod = tuning->getVirtualPeriod();
+	if (virtualPeriod != 0)
+		periodLabel += " (" + juce::String(virtualPeriod) + ")";
+	setTuningPeriodLabel(periodLabel);
 
-	//juce::String periodDisplay = juce::String(period) + " cents";
-	//double virtualPeriod = tuningOutDefinition[TuneUpIDs::virtualPeriodId];
+	auto sizeLabel = juce::String(tuning->getTuningSize());
+	auto virtualSize = tuning->getVirtualSize();
+	if (virtualSize != 0)
+		sizeLabel += " (" + juce::String(virtualSize) + ")";
+	setTuningSizeLabel(sizeLabel);
 
-	//if (period != virtualPeriod)
-	//	periodDisplay += " (" + juce::String(virtualPeriod) + ")";
+	auto mapping = mappedTuning->getMapping();
+	setRootMidiChannelLabel(juce::String(mapping->getRootMidiChannel()));
+	setRootMidiNoteLabel(juce::String(mapping->getRootMidiNote()));
 	
-	setTuningPeriodLabel(juce::String(tuning->getPeriodCents()) + " cents");
-
-	setRootMidiChannelLabel(juce::String(tuning->getRootMidiChannel()));
-	setRootMidiNoteLabel(juce::String(tuning->getRootMidiNote()));
 	setRootFrequencyLabel(juce::String(tuning->getRootFrequency()) + " hz");
 }
 
@@ -282,7 +277,7 @@ void OverviewPanel::mappingTypeButtonClicked()
 
 void OverviewPanel::tuningReferenceEdited()
 {
-	Tuning::Reference newReference;
+	int newRootMidiChannel = 1;
 
 	auto channelInput = rootMidiChannelBox->getText().trim();
 	int channelValue = -1;
@@ -290,12 +285,14 @@ void OverviewPanel::tuningReferenceEdited()
 	{
 		channelValue = channelInput.getIntValue();
 		if (channelValue >= 1 && channelValue <= 16)
-			newReference.rootMidiChannel = channelValue;
+			newRootMidiChannel = channelValue;
 	}
 	if (channelValue < 0)
 	{
 		rootMidiChannelBox->setText(rootChannelBackup, juce::NotificationType::dontSendNotification);
 	}
+
+	int newRootMidiNote = 69;
 
 	auto noteInput = rootMidiNoteBox->getText().trim();
 	int noteValue = -1;
@@ -303,7 +300,7 @@ void OverviewPanel::tuningReferenceEdited()
 	{
 		noteValue = noteInput.getIntValue();
 		if (noteValue >= 0 && noteValue < 128)
-			newReference.rootMidiNote = noteValue;
+			newRootMidiNote = noteValue;
 	}
 	if (noteValue < 0)
 	{
@@ -314,12 +311,14 @@ void OverviewPanel::tuningReferenceEdited()
 	if (freqInput.endsWith("hz"))
 		freqInput = freqInput.substring(0, freqInput.length() - 3).trim();
 
+	double newRootFrequency = 440;
+
 	double freqValue = -1;
 	if (freqInput.containsOnly("0123456789."))
 	{
 		freqValue = freqInput.getDoubleValue();
 		if (freqValue >= 8.0 && freqValue < 14000.0)
-			newReference.rootFrequency = freqValue;
+			newRootFrequency = freqValue;
 
 		rootFrequencyBox->setText(freqInput + " hz", juce::NotificationType::dontSendNotification);
 	}
@@ -328,7 +327,8 @@ void OverviewPanel::tuningReferenceEdited()
 		rootFrequencyBox->setText(rootFrequencyBackup, juce::NotificationType::dontSendNotification);
 	}
 
-	tuningWatchers.call(&TuningWatcher::tuningTargetReferenceChanged, this, newReference);
+	tuningWatchers.call(&TuningWatcher::targetRootFrequencyChanged, this, newRootFrequency);
+	mappingWatchers.call(&MappingWatcher::mappingRootChanged, newRootMidiChannel, newRootMidiNote);
 }
 
 void OverviewPanel::setPitchbendRangeText(int pitchbendRange)

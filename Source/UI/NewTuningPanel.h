@@ -27,7 +27,7 @@ class NewTuningPanel : public juce::TabbedComponent,
     std::unique_ptr<juce::TextButton> backButton;
     std::unique_ptr<juce::TextButton> previewButton;
 
-    std::unique_ptr<Tuning> tuningStaged;
+    std::unique_ptr<CentsDefinition> tuningStaged;
 
     int lastTabIndex = 1;
 
@@ -44,7 +44,7 @@ public:
 
     
     bool previewOn() const { return previewButton->getToggleState(); }
-    const Tuning* stagedTuning() const { return tuningStaged.get(); }
+    const CentsDefinition& stagedTuning() const { return *tuningStaged; }
 
     void saveTuning();
 
@@ -52,7 +52,7 @@ public:
     void resized() override;
 
     // TuningWatcher Implementation
-    void tuningTargetChanged(TuningChanger* changer, const Tuning* tuning) override;
+    void targetDefinitionLoaded(TuningChanger* changer, CentsDefinition definition) override;
 
 
 private:

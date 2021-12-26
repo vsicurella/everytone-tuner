@@ -27,6 +27,7 @@ public:
     
     MappedTuning();
     MappedTuning(std::shared_ptr<Tuning> tuning, std::shared_ptr<TuningTableMap> mapping);
+    MappedTuning(const MappedTuning& mappedTuning);
     ~MappedTuning();
 
     // TuningBase implementation

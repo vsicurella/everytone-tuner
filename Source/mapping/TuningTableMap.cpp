@@ -11,7 +11,8 @@
 #include "TuningTableMap.h"
 
 TuningTableMap::TuningTableMap(TuningTableMap::Definition definition)
-    : rootMidiNote(definition.rootMidiNote),
+    : rootMidiChannel(definition.rootMidiChannel),
+      rootMidiNote(definition.rootMidiNote),
       rootTuningIndex(definition.rootTuningIndex),
       map(std::make_unique<Map<int>>(*definition.map))
 {
@@ -19,15 +20,17 @@ TuningTableMap::TuningTableMap(TuningTableMap::Definition definition)
 }
 
 TuningTableMap::TuningTableMap(const TuningTableMap& mapToCopy)
-    : rootMidiNote(mapToCopy.rootMidiNote),
-    rootTuningIndex(mapToCopy.rootTuningIndex),
-    map(new Map<int>(*mapToCopy.map.get()))
+    : rootMidiChannel(mapToCopy.rootMidiChannel),
+      rootMidiNote(mapToCopy.rootMidiNote),
+      rootTuningIndex(mapToCopy.rootTuningIndex),
+      map(new Map<int>(*mapToCopy.map.get()))
 {
     rebuildTable();
 }
 
 void TuningTableMap::operator=(const TuningTableMap& mapToCopy)
 {
+    rootMidiChannel = mapToCopy.rootMidiChannel;
     rootMidiNote = mapToCopy.rootMidiNote;
     rootTuningIndex = mapToCopy.rootTuningIndex;
     map.reset(new Map<int>(*mapToCopy.getDefinition().map));
@@ -106,6 +109,7 @@ TuningTableMap::Definition TuningTableMap::getDefinition() const
 {
     TuningTableMap::Definition definition =
     {
+        rootMidiChannel,
         rootMidiNote,
         rootTuningIndex,
         map.get()

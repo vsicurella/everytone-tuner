@@ -10,7 +10,7 @@
 #include "PluginEditor.h"
 #include "TuningHelpers.h"
 
-#if RUN_MULTIMAPPER_TESTS
+#if RUN_MULTIMAPPER_TESTS && 0
     #include "./tests/Map_Test_Generator.h"
     #include "./tests/MultichannelMap_Test.h"
     #include "./tests/Tuning_tests.h"
@@ -20,8 +20,8 @@
 
 //==============================================================================
 MultimapperAudioProcessor::MultimapperAudioProcessor()
-    : tuningController(),
-      voiceController(tuningController),
+    : tunerController(),
+      voiceController(tunerController),
 
 #ifndef JucePlugin_PreferredChannelConfigurations
      AudioProcessor (BusesProperties()
@@ -40,7 +40,7 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
 #endif
 
 
-#if RUN_MULTIMAPPER_TESTS
+#if RUN_MULTIMAPPER_TESTS && 0
     DBG("Running tests...");
 
     Map_Test_Generator mapTests;
@@ -221,7 +221,8 @@ void MultimapperAudioProcessor::getStateInformation (juce::MemoryBlock& destData
     //auto sourceNode = tuningToValueTree(*midiBrain->getTuningSource(), Everytone::ID::TuningSource);
     //state.addChild(sourceNode, -1, nullptr);
     
-    auto targetNode = tuningToValueTree(tuningController.getTuningTarget().get(), Everytone::ID::TuningTarget);
+    auto targetTuning = tunerController.readTuningTarget()->getTuning();
+    auto targetNode = tuningToValueTree(targetTuning, Everytone::ID::TuningTarget);
     state.addChild(targetNode, -1, nullptr);
 
     auto optionsNode = options().toValueTree();
@@ -323,74 +324,72 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
     buffer.swapWith(processedBuffer);
 }
 
-void MultimapperAudioProcessor::testMidi()
-{
-    juce::MidiBuffer buffer;
-    int sample = 0;
-    // Note on + off for each note in channel
-    for (int ch = 1; ch <= 1; ch++)
-        for (int n = 0; n < 128; n++)
-        {
-            auto msg = juce::MidiMessage::noteOn(ch, n, (juce::uint8)100);
-            buffer.addEvent(msg, sample++);
-            msg = juce::MidiMessage::noteOff(ch, n);
-            buffer.addEvent(msg, sample++);
-        }
-
-    auto audioDummy = juce::AudioSampleBuffer();
-    processBlock(audioDummy, buffer);
-}
+//void MultimapperAudioProcessor::testMidi()
+//{
+//    juce::MidiBuffer buffer;
+//    int sample = 0;
+//    // Note on + off for each note in channel
+//    for (int ch = 1; ch <= 1; ch++)
+//        for (int n = 0; n < 128; n++)
+//        {
+//            auto msg = juce::MidiMessage::noteOn(ch, n, (juce::uint8)100);
+//            buffer.addEvent(msg, sample++);
+//            msg = juce::MidiMessage::noteOff(ch, n);
+//            buffer.addEvent(msg, sample++);
+//        }
+//
+//    auto audioDummy = juce::AudioSampleBuffer();
+//    processBlock(audioDummy, buffer);
+//}
 
 Everytone::Options MultimapperAudioProcessor::options() const
 {
     return Everytone::Options
     {
-        tuningController.getMappingMode(),
-        tuningController.getMappingType(),
+        tunerController.getMappingMode(),
+        tunerController.getMappingType(),
         voiceController.getChannelMode(),
         Everytone::MpeZone::Lower,
         Everytone::MidiMode::Mono,
         Everytone::VoiceRule::Ignore,
         voiceController.getVoiceLimit(),
-        tuningController.getPitchbendRange()
+        tunerController.getPitchbendRange()
     };
 }
 
-void MultimapperAudioProcessor::loadTuningSource(const Tuning& tuning)
+void MultimapperAudioProcessor::loadTuningSource(const CentsDefinition& tuningDefinition)
 {
-    tuningController.setSourceTuning(&tuning);
-    tuningWatchers.call(&TuningWatcher::tuningSourceChanged, this, tuningController.readTuningSource());
+    tunerController.loadSourceTuning(tuningDefinition);
 }
 
-void MultimapperAudioProcessor::loadTuningTarget(const Tuning& tuning)
+void MultimapperAudioProcessor::loadTuningTarget(const CentsDefinition& tuningDefinition)
 {
-    tuningController.setTargetTuning(&tuning);
-    tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuningController.readTuningTarget());
+    tunerController.loadTargetTuning(tuningDefinition);
 }
 
 void MultimapperAudioProcessor::setTargetTuningRootFrequency(double frequency)
 {
-    auto oldTuning = tuningController.getTuningTarget();
-    auto newTuning = Tuning(*oldTuning.get());
-    newTuning.setRootFrequency(frequency);
-    loadTuningTarget(newTuning);
-    tuningWatchers.call(&TuningWatcher::tuningTargetRootFrequency, this, frequency);
-    //juce::Logger::writeToLog("Loaded new target tuning reference: " + reference.toString());
+    tunerController.setTargetRootFrequency(frequency);
 }
 
-void MultimapperAudioProcessor::loadNoteMapping(const TuningTableMap& map)
+void MultimapperAudioProcessor::setTargetMappingRoot(int rootMidiChannel, int rootMidiNote)
 {
-    tuningController.setNoteMapping(&map);
+
 }
+
+//void MultimapperAudioProcessor::loadNoteMapping(const TuningTableMap& map)
+//{
+//    tunerController.setNoteMapping(&map);
+//}
 
 void MultimapperAudioProcessor::setAutoMappingType(Everytone::MappingType type)
 {
-    tuningController.setMappingType(type);
+    tunerController.setMappingType(type);
 }
 
 void MultimapperAudioProcessor::setMappingMode(Everytone::MappingMode mode)
 {
-    tuningController.setMappingMode(mode);
+    tunerController.setMappingMode(mode);
 }
 
 void MultimapperAudioProcessor::setChannelMode(Everytone::ChannelMode mode)
@@ -410,7 +409,7 @@ void MultimapperAudioProcessor::setVoiceLimit(int voiceLimit)
 
 void MultimapperAudioProcessor::setPitchbendRange(int pitchbendRange)
 {
-    tuningController.setPitchbendRange(pitchbendRange);
+    tunerController.setPitchbendRange(pitchbendRange);
 }
 
 void MultimapperAudioProcessor::setOptions(Everytone::Options optionsIn)

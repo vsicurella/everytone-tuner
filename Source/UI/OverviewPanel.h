@@ -10,12 +10,11 @@
 
 #pragma once
 
-#include "../Tuning.h"
+#include "../tuning/MappedTuning.h"
 #include "../TuningChanger.h"
 #include "../MappingChanger.h"
-#include "../MappedTuningController.h"
 
-class OverviewPanel  : public juce::Component, public TuningChanger, public OptionsChanger
+class OverviewPanel  : public juce::Component, public TuningChanger, public MappingChanger, public OptionsChanger
 {
 public:
     //==============================================================================
@@ -24,7 +23,7 @@ public:
 
 public:
 
-	void setTuningDisplayed(const Tuning* tuning);
+	void setTuningDisplayed(const MappedTuning* tuning);
 
 	void mappingTypeButtonClicked();
 

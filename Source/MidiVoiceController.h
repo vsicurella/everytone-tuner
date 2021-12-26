@@ -10,14 +10,14 @@
 
 #pragma once
 
-#include "MappedTuningController.h"
+#include "TunerController.h"
 #include "MidiVoice.h"
 
 #define MULTIMAPPER_MAX_VOICES 16
 
 class MidiVoiceController
 {
-    MappedTuningController& tuningController;
+    TunerController& tuningController;
 
     juce::OwnedArray<MidiVoice> voices;
 
@@ -49,7 +49,7 @@ private:
 
 public:
 
-    MidiVoiceController(MappedTuningController& tuningController);
+    MidiVoiceController(TunerController& tuningController);
     ~MidiVoiceController();
 
     Everytone::ChannelMode getChannelMode() const { return channelMode; }

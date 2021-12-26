@@ -9,7 +9,7 @@
 #pragma once
 
 #include "TuningChanger.h"
-#include "MappedTuningController.h"
+#include "TunerController.h"
 #include "MidiVoiceController.h"
 
 class MultimapperLog : public juce::Logger
@@ -79,22 +79,25 @@ public:
 
     //==============================================================================
 
-    const Tuning* activeSourceTuning() const { return tuningController.readTuningSource(); }
+    const MappedTuning* currentSource() const { return tunerController.readTuningSource(); }
 
-    const Tuning* activeTargetTuning() const { return tuningController.readTuningTarget(); }
-
-    const TuningTableMap* noteMapping() const { return tuningController.readMapping(); }
+    const MappedTuning* currentTarget() const { return tunerController.readTuningTarget(); }
 
     Everytone::Options options() const;
 
     //==============================================================================
 
-    void loadTuningSource(const Tuning& tuning);
-    void loadTuningTarget(const Tuning& tuning);
+    void addTunerControllerWatcher(TunerController::Watcher* watcher) { tunerController.addWatcher(watcher); }
+    void removeTunerControllerWatcher(TunerController::Watcher* watcher) { tunerController.removeWatcher(watcher); }
+
+    void loadTuningSource(const CentsDefinition& tuningDefinition);
+    void loadTuningTarget(const CentsDefinition& tuningDefinition);
 
     void setTargetTuningRootFrequency(double frequency);
 
-    void loadNoteMapping(const TuningTableMap& map);
+    void setTargetMappingRoot(int rootMidiChannel, int rootMidiNote);
+
+    //void loadNoteMapping(const TuningTableMap& map);
 
     //==============================================================================
 
@@ -119,12 +122,11 @@ private:
 
     void tuneMidiBuffer(juce::MidiBuffer& buffer);
 
-
-    void testMidi();
+    //void testMidi();
 
 private:
 
-    MappedTuningController tuningController;
+    TunerController tunerController;
     MidiVoiceController voiceController;
     
     std::unique_ptr<MultimapperLog> logger;
