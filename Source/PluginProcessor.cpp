@@ -20,8 +20,8 @@
 
 //==============================================================================
 MultimapperAudioProcessor::MultimapperAudioProcessor()
-    : tunerController(),
-      voiceController(tunerController),
+    : /*tunerController(),
+      voiceController(tunerController),*/
 
 #ifndef JucePlugin_PreferredChannelConfigurations
      AudioProcessor (BusesProperties()
@@ -65,6 +65,9 @@ MultimapperAudioProcessor::~MultimapperAudioProcessor()
 {
     juce::Logger::setCurrentLogger(nullptr);
     logger = nullptr;
+
+    voiceController = nullptr;
+    tunerController = nullptr;
 }
 
 //==============================================================================
@@ -221,8 +224,12 @@ void MultimapperAudioProcessor::getStateInformation (juce::MemoryBlock& destData
     //auto sourceNode = tuningToValueTree(*midiBrain->getTuningSource(), Everytone::ID::TuningSource);
     //state.addChild(sourceNode, -1, nullptr);
     
-    auto targetTuning = tunerController.readTuningTarget()->getTuning();
+    auto targetTuning = tunerController->readTuningTarget()->getTuning();
     auto targetNode = tuningToValueTree(targetTuning, Everytone::ID::TuningTarget);
+
+    auto targetMapping = tunerController->readTuningTarget()->getMapping();
+    auto targetMapNode = tuningTableMapToValueTree(*targetMapping);
+    targetNode.addChild(targetMapNode, -1, nullptr);
     state.addChild(targetNode, -1, nullptr);
 
     auto optionsNode = options().toValueTree();
@@ -248,12 +255,24 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     //    loadTuningSource(source);
     //}
 
+    CentsDefinition targetDefinition;
+    std::unique_ptr<TuningTableMap> targetMap;
+
     auto targetTree = state.getChildWithName(Everytone::ID::TuningTarget);
     if (targetTree.isValid())
     {
-        auto target = parseTuningValueTree(targetTree);
-        loadTuningTarget(target);
+        targetDefinition = parseTuningValueTree(targetTree);
+
+        auto targetMap = targetTree.getChildWithName(Everytone::ID::TuningTableMidiMap);
+        //if (targetMap.isValid())
+        //{
+        //    targetMap = std::make_unique<TuningTableMap>(parseTuningTableMapTree(targetMap));
+        //}
     }
+
+    // TODO actually load saved mapping
+    tunerController = std::make_unique<TunerController>(targetDefinition);
+    voiceController = std::make_unique<MidiVoiceController>(*tunerController);
 
     auto optionsTree = state.getChildWithName(Everytone::ID::Options);
     if (optionsTree.isValid())
@@ -292,7 +311,7 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
             if (msg.isNoteOn())
             {
                 // Check if voice already exists??
-                voice = voiceController.addVoice(msg);
+                voice = voiceController->addVoice(msg);
                 if (voice == nullptr)
                     continue;
 
@@ -305,7 +324,7 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
             }
             else
             {
-                voice = voiceController.getVoice(msg);
+                voice = voiceController->getVoice(msg);
                 if (voice == nullptr)
                     continue;
             }
@@ -314,7 +333,7 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
 
             if (msg.isNoteOff())
             {
-                voiceController.removeVoice(voice);
+                voiceController->removeVoice(voice);
             }
         }
 
@@ -346,30 +365,30 @@ Everytone::Options MultimapperAudioProcessor::options() const
 {
     return Everytone::Options
     {
-        tunerController.getMappingMode(),
-        tunerController.getMappingType(),
-        voiceController.getChannelMode(),
+        tunerController->getMappingMode(),
+        tunerController->getMappingType(),
+        voiceController->getChannelMode(),
         Everytone::MpeZone::Lower,
         Everytone::MidiMode::Mono,
         Everytone::VoiceRule::Ignore,
-        voiceController.getVoiceLimit(),
-        tunerController.getPitchbendRange()
+        voiceController->getVoiceLimit(),
+        tunerController->getPitchbendRange()
     };
 }
 
 void MultimapperAudioProcessor::loadTuningSource(const CentsDefinition& tuningDefinition)
 {
-    tunerController.loadSourceTuning(tuningDefinition);
+    tunerController->loadSourceTuning(tuningDefinition);
 }
 
 void MultimapperAudioProcessor::loadTuningTarget(const CentsDefinition& tuningDefinition)
 {
-    tunerController.loadTargetTuning(tuningDefinition);
+    tunerController->loadTargetTuning(tuningDefinition);
 }
 
 void MultimapperAudioProcessor::setTargetTuningRootFrequency(double frequency)
 {
-    tunerController.setTargetRootFrequency(frequency);
+    tunerController->setTargetRootFrequency(frequency);
 }
 
 void MultimapperAudioProcessor::setTargetMappingRoot(int rootMidiChannel, int rootMidiNote)
@@ -379,37 +398,37 @@ void MultimapperAudioProcessor::setTargetMappingRoot(int rootMidiChannel, int ro
 
 //void MultimapperAudioProcessor::loadNoteMapping(const TuningTableMap& map)
 //{
-//    tunerController.setNoteMapping(&map);
+//    tunerController->setNoteMapping(&map);
 //}
 
 void MultimapperAudioProcessor::setAutoMappingType(Everytone::MappingType type)
 {
-    tunerController.setMappingType(type);
+    tunerController->setMappingType(type);
 }
 
 void MultimapperAudioProcessor::setMappingMode(Everytone::MappingMode mode)
 {
-    tunerController.setMappingMode(mode);
+    tunerController->setMappingMode(mode);
 }
 
 void MultimapperAudioProcessor::setChannelMode(Everytone::ChannelMode mode)
 {
-    voiceController.setChannelMode(mode);
+    voiceController->setChannelMode(mode);
 }
 
 void MultimapperAudioProcessor::setMpeZone(Everytone::MpeZone zone)
 {
-    voiceController.setMpeZone(zone);
+    voiceController->setMpeZone(zone);
 }
 
 void MultimapperAudioProcessor::setVoiceLimit(int voiceLimit)
 {
-    voiceController.setVoiceLimit(voiceLimit);
+    voiceController->setVoiceLimit(voiceLimit);
 }
 
 void MultimapperAudioProcessor::setPitchbendRange(int pitchbendRange)
 {
-    tunerController.setPitchbendRange(pitchbendRange);
+    tunerController->setPitchbendRange(pitchbendRange);
 }
 
 void MultimapperAudioProcessor::setOptions(Everytone::Options optionsIn)

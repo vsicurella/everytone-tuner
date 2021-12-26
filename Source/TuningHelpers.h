@@ -77,7 +77,8 @@ static juce::ValueTree tuningTableMapToValueTree(const TuningTableMap& midiMap)
     auto tree = juce::ValueTree(Everytone::ID::TuningTableMidiMap);
    
     auto definition = midiMap.getDefinition();
-
+    
+    tree.setProperty(Everytone::ID::RootMidiChannel,  definition.rootMidiChannel, nullptr);
     tree.setProperty(Everytone::ID::RootMidiNote,     definition.rootMidiNote,            nullptr);
     tree.setProperty(Everytone::ID::RootTuningIndex,  definition.rootTuningIndex,         nullptr);
 

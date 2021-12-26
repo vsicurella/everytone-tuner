@@ -45,6 +45,7 @@ private:
 public:
 
     TunerController();
+    TunerController(CentsDefinition targetTuning, TuningTableMap* targetMapping = nullptr); // Should add source to this
     ~TunerController();
 
     std::shared_ptr<MidiNoteTuner>& getTuner() { return currentTuner; }

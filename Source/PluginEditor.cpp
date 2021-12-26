@@ -19,8 +19,8 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     addAndMakeVisible(*menuBar);
 
     overviewPanel.reset(new OverviewPanel(audioProcessor.options()));
-    addAndMakeVisible(overviewPanel.get());
     overviewPanel->setTuningDisplayed(audioProcessor.currentTarget());
+    addAndMakeVisible(overviewPanel.get());
     overviewPanel->addOptionsWatcher(this);
     
     overviewPanel->addMappingWatcher(this);

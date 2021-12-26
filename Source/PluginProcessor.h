@@ -79,16 +79,16 @@ public:
 
     //==============================================================================
 
-    const MappedTuning* currentSource() const { return tunerController.readTuningSource(); }
+    const MappedTuning* currentSource() const { return tunerController->readTuningSource(); }
 
-    const MappedTuning* currentTarget() const { return tunerController.readTuningTarget(); }
+    const MappedTuning* currentTarget() const { return tunerController->readTuningTarget(); }
 
     Everytone::Options options() const;
 
     //==============================================================================
 
-    void addTunerControllerWatcher(TunerController::Watcher* watcher) { tunerController.addWatcher(watcher); }
-    void removeTunerControllerWatcher(TunerController::Watcher* watcher) { tunerController.removeWatcher(watcher); }
+    void addTunerControllerWatcher(TunerController::Watcher* watcher) { tunerController->addWatcher(watcher); }
+    void removeTunerControllerWatcher(TunerController::Watcher* watcher) { tunerController->removeWatcher(watcher); }
 
     void loadTuningSource(const CentsDefinition& tuningDefinition);
     void loadTuningTarget(const CentsDefinition& tuningDefinition);
@@ -126,8 +126,8 @@ private:
 
 private:
 
-    TunerController tunerController;
-    MidiVoiceController voiceController;
+    std::unique_ptr<TunerController> tunerController;
+    std::unique_ptr<MidiVoiceController> voiceController;
     
     std::unique_ptr<MultimapperLog> logger;
 

@@ -17,6 +17,14 @@ TunerController::TunerController()
     setTunings(standardTuning, standardMapping, standardTuning, standardMapping);
 }
 
+TunerController::TunerController(CentsDefinition targetTuning, TuningTableMap* targetMapping)
+{
+    auto standardTuning = std::make_shared<Tuning>(Tuning::StandardTuning());
+    auto standardMapping = std::make_shared<TuningTableMap>(TuningTableMap::StandardMapping());
+    setSourceTuning(standardTuning, standardMapping, false);
+    loadTargetTuning(targetTuning);
+}
+
 TunerController::~TunerController()
 {
 
