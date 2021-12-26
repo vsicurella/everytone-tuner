@@ -12,17 +12,15 @@
 
 Tuning::Tuning(CentsDefinition definition)
     : tuningSize(definition.intervalCents.size()),
-      rootFrequency(definition.rootFrequency),
-      TuningBase(definition.name, definition.description)
+      TuningBase(definition.rootFrequency, definition.name, definition.description)
 {
 	setupCentsMap(definition.intervalCents);
 }
 
 Tuning::Tuning(const Tuning& tuning)
     : tuningSize(tuning.tuningSize),
-      rootFrequency(tuning.rootFrequency),
       periodCents(tuning.periodCents),
-      TuningBase(tuning.name, tuning.description)
+      TuningBase(tuning.rootFrequency, tuning.name, tuning.description)
 {
     setupCentsMap(tuning.getIntervalCentsTable());
 }
@@ -41,8 +39,8 @@ void Tuning::setupCentsMap(const juce::Array<double>& cents)
         tuningSize,
         tuningShifted.data(),
         periodCents,
-        0,         /* pattern rootIndex */
-        rootIndex, /* tuning index rootIndex */
+        0,                     /* pattern rootIndex */
+        0, /* tuning index rootIndex */
     };
 
     centsMap.reset(new Map<double>(definition));
@@ -61,7 +59,7 @@ void Tuning::setupRootAndTableSize()
     int highestFromRoot = centsMap->closestIndexTo(highestCents);
 
     rootIndex = -lowestFromRoot;
-    lookupTableSize = lowestFromRoot - highestFromRoot;
+    lookupTableSize = highestFromRoot - lowestFromRoot + 1;
 
     //juce::Logger::writeToLog("Best mapping, rootIndex: " + juce::String(lowestToNewRoot) + ", size: " + juce::String(tableSize));
 }

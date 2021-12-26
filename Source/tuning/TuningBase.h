@@ -26,6 +26,9 @@ public:
 	TuningBase(juce::String nameIn = juce::String(), juce::String descriptionIn = juce::String())
 		: name(nameIn), description(descriptionIn) {}
 
+	TuningBase(double rootFrequencyIn, juce::String nameIn = juce::String(), juce::String descriptionIn = juce::String())
+		: rootFrequency(rootFrequencyIn), name(nameIn), description(descriptionIn) {}
+
 	virtual juce::String getName() const { return name; }
 	virtual juce::String getDescription() const { return description; }
 
@@ -36,7 +39,7 @@ public:
 	virtual void setName(juce::String nameIn) { name = nameIn; };
 	virtual void setDescription(juce::String descIn) { description = descIn; }
 
-	virtual void setRootFrequency(double frequqency) = 0;
+	virtual void setRootFrequency(double frequency) = 0;
 
 	virtual double centsAt(int index) const = 0;
 	virtual double centsFromRoot(int steps) const { return centsAt(steps - rootIndex); }

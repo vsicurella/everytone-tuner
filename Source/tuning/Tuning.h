@@ -20,7 +20,6 @@ class Tuning : public TuningBase
 {
 	// Parameters	
 	juce::Array<double> centsTable;
-	double rootFrequency;
 
 	int lookupTableSize;
 
