@@ -19,13 +19,21 @@ class MappedTuning : public TuningBase
     std::shared_ptr<Tuning> tuning;
     std::shared_ptr<TuningTableMap> mapping;
 
+public:
+
+    struct Root
+    {
+        int midiChannel = 1;
+        int midiNote = 69;
+        double frequency = 440.0;
+    };
+
 private:
 
     int midiIndex(int note, int channelIndex) { return 128 * channelIndex + note; }
 
 public:
     
-    MappedTuning();
     MappedTuning(std::shared_ptr<Tuning> tuning, std::shared_ptr<TuningTableMap> mapping);
     MappedTuning(const MappedTuning& mappedTuning);
     ~MappedTuning();
@@ -52,6 +60,17 @@ public:
     std::shared_ptr<Tuning> shareTuning() const { return tuning; }
 
     std::shared_ptr<TuningTableMap> shareMapping() const { return mapping; }
+
+    MappedTuning::Root getRoot() const
+    {
+        MappedTuning::Root root =
+        {
+            mapping->getRootMidiChannel(),
+            mapping->getRootMidiNote(),
+            tuning->getRootFrequency()
+        };
+        return root;
+    }
 
 
     virtual int tuningIndexAt(int midiNote, int midiChannel) const;

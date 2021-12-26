@@ -37,7 +37,6 @@ class Tuning : public TuningBase
 
 	double periodCents;
 	double periodRatio;
-	//double periodMts;
 
 	double rootMts;
 
@@ -53,34 +52,6 @@ private:
 	void setupRootAndTableSize();
 
 	void rebuildTables();
-
-public:
-
-	//struct Reference
-	//{
-	//	int rootMidiNote = 60;
-	//	int rootMidiChannel = 1;
-	//	double rootFrequency = 261.6255653;
-
-	//	bool operator==(const Reference& reference)
-	//	{
-	//		return rootMidiNote == reference.rootMidiNote
-	//			&& rootMidiChannel == reference.rootMidiChannel
-	//			&& rootFrequency == reference.rootFrequency;
-	//	}
-
- //       juce::String toString() const 
- //       {
- //           juce::StringArray arr =
- //           {
- //               "note: " + juce::String(rootMidiNote),
- //               "channel: " + juce::String(rootMidiChannel),
- //               "frequency: " + juce::String(rootFrequency)
- //           };
- //           
- //           return "{ " + arr.joinIntoString(", ") + " }";
- //       }
-	//};
 
 public:
 

@@ -12,9 +12,8 @@
 
 #include "../tuning/MappedTuning.h"
 #include "../TuningChanger.h"
-#include "../MappingChanger.h"
 
-class OverviewPanel  : public juce::Component, public TuningChanger, public MappingChanger, public OptionsChanger
+class OverviewPanel  : public juce::Component, public TuningChanger, public OptionsChanger
 {
 public:
     //==============================================================================
@@ -33,11 +32,6 @@ public:
 
     void paint (juce::Graphics& g) override;
     void resized() override;
-
-	//==============================================================================
-	// TuningWatcher implementation
-
-	//void tuningChanged(TuningChanger* changer, Tuning* tuning) override;
 
 private:
 

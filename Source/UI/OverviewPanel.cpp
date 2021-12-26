@@ -277,7 +277,7 @@ void OverviewPanel::mappingTypeButtonClicked()
 
 void OverviewPanel::tuningReferenceEdited()
 {
-	TuningTableMap::Root newRoot;
+	MappedTuning::Root newRoot;
 
 	auto channelInput = rootMidiChannelBox->getText().trim();
 	int channelValue = -1;
@@ -309,14 +309,12 @@ void OverviewPanel::tuningReferenceEdited()
 	if (freqInput.endsWith("hz"))
 		freqInput = freqInput.substring(0, freqInput.length() - 3).trim();
 
-	double newRootFrequency = 440;
-
 	double freqValue = -1;
 	if (freqInput.containsOnly("0123456789."))
 	{
 		freqValue = freqInput.getDoubleValue();
 		if (freqValue >= 8.0 && freqValue < 14000.0)
-			newRootFrequency = freqValue;
+			newRoot.frequency = freqValue;
 
 		rootFrequencyBox->setText(freqInput + " hz", juce::NotificationType::dontSendNotification);
 	}
@@ -325,8 +323,7 @@ void OverviewPanel::tuningReferenceEdited()
 		rootFrequencyBox->setText(rootFrequencyBackup, juce::NotificationType::dontSendNotification);
 	}
 
-	tuningWatchers.call(&TuningWatcher::targetRootFrequencyChanged, this, newRootFrequency);
-	mappingWatchers.call(&MappingWatcher::targetMappingRootChanged, newRoot);
+	tuningWatchers.call(&TuningWatcher::targetMappedTuningRootChanged, this, newRoot);
 }
 
 void OverviewPanel::setPitchbendRangeText(int pitchbendRange)

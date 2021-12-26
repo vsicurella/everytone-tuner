@@ -28,8 +28,8 @@ struct MidiPitch
 
 class MidiNoteTuner
 {
-	const std::unique_ptr<MappedTuning> sourceTuning;
-	const std::unique_ptr<MappedTuning> targetTuning;
+	const std::shared_ptr<MappedTuning> sourceTuning;
+	const std::shared_ptr<MappedTuning> targetTuning;
 
 	int pitchbendRange; // total bipolar range of pitchbend in semitones
 
@@ -43,7 +43,7 @@ public:
 		          std::shared_ptr<Tuning> targetTuning, 
 		          std::shared_ptr<TuningTableMap> targetMapping,
 				  int pitchbendRange = 4);
-	MidiNoteTuner(const MappedTuning& mappedSource, const MappedTuning& mappedTarget, int pitchbendRange = 4);
+	MidiNoteTuner(const std::shared_ptr<MappedTuning>& mappedSource, const std::shared_ptr<MappedTuning>& mappedTarget, int pitchbendRange = 4);
     ~MidiNoteTuner();
 
 	const Tuning* tuningSource() const { return sourceTuning->getTuning(); }

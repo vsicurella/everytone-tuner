@@ -69,7 +69,7 @@ public:
         The root MIDI Channel & Note marks 0 periods, and will output the rootTuningIndex parameter.
         The rootTuningIndex is automatically set if it's argument is out of bounds, which is default.
     */
-    static TuningTableMap::Definition PeriodicMappingDefinition(int period, int rootMidiNote, int rootMidiChannel = 1, int rootTuningIndex = -1)
+    static TuningTableMap::Definition PeriodicMappingDefinition(int period, int rootMidiChannel, int rootMidiNote, int rootTuningIndex = -1)
     {
         // Multichannel MIDI Note index from 0 through 2047
         int rootMidiNoteIndex = (rootMidiChannel - 1) * 128 + rootMidiNote;

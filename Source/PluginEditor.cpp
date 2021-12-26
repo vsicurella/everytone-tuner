@@ -21,9 +21,10 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     overviewPanel.reset(new OverviewPanel(audioProcessor.options()));
     overviewPanel->setTuningDisplayed(audioProcessor.currentTarget());
     addAndMakeVisible(overviewPanel.get());
+
+    overviewPanel->addTuningWatcher(this);
     overviewPanel->addOptionsWatcher(this);
     
-    overviewPanel->addMappingWatcher(this);
     audioProcessor.addTunerControllerWatcher(this);
 
     contentComponent = overviewPanel.get();
@@ -80,16 +81,15 @@ void MultimapperAudioProcessorEditor::resized()
 
 }
 
-void MultimapperAudioProcessorEditor::sourceTuningChanged(const MappedTuning& source)
+void MultimapperAudioProcessorEditor::sourceTuningChanged(const std::shared_ptr<MappedTuning>& source)
 {
 
 }
 
-void MultimapperAudioProcessorEditor::targetTuningChanged(const MappedTuning& target)
+void MultimapperAudioProcessorEditor::targetTuningChanged(const std::shared_ptr<MappedTuning>& target)
 {
-    overviewPanel->setTuningDisplayed(&target);
+    overviewPanel->setTuningDisplayed(target.get());
 }
-
 
 void MultimapperAudioProcessorEditor::targetDefinitionLoaded(TuningChanger* changer, CentsDefinition definition)
 {
@@ -106,14 +106,14 @@ void MultimapperAudioProcessorEditor::targetRootFrequencyChanged(TuningChanger* 
     audioProcessor.setTargetTuningRootFrequency(frequency);
 }
 
+void MultimapperAudioProcessorEditor::targetMappedTuningRootChanged(TuningChanger* changer, MappedTuning::Root root)
+{
+    audioProcessor.setTargetMappedTuningRoot(root);
+}
+
 void MultimapperAudioProcessorEditor::mappingTypeChanged(Everytone::MappingType type)
 {
     audioProcessor.setAutoMappingType(type);
-}
-
-void MultimapperAudioProcessorEditor::targetMappingRootChanged(TuningTableMap::Root root)
-{
-    audioProcessor.setTargetMappingRoot(root);
 }
 
 void MultimapperAudioProcessorEditor::mappingModeChanged(Everytone::MappingMode mode)

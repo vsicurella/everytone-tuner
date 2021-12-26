@@ -10,17 +10,16 @@
 
 #include "MappedTuning.h"
 
-MappedTuning::MappedTuning()
-    : tuning(std::make_shared<Tuning>()), 
-      mapping(std::make_shared<TuningTableMap>(TuningTableMap::StandardMappingDefinition())) {}
-
 MappedTuning::MappedTuning(std::shared_ptr<Tuning> tuningIn, std::shared_ptr<TuningTableMap> mappingIn)
     : tuning(tuningIn),
-      mapping(mappingIn) {}
+      mapping(mappingIn),
+      TuningBase(tuningIn->getRootIndex(), tuningIn->getRootFrequency(), tuningIn->getName(), tuningIn->getDescription()) {}
+
 
 MappedTuning::MappedTuning(const MappedTuning& mappedTuning)
     : tuning(mappedTuning.shareTuning()),
-      mapping(mappedTuning.shareMapping()) {}
+      mapping(mappedTuning.shareMapping()),
+      TuningBase(mappedTuning.getTuning()->getRootIndex(), mappedTuning.getTuning()->getRootFrequency(), mappedTuning.getTuning()->getName(), mappedTuning.getTuning()->getDescription()) {}
 
 MappedTuning::~MappedTuning()
 {

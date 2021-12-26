@@ -25,7 +25,6 @@ class MultimapperAudioProcessorEditor  : public juce::AudioProcessorEditor,
                                          public TunerController::Watcher,
                                          public TuningWatcher,
                                          public TuningChanger,
-                                          public MappingWatcher,
                                          public OptionsWatcher
 {
 public:
@@ -39,9 +38,9 @@ public:
     //==============================================================================
     // TunerController::Watcher implementation
 
-    void sourceTuningChanged(const MappedTuning& source) override;
+    void sourceTuningChanged(const std::shared_ptr<MappedTuning>& source) override;
 
-    void targetTuningChanged(const MappedTuning& target) override;
+    void targetTuningChanged(const std::shared_ptr<MappedTuning>& target) override;
 
 
     //==============================================================================
@@ -53,11 +52,7 @@ public:
 
     void targetRootFrequencyChanged(TuningChanger* changer, double frequency) override;
 
-    //==============================================================================
-    // MappingWatcher implementation
-
-    //void sourceMappingRootChanged(TuningTableMap::Root root) override;
-    void targetMappingRootChanged(TuningTableMap::Root root) override;
+    void targetMappedTuningRootChanged(TuningChanger* changer, MappedTuning::Root root) override;
 
     //==============================================================================
     // OptionsWatcher implementation

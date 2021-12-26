@@ -94,8 +94,8 @@ public:
     void loadTuningTarget(const CentsDefinition& tuningDefinition);
 
     void setTargetTuningRootFrequency(double frequency);
-
     void setTargetMappingRoot(TuningTableMap::Root root);
+    void setTargetMappedTuningRoot(MappedTuning::Root root);
 
     //void loadNoteMapping(const TuningTableMap& map);
 

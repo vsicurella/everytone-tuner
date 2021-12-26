@@ -23,8 +23,8 @@ public:
     class Watcher
     {
     public:
-        virtual void sourceTuningChanged(const MappedTuning& source) {}
-        virtual void targetTuningChanged(const MappedTuning& target) {}
+        virtual void sourceTuningChanged(const std::shared_ptr<MappedTuning>& source) {}
+        virtual void targetTuningChanged(const std::shared_ptr<MappedTuning>& target) {}
     };
 
 private:
@@ -32,8 +32,8 @@ private:
     TuningTableMap::Root sourceMapRoot;
     TuningTableMap::Root targetMapRoot;
 
-    MappedTuning currentTuningSource;
-    MappedTuning currentTuningTarget;
+    std::shared_ptr<MappedTuning> currentTuningSource;
+    std::shared_ptr<MappedTuning> currentTuningTarget;
 
     std::shared_ptr<MidiNoteTuner> currentTuner;
 
@@ -63,8 +63,8 @@ public:
     TuningTableMap::Root getSourceMapRoot() const { return sourceMapRoot; }
     TuningTableMap::Root getTargetMapRoot() const { return targetMapRoot; }
 
-    const MappedTuning* readTuningSource() const { return &currentTuningSource; }
-    const MappedTuning* readTuningTarget() const { return &currentTuningTarget; }
+    const MappedTuning* readTuningSource() const { return currentTuningSource.get(); }
+    const MappedTuning* readTuningTarget() const { return currentTuningTarget.get(); }
 
     Everytone::MappingMode getMappingMode() const { return mappingMode; }
     Everytone::MappingType getMappingType() const { return mappingType; }
@@ -91,6 +91,9 @@ public:
 
     void setSourceMapRoot(TuningTableMap::Root root);
     void setTargetMapRoot(TuningTableMap::Root root);
+
+    void setSourceMappedTuningRoot(MappedTuning::Root root);
+    void setTargetMappedTuningRoot(MappedTuning::Root root);
 
     void loadTunings(const CentsDefinition& sourceTuningDefinition, const CentsDefinition& targetTuningDefinition);
     //void setTunings(const CentsDefinition& sourceTuningDefinition, const CentsDefinition& targetTuningDefinition,

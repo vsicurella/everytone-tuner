@@ -89,8 +89,6 @@
       <FILE id="QKYQ2p" name="TunerController.cpp" compile="1" resource="0"
             file="Source/TunerController.cpp"/>
       <FILE id="HhASYm" name="TuningChanger.h" compile="0" resource="0" file="Source/TuningChanger.h"/>
-      <FILE id="oYq05H" name="MappingChanger.h" compile="0" resource="0"
-            file="Source/MappingChanger.h"/>
       <FILE id="wyXPRk" name="LogWindow.h" compile="0" resource="0" file="Source/LogWindow.h"/>
       <FILE id="lloha5" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>

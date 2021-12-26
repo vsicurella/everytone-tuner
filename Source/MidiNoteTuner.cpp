@@ -21,9 +21,9 @@ MidiNoteTuner::MidiNoteTuner(
       targetTuning(std::make_unique<MappedTuning>(targetTuningIn, targetMappingIn)), 
       pitchbendRange(pitchbendRangeIn) {}
 
-MidiNoteTuner::MidiNoteTuner(const MappedTuning& mappedSource, const MappedTuning& mappedTarget, int pitchbendRangeIn)
-	: sourceTuning(std::make_unique<MappedTuning>(mappedSource)),
-	  targetTuning(std::make_unique<MappedTuning>(mappedTarget)),
+MidiNoteTuner::MidiNoteTuner(const std::shared_ptr<MappedTuning>& mappedSource, const std::shared_ptr<MappedTuning>& mappedTarget, int pitchbendRangeIn)
+	: sourceTuning(mappedSource),
+	  targetTuning(mappedTarget),
 	  pitchbendRange(pitchbendRangeIn) {}
 
 MidiNoteTuner::~MidiNoteTuner() {}

@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    TuningBroadcaster.h
+    TuningChanger.h
     Created: 9 Dec 2021 8:55:10pm
     Author:  Vincenzo
 
@@ -10,9 +10,8 @@
     
 #pragma once
 
-#include <JuceHeader.h>
-#include "./tuning/Tuning.h"
-#include "./mapping/TuningTableMap.h"
+#include "./tuning/MappedTuning.h"
+#include "./Common.h"
 
 class TuningChanger;
 
@@ -31,6 +30,15 @@ public:
     // Used when only the tuning's root frequency changes - mapping stays the same in either Auto or Manual mode
     virtual void sourceRootFrequencyChanged(TuningChanger* changer, double frequency) {}
     virtual void targetRootFrequencyChanged(TuningChanger* changer, double frequency) {}
+
+    // Used when only the TuningTableMap midi root changes
+    virtual void sourceMappingRootChanged(TuningChanger* changer, TuningTableMap::Root root) {};
+    virtual void targetMappingRootChanged(TuningChanger* changer, TuningTableMap::Root root) {};
+
+    // Used to update all references
+    virtual void sourceMappedTuningRootChanged(TuningChanger* changer, MappedTuning::Root root) {};
+    virtual void targetMappedTuningRootChanged(TuningChanger* changer, MappedTuning::Root root) {};
+
 };
 
 class TuningChanger
