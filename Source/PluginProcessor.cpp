@@ -20,8 +20,8 @@
 
 //==============================================================================
 MultimapperAudioProcessor::MultimapperAudioProcessor()
-    : /*tunerController(),
-      voiceController(tunerController),*/
+    : tunerController(std::make_unique<TunerController>()),
+      voiceController(std::make_unique<MidiVoiceController>(*tunerController)),
 
 #ifndef JucePlugin_PreferredChannelConfigurations
      AudioProcessor (BusesProperties()
@@ -224,14 +224,18 @@ void MultimapperAudioProcessor::getStateInformation (juce::MemoryBlock& destData
     //auto sourceNode = tuningToValueTree(*midiBrain->getTuningSource(), Everytone::ID::TuningSource);
     //state.addChild(sourceNode, -1, nullptr);
     
-    auto targetNode = mappedTuningToValueTree(tunerController->readTuningTarget(), Everytone::ID::TuningTarget);
-    state.addChild(targetNode, 0, nullptr);
+    // Some hosts call this on initialization
+    if (tunerController.get() != nullptr && voiceController.get() != nullptr)
+    {
+        auto targetNode = mappedTuningToValueTree(tunerController->readTuningTarget(), Everytone::ID::TuningTarget);
+        state.addChild(targetNode, 0, nullptr);
 
-    auto optionsNode = options().toValueTree();
-    state.addChild(optionsNode, -1, nullptr);
+        auto optionsNode = options().toValueTree();
+        state.addChild(optionsNode, -1, nullptr);
 
-    juce::MemoryOutputStream stream(destData, false);
-    state.writeToStream(stream);
+        juce::MemoryOutputStream stream(destData, false);
+        state.writeToStream(stream);
+    }
 }
 
 void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -274,11 +278,8 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
         options = Everytone::Options::fromValueTree(optionsTree);
     }
 
-    tunerController = std::make_unique<TunerController>(sourceTuningDefinition, sourceMapDefinition, 
-                                                        targetTuningDefinition, targetMapDefinition, 
-                                                        options.mappingMode, options.mappingType);
-
-    voiceController = std::make_unique<MidiVoiceController>(*tunerController);
+    tunerController->loadTunings(sourceTuningDefinition, sourceMapDefinition, targetTuningDefinition, targetMapDefinition);
+    setOptions(options);
 }
 
 //==============================================================================

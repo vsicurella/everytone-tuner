@@ -46,7 +46,7 @@ private:
 
 public:
 
-    TunerController(Everytone::MappingMode mappingMode, Everytone::MappingType mappingType=Everytone::MappingType::Linear);
+    TunerController(Everytone::MappingMode mappingMode=Everytone::MappingMode::Auto, Everytone::MappingType mappingType=Everytone::MappingType::Linear);
 
     TunerController(CentsDefinition sourceTuning, TuningTableMap::Root sourceMapRootIn, 
                     CentsDefinition targetTuning, TuningTableMap::Root targetMapRootIn,
@@ -96,8 +96,8 @@ public:
     void setTargetMappedTuningRoot(MappedTuning::Root root);
 
     void loadTunings(const CentsDefinition& sourceTuningDefinition, const CentsDefinition& targetTuningDefinition);
-    //void setTunings(const CentsDefinition& sourceTuningDefinition, const CentsDefinition& targetTuningDefinition,
-    //                const TuningTableMap::Definition& sourceMapDefinition, const TuningTableMap::Definition& targetMapDefinition);
+    void loadTunings(const CentsDefinition& sourceTuningDefinition, const TuningTableMap::Definition& sourceMapDefinition,
+                     const CentsDefinition& targetTuningDefinition, const TuningTableMap::Definition& targetMapDefinition);
 
     void setMappingMode(Everytone::MappingMode mode);
     void setMappingType(Everytone::MappingType type);

@@ -10,8 +10,14 @@
 
 #include "MidiVoiceController.h"
 
-MidiVoiceController::MidiVoiceController(TunerController& tuningControllerIn)
-    : tuningController(tuningControllerIn)
+MidiVoiceController::MidiVoiceController(TunerController& tuningControllerIn, 
+                                         Everytone::ChannelMode channelModeIn,
+                                         Everytone::MpeZone zoneIn,
+                                         int limitIn)
+    : tuningController(tuningControllerIn),
+      channelMode(channelModeIn),
+      mpeZone(zoneIn),
+      voiceLimit(limitIn)
 {
     for (int i = 0; i < MULTIMAPPER_MAX_VOICES; i++)
         voices.add(new MidiVoice());

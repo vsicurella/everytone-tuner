@@ -160,6 +160,18 @@ void TunerController::loadTunings(const CentsDefinition& sourceTuningDefinition,
                newTargetTuning, mapForTuning(newTargetTuning.get(), true));
 }
 
+void TunerController::loadTunings(const CentsDefinition& sourceTuningDefinition, const TuningTableMap::Definition& sourceMapDefinition,
+                                  const CentsDefinition& targetTuningDefinition, const TuningTableMap::Definition& targetMapDefinition)
+{
+    auto newSourceTuning = std::make_shared<Tuning>(sourceTuningDefinition);
+    auto newSourceMapping = std::make_shared<TuningTableMap>(sourceMapDefinition);
+
+    auto newTargetTuning = std::make_shared<Tuning>(targetTuningDefinition);
+    auto newTargetMapping = std::make_shared<TuningTableMap>(targetMapDefinition);
+
+    setTunings(newSourceTuning, newSourceMapping, newTargetTuning, newTargetMapping);
+}
+
 void TunerController::updateCurrentTuner()
 {
     currentTuner = std::make_shared<MidiNoteTuner>(currentTuningSource, currentTuningTarget, pitchbendRange);
@@ -172,8 +184,12 @@ void TunerController::setMappingMode(Everytone::MappingMode mode)
 
 void TunerController::setMappingType(Everytone::MappingType type)
 {
-    mappingType = type;
-    mappingTypeChanged();
+    bool typeChanged = mappingType != type;
+    if (typeChanged)
+    {
+        mappingType = type;
+        mappingTypeChanged();
+    }
 }
 
 void TunerController::setPitchbendRange(int pitchbendRangeIn)

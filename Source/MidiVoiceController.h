@@ -49,7 +49,10 @@ private:
 
 public:
 
-    MidiVoiceController(TunerController& tuningController);
+    MidiVoiceController(TunerController& tuningController, 
+                        Everytone::ChannelMode channelmodeIn = Everytone::ChannelMode::FirstAvailable,
+                        Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower,
+                        int voiceLimit = MULTIMAPPER_MAX_VOICES);
     ~MidiVoiceController();
 
     Everytone::ChannelMode getChannelMode() const { return channelMode; }
