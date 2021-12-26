@@ -138,9 +138,13 @@ public:
 
 public:
 
-	static Tuning StandardTuning()
+	static CentsDefinition StandardTuningDefinition()
 	{
-		auto definition = CentsDefinition::CentsDivisions(12);
-		return Tuning(definition);
+		return CentsDefinition::CentsDivisions(12);
+	}
+
+	static std::unique_ptr<Tuning> StandardTuning()
+	{
+		return std::make_unique<Tuning>(StandardTuningDefinition());
 	}
 };

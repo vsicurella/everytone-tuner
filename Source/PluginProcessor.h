@@ -95,7 +95,7 @@ public:
 
     void setTargetTuningRootFrequency(double frequency);
 
-    void setTargetMappingRoot(int rootMidiChannel, int rootMidiNote);
+    void setTargetMappingRoot(TuningTableMap::Root root);
 
     //void loadNoteMapping(const TuningTableMap& map);
 

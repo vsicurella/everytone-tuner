@@ -29,24 +29,28 @@ class TuningTableMap
 {
 public:
 
+    struct Root
+    {
+        int midiChannel = 1;
+        int midiNote = 60;
+    };
+
     // Constructor parameters for TuningTableMap
     // input: rootMidiNote, output: rootTuningIndex
     struct Definition
     {
-        int rootMidiChannel = 1;
-        int rootMidiNote = 60;
-        int rootTuningIndex = 60;
-        Map<int>* map;
+        Root root;
+        Map<int> map;
     };
 
 protected:
 
-    // MIDI Channel and Note combine to align with tuning table root
+    // MIDI Channel and Note combine to set the mapping root
     int rootMidiChannel;
     int rootMidiNote;
 
     // Tuning table index to align with map root
-    int rootTuningIndex;
+    //int tuningRootIndex;
 
     // MIDI Note to Tuning Table index map
     std::unique_ptr<Map<int>> map;
@@ -88,7 +92,9 @@ public:
 
     //int periodsAt(int channel, int note);
 
-    TuningTableMap::Definition getDefinition() const;
+    Root getRoot() const;
+
+    Definition getDefinition() const;
 
 public:
 
@@ -96,7 +102,7 @@ public:
     /// Returns a 1:1 MIDI note to tuning table index mapping that repeats every 128 notes
     /// </summary>
     /// <returns></returns>
-    static TuningTableMap StandardMapping()
+    static TuningTableMap::Definition StandardMappingDefinition()
     {
         Map<int>::FunctionDefinition mapDefinition =
         {
@@ -107,13 +113,11 @@ public:
             0
         };
 
-        auto map = Map<int>(mapDefinition);
-
-        TuningTableMap::Definition definition;
-        definition.map = &map;
-
-        auto tuningTableMap = TuningTableMap(definition);
-        return tuningTableMap;
+        return TuningTableMap::Definition
+        {
+            TuningTableMap::Root { 1, 69 },
+            Map<int>(mapDefinition)
+        };
     }
 
     /*
@@ -121,22 +125,22 @@ public:
     The root MIDI Channel & Note marks 0 periods, and will output the rootTuningIndex parameter.
     The rootTuningIndex is automatically set if it's argument is out of bounds, which is default.
     */
-    static TuningTableMap CreateLinearMidiMapping(int rootMidiNote, int rootMidiChannel = 1, int rootTuningIndex = -1)
+    static TuningTableMap::Definition LinearMappingDefinition(int rootMidiChannel, int rootMidiNote, int tuningRootIndex)
     {
         int midiIndex = mod((rootMidiChannel - 1) * 128 + rootMidiNote, 2048);
-        if (rootTuningIndex < 0)
-            rootTuningIndex = midiIndex;
 
         auto mapFunction = Map<int>::FunctionDefinition
         {
             2048,
             0,
-            [&](int x) { return mod(x - midiIndex + rootTuningIndex, 2048); },
+            [&](int x) { return mod(x - midiIndex + tuningRootIndex, 2048); },
             0
         };
-        auto linearMap = Map<int>(mapFunction);
-        TuningTableMap::Definition definition { rootMidiChannel, rootMidiNote, rootTuningIndex, &linearMap };
 
-        return TuningTableMap(definition);
+        return TuningTableMap::Definition
+        {
+            TuningTableMap::Root { rootMidiChannel, rootMidiNote },
+            Map<int>(mapFunction)
+        };
     }
 };

@@ -3,7 +3,7 @@
 
     Map.h
     Created: 7 Nov 2021 10:34:41am
-    Author:  soundtoys
+    Author:  Vincenzo Sicurella
 
   ==============================================================================
 */
@@ -14,16 +14,11 @@
 // Multichannel map
 class MultichannelMap : public TuningTableMap
 {
-    int numMaps = 0;
-
     // Maps per channel of MultichannelMap
     std::vector<Map<int>> maps;
 
     // The multimap index that considered the root map
     int multimapRootIndex = 0;
-
-    // The MIDI channel associated with the root MIDI note & map root
-    int rootMidiChannel = 1;
 
     // A lookup table by [midiChannel][midiNote]
     int** lookup;
@@ -32,17 +27,11 @@ public:
 
     struct Definition
     {
-        int rootTuningIndex = 60;
-        int rootMidiNote = 60;
-        int rootMidiChannel = 1;
-
-        int numMaps = 0;
-        const std::vector<Map<int>>& maps;
+        TuningTableMap::Root root;
+        std::vector<Map<int>> maps;
     };
 
 private:
-
-    static TuningTableMap::Definition initializePattern(Definition definition);
 
     static Map<int> buildMultimap(Definition definition);
 
@@ -60,12 +49,27 @@ public:
 
 public:
 
+    static TuningTableMap::Definition DefineTuningTableMap(Definition definition)
+    {
+        return TuningTableMap::Definition
+        {
+            TuningTableMap::Root { definition.root.midiChannel, definition.root.midiNote },
+            buildMultimap(definition)
+        };
+    }
+
+    static std::unique_ptr<TuningTableMap> CreateTuningTableMap(Definition definition)
+    {
+        auto d = DefineTuningTableMap(definition);
+        return std::make_unique<TuningTableMap>(d);
+    }
+
     /*
         Creates a MultichannelMap that have linear maps that are offset by a period from each other.
         The root MIDI Channel & Note marks 0 periods, and will output the rootTuningIndex parameter.
         The rootTuningIndex is automatically set if it's argument is out of bounds, which is default.
     */
-    static MultichannelMap CreatePeriodicMapping(int period, int rootMidiNote, int rootMidiChannel = 1, int rootTuningIndex = -1)
+    static TuningTableMap::Definition PeriodicMappingDefinition(int period, int rootMidiNote, int rootMidiChannel = 1, int rootTuningIndex = -1)
     {
         // Multichannel MIDI Note index from 0 through 2047
         int rootMidiNoteIndex = (rootMidiChannel - 1) * 128 + rootMidiNote;
@@ -97,14 +101,10 @@ public:
 
         MultichannelMap::Definition d =
         {
-            rootTuningIndex,    /* rootTuningIndex */
-            rootMidiNote,       /* rootMidiNote */
-            rootMidiChannel,    /* rootMidiChannel */
-            16,                 /* numMaps */
+            TuningTableMap::Root { rootMidiChannel, rootMidiNote },
             maps                /* maps */
         };
 
-        MultichannelMap multichannelMap = MultichannelMap(d);
-        return multichannelMap;
+        return DefineTuningTableMap(d);
     }
 };

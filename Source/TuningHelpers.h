@@ -72,29 +72,26 @@ static CentsDefinition parseTuningValueTree(juce::ValueTree tree)
     return definition;
 }
 
-static juce::ValueTree tuningTableMapToValueTree(const TuningTableMap& midiMap)
+static juce::ValueTree tuningTableMapToValueTree(const TuningTableMap* midiMap, juce::Identifier name = Everytone::ID::TuningTableMidiMap)
 {
-    auto tree = juce::ValueTree(Everytone::ID::TuningTableMidiMap);
-   
-    auto definition = midiMap.getDefinition();
+    auto tree = juce::ValueTree(name);
+    auto definition = midiMap->getDefinition();
     
-    tree.setProperty(Everytone::ID::RootMidiChannel,  definition.rootMidiChannel, nullptr);
-    tree.setProperty(Everytone::ID::RootMidiNote,     definition.rootMidiNote,            nullptr);
-    tree.setProperty(Everytone::ID::RootTuningIndex,  definition.rootTuningIndex,         nullptr);
+    tree.setProperty(Everytone::ID::RootMidiChannel,  definition.root.midiChannel,      nullptr);
+    tree.setProperty(Everytone::ID::RootMidiNote,     definition.root.midiNote,         nullptr);
+    tree.setProperty(Everytone::ID::Period,           definition.map.base(),           nullptr);
+    tree.setProperty(Everytone::ID::PatternRoot,      definition.map.patternRoot(),    nullptr);
+    tree.setProperty(Everytone::ID::MapRoot,          definition.map.mapRoot(),        nullptr);
+    tree.setProperty(Everytone::ID::Transpose,        definition.map.transposition(),  nullptr);
 
-    tree.setProperty(Everytone::ID::Period,           definition.map->base(),             nullptr);
-    tree.setProperty(Everytone::ID::PatternRoot,      definition.map->patternRoot(),      nullptr);
-    tree.setProperty(Everytone::ID::MapRoot,          definition.map->mapRoot(),          nullptr);
-    tree.setProperty(Everytone::ID::Transpose,        definition.map->transposition(),    nullptr);
-
-    auto pattern = arrayToValueTree(definition.map->pattern(), Everytone::ID::Pattern, Everytone::ID::Pattern);
+    auto pattern = arrayToValueTree(definition.map.pattern(), Everytone::ID::Pattern, Everytone::ID::Pattern);
 
     tree.addChild(pattern, -1, nullptr);
 
     return tree;
 }
 
-static TuningTableMap parseTuningTableMapTree(juce::ValueTree tree)
+static TuningTableMap::Definition parseTuningTableMapTree(juce::ValueTree tree)
 {
     auto patternNode = tree.getChildWithName(Everytone::ID::Pattern);
     const int mapSize = patternNode.getNumChildren();
@@ -120,20 +117,27 @@ static TuningTableMap parseTuningTableMapTree(juce::ValueTree tree)
         transpose
     };
 
-    auto map = Map<int>(mapDefinition);
-
-    int rootMidiChannel = tree.getProperty(Everytone::ID::RootMidiChannel);
-    int rootMidiNote = tree.getProperty(Everytone::ID::RootMidiNote);
-    int rootTuningIndex = tree.getProperty(Everytone::ID::RootTuningIndex);
-
     TuningTableMap::Definition definition
     {
-        rootMidiChannel,
-        rootMidiNote,
-        rootTuningIndex,
-        &map
+        TuningTableMap::Root 
+        {
+            (int)tree.getProperty(Everytone::ID::RootMidiChannel),
+            (int)tree.getProperty(Everytone::ID::RootMidiNote)
+        },
+
+        Map<int>(mapDefinition)
     };
 
-    auto tuningTableMap = TuningTableMap(definition);
-    return tuningTableMap;
+    return definition;
+}
+
+static juce::ValueTree mappedTuningToValueTree(const MappedTuning* mappedTuning, juce::Identifier name)
+{
+    auto tuningTree = tuningToValueTree(mappedTuning->getTuning());
+    auto mappingTree = tuningTableMapToValueTree(mappedTuning->getMapping());
+
+    auto tree = juce::ValueTree(name);
+    tree.addChild(tuningTree, 0, nullptr);
+    tree.addChild(mappingTree, 1, nullptr);
+    return tree;
 }

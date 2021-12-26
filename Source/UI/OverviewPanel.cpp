@@ -277,7 +277,7 @@ void OverviewPanel::mappingTypeButtonClicked()
 
 void OverviewPanel::tuningReferenceEdited()
 {
-	int newRootMidiChannel = 1;
+	TuningTableMap::Root newRoot;
 
 	auto channelInput = rootMidiChannelBox->getText().trim();
 	int channelValue = -1;
@@ -285,14 +285,12 @@ void OverviewPanel::tuningReferenceEdited()
 	{
 		channelValue = channelInput.getIntValue();
 		if (channelValue >= 1 && channelValue <= 16)
-			newRootMidiChannel = channelValue;
+			newRoot.midiChannel = channelValue;
 	}
 	if (channelValue < 0)
 	{
 		rootMidiChannelBox->setText(rootChannelBackup, juce::NotificationType::dontSendNotification);
 	}
-
-	int newRootMidiNote = 69;
 
 	auto noteInput = rootMidiNoteBox->getText().trim();
 	int noteValue = -1;
@@ -300,7 +298,7 @@ void OverviewPanel::tuningReferenceEdited()
 	{
 		noteValue = noteInput.getIntValue();
 		if (noteValue >= 0 && noteValue < 128)
-			newRootMidiNote = noteValue;
+			newRoot.midiNote = noteValue;
 	}
 	if (noteValue < 0)
 	{
@@ -328,7 +326,7 @@ void OverviewPanel::tuningReferenceEdited()
 	}
 
 	tuningWatchers.call(&TuningWatcher::targetRootFrequencyChanged, this, newRootFrequency);
-	mappingWatchers.call(&MappingWatcher::mappingRootChanged, newRootMidiChannel, newRootMidiNote);
+	mappingWatchers.call(&MappingWatcher::targetMappingRootChanged, newRoot);
 }
 
 void OverviewPanel::setPitchbendRangeText(int pitchbendRange)

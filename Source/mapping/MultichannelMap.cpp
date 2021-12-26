@@ -3,7 +3,7 @@
 
     Map.cpp
     Created: 7 Nov 2021 10:53:27am
-    Author:  soundtoys
+    Author:  Vincenzo Sicurella
 
   ==============================================================================
 */
@@ -11,42 +11,20 @@
 #include "MultichannelMap.h"
 
 MultichannelMap::MultichannelMap(MultichannelMap::Definition definition)
-    : TuningTableMap(initializePattern(definition)),
-      numMaps(definition.numMaps),
-      maps(definition.maps),
-      rootMidiChannel(definition.rootMidiChannel) {}
-
+    : TuningTableMap(DefineTuningTableMap(definition)),
+      maps(definition.maps) {}
 
 MultichannelMap::MultichannelMap(const MultichannelMap& mapToCopy)
-    : numMaps(mapToCopy.numMaps),
-      maps(mapToCopy.maps),
-      rootMidiChannel(mapToCopy.rootMidiChannel),
-      TuningTableMap(initializePattern(mapToCopy.getDefinition())) {}
+    : maps(mapToCopy.maps),
+      TuningTableMap(DefineTuningTableMap(mapToCopy.getDefinition())) {}
 
-MultichannelMap::~MultichannelMap()
-{
-}
-
-TuningTableMap::Definition MultichannelMap::initializePattern(MultichannelMap::Definition definition)
-{
-    auto multimap = buildMultimap(definition);
-
-    TuningTableMap::Definition d =
-    {
-        definition.rootMidiChannel,
-        definition.rootMidiNote,
-        definition.rootTuningIndex,
-        new Map<int>(multimap)
-    };
-
-    return d;
-}
+MultichannelMap::~MultichannelMap() {}
 
 Map<int> MultichannelMap::buildMultimap(MultichannelMap::Definition definition)
 {
     // Create multimap from maps
     int multipattern[2048];
-    for (int m = 0; m < definition.numMaps; m++)
+    for (int m = 0; m < definition.maps.size(); m++)
     {
         auto channelOffset = m * 128;
         auto map = &(definition.maps[m]);
@@ -58,7 +36,7 @@ Map<int> MultichannelMap::buildMultimap(MultichannelMap::Definition definition)
     }
 
     // Probably should be reworked
-    int period = definition.maps.at(definition.rootMidiChannel - 1).base();
+    int period = definition.maps.at(definition.root.midiChannel - 1).base();
 
     Map<int>::Definition d =
     {
@@ -76,10 +54,7 @@ MultichannelMap::Definition MultichannelMap::getDefinition() const
 {
     MultichannelMap::Definition definition = 
     {
-        rootTuningIndex,
-        rootMidiNote,
-        rootMidiChannel,
-        numMaps,
+        TuningTableMap::Root { rootMidiChannel, rootMidiNote },
         maps,
     };
 

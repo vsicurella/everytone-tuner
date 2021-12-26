@@ -80,10 +80,10 @@ public:
 private:
 
     // Size of map pattern
-    const int mapSize;
+    int mapSize;
 
     // Integer mapping pattern
-    const Pattern mapPattern;
+    Pattern mapPattern;
         
     // Modulo base for map pattern repetition
     T patternBase = 0;
@@ -139,31 +139,50 @@ private:
 
 public:
 
+    // 1:1 mapping
+    Map()
+        : mapSize(1),
+          mapPattern({ 1 }),
+          patternBase(1),
+          patternRootIndex(0),
+          mapRootIndex(0),
+          transpose(0) {}
+
     Map(Definition definition)
         : mapSize(definition.mapSize), 
-            mapPattern(initializePattern(definition)),
-            patternBase(definition.patternBase),
-            patternRootIndex(mod(definition.patternRootIndex, definition.mapSize)),
-            mapRootIndex(definition.mapRootIndex),
-            transpose(definition.transpose) {}
+          mapPattern(initializePattern(definition)),
+          patternBase(definition.patternBase),
+          patternRootIndex(mod(definition.patternRootIndex, definition.mapSize)),
+          mapRootIndex(definition.mapRootIndex),
+          transpose(definition.transpose) {}
 
     Map(FunctionDefinition definition)
         : mapSize(definition.mapSize), 
-            mapPattern(initializePattern(definition)),
-            patternBase(definition.base),
-            patternRootIndex(0),
-            mapRootIndex(0),
-            transpose(definition.transpose) {}
+          mapPattern(initializePattern(definition)),
+          patternBase(definition.base),
+          patternRootIndex(0),
+          mapRootIndex(0),
+          transpose(definition.transpose) {}
 
     Map(const Map& map)
-        : mapSize(map.mapSize), 
-            mapPattern(initializePattern(map.definition())),
-            patternBase(map.patternBase),
-            patternRootIndex(map.patternRootIndex),
-            mapRootIndex(map.mapRootIndex),
-            transpose(map.transpose) {}
+        : mapSize(map.mapSize),
+          mapPattern(initializePattern(map.definition())),
+          patternBase(map.patternBase),
+          patternRootIndex(map.patternRootIndex),
+          mapRootIndex(map.mapRootIndex),
+          transpose(map.transpose) {}
 
     ~Map() {}
+
+    void operator=(const Map& map)
+    {
+        mapSize = map.mapSize;
+        mapPattern = initializePattern(map.definition());
+        patternBase = map.patternBase;
+        patternRootIndex  = map.patternRootIndex;
+        mapRootIndex = map.mapRootIndex;
+        transpose = map.transpose;
+    }
 
     Definition definition() const
     {

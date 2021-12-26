@@ -12,7 +12,7 @@
 
 MappedTuning::MappedTuning()
     : tuning(std::make_shared<Tuning>()), 
-      mapping(std::make_shared<TuningTableMap>(TuningTableMap::StandardMapping())) {}
+      mapping(std::make_shared<TuningTableMap>(TuningTableMap::StandardMappingDefinition())) {}
 
 MappedTuning::MappedTuning(std::shared_ptr<Tuning> tuningIn, std::shared_ptr<TuningTableMap> mappingIn)
     : tuning(tuningIn),

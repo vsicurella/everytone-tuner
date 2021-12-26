@@ -56,7 +56,8 @@ public:
     //==============================================================================
     // MappingWatcher implementation
 
-    void mappingRootChanged(int rootMidiChannel, int rootMidiNote) override;
+    //void sourceMappingRootChanged(TuningTableMap::Root root) override;
+    void targetMappingRootChanged(TuningTableMap::Root root) override;
 
     //==============================================================================
     // OptionsWatcher implementation

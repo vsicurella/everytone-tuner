@@ -111,9 +111,9 @@ void MultimapperAudioProcessorEditor::mappingTypeChanged(Everytone::MappingType 
     audioProcessor.setAutoMappingType(type);
 }
 
-void MultimapperAudioProcessorEditor::mappingRootChanged(int rootMidiChannel, int rootMidiNote)
+void MultimapperAudioProcessorEditor::targetMappingRootChanged(TuningTableMap::Root root)
 {
-    audioProcessor.setTargetMappingRoot(rootMidiChannel, rootMidiNote);
+    audioProcessor.setTargetMappingRoot(root);
 }
 
 void MultimapperAudioProcessorEditor::mappingModeChanged(Everytone::MappingMode mode)

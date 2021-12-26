@@ -16,7 +16,8 @@ struct MappingChanger;
 
 struct MappingWatcher
 {
-    virtual void mappingRootChanged(int rootMidiChannel, int rootMidiNote) {};
+    virtual void sourceMappingRootChanged(TuningTableMap::Root root) {};
+    virtual void targetMappingRootChanged(TuningTableMap::Root root) {};
 };
 
 class MappingChanger

@@ -11,10 +11,9 @@
 #include "TuningTableMap.h"
 
 TuningTableMap::TuningTableMap(TuningTableMap::Definition definition)
-    : rootMidiChannel(definition.rootMidiChannel),
-      rootMidiNote(definition.rootMidiNote),
-      rootTuningIndex(definition.rootTuningIndex),
-      map(std::make_unique<Map<int>>(*definition.map))
+    : rootMidiChannel(definition.root.midiChannel),
+      rootMidiNote(definition.root.midiNote),
+      map(std::make_unique<Map<int>>(definition.map))
 {
     rebuildTable();
 }
@@ -22,7 +21,6 @@ TuningTableMap::TuningTableMap(TuningTableMap::Definition definition)
 TuningTableMap::TuningTableMap(const TuningTableMap& mapToCopy)
     : rootMidiChannel(mapToCopy.rootMidiChannel),
       rootMidiNote(mapToCopy.rootMidiNote),
-      rootTuningIndex(mapToCopy.rootTuningIndex),
       map(new Map<int>(*mapToCopy.map.get()))
 {
     rebuildTable();
@@ -32,8 +30,7 @@ void TuningTableMap::operator=(const TuningTableMap& mapToCopy)
 {
     rootMidiChannel = mapToCopy.rootMidiChannel;
     rootMidiNote = mapToCopy.rootMidiNote;
-    rootTuningIndex = mapToCopy.rootTuningIndex;
-    map.reset(new Map<int>(*mapToCopy.getDefinition().map));
+    map.reset(new Map<int>(mapToCopy.getDefinition().map));
     rebuildTable();
 }
 
@@ -105,15 +102,17 @@ int TuningTableMap::tableAt(int midiNoteIndex) const
     return table[midiNoteIndex];
 }
 
+TuningTableMap::Root TuningTableMap::getRoot() const
+{
+    return Root { rootMidiChannel, rootMidiNote };
+}
+
 TuningTableMap::Definition TuningTableMap::getDefinition() const
 {
     TuningTableMap::Definition definition =
     {
-        rootMidiChannel,
-        rootMidiNote,
-        rootTuningIndex,
-        map.get()
+        TuningTableMap::Root { rootMidiChannel, rootMidiNote },
+        *map
     };
-
     return definition;
 }

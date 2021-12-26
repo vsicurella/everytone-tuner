@@ -27,8 +27,10 @@ public:
         virtual void targetTuningChanged(const MappedTuning& target) {}
     };
 
-
 private:
+
+    TuningTableMap::Root sourceMapRoot;
+    TuningTableMap::Root targetMapRoot;
 
     MappedTuning currentTuningSource;
     MappedTuning currentTuningTarget;
@@ -44,11 +46,22 @@ private:
 
 public:
 
-    TunerController();
-    TunerController(CentsDefinition targetTuning, TuningTableMap* targetMapping = nullptr); // Should add source to this
+    TunerController(Everytone::MappingMode mappingMode, Everytone::MappingType mappingType=Everytone::MappingType::Linear);
+
+    TunerController(CentsDefinition sourceTuning, TuningTableMap::Root sourceMapRootIn, 
+                    CentsDefinition targetTuning, TuningTableMap::Root targetMapRootIn,
+                    Everytone::MappingMode mappingMode, Everytone::MappingType mappingType = Everytone::MappingType::Linear);
+
+    TunerController(CentsDefinition sourceTuning, TuningTableMap::Definition sourceMapping,
+                    CentsDefinition targetTuning, TuningTableMap::Definition targetMapping,
+                    Everytone::MappingMode mappingMode, Everytone::MappingType mappingType = Everytone::MappingType::Linear);
+    
     ~TunerController();
 
     std::shared_ptr<MidiNoteTuner>& getTuner() { return currentTuner; }
+
+    TuningTableMap::Root getSourceMapRoot() const { return sourceMapRoot; }
+    TuningTableMap::Root getTargetMapRoot() const { return targetMapRoot; }
 
     const MappedTuning* readTuningSource() const { return &currentTuningSource; }
     const MappedTuning* readTuningTarget() const { return &currentTuningTarget; }
@@ -76,7 +89,10 @@ public:
     void setSourceRootFrequency(double frequency);
     void setTargetRootFrequency(double frequency);
 
-    void setTunings(const CentsDefinition& sourceTuningDefinition, const CentsDefinition& targetTuningDefinition);
+    void setSourceMapRoot(TuningTableMap::Root root);
+    void setTargetMapRoot(TuningTableMap::Root root);
+
+    void loadTunings(const CentsDefinition& sourceTuningDefinition, const CentsDefinition& targetTuningDefinition);
     //void setTunings(const CentsDefinition& sourceTuningDefinition, const CentsDefinition& targetTuningDefinition,
     //                const TuningTableMap::Definition& sourceMapDefinition, const TuningTableMap::Definition& targetMapDefinition);
 
@@ -86,6 +102,11 @@ public:
     void setPitchbendRange(int pitchbendRange);
 
 private:
+
+    std::shared_ptr<TuningTableMap> mapForTuning(const Tuning* tuning, bool isTarget);
+
+    void loadSourceTuning(const CentsDefinition& definition, bool updateTuner);
+    void loadTargetTuning(const CentsDefinition& definition, bool updateTuner);
 
     void setSourceTuning(std::shared_ptr<Tuning> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner = true);
     void setTargetTuning(std::shared_ptr<Tuning> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner = true);
@@ -97,14 +118,12 @@ private:
 
     void mappingTypeChanged();
 
-    std::unique_ptr<TuningTableMap> newTuningMap(const Tuning* tuningDefinition);
-
 public:
 
-    static std::unique_ptr<TuningTableMap> newTuningMap(const Tuning* tuningDefinition, Everytone::MappingType mappingType);
-
     // For use in "Auto Mapping" mode with tunings created in the app
-    static std::unique_ptr<TuningTableMap> NewLinearMappingFromTuning(const Tuning* tuningDefinition);
-    static std::unique_ptr<TuningTableMap> NewPeriodicMappingFromTuning(const Tuning* tuningDefinition);
+    static std::shared_ptr<TuningTableMap> NewLinearMappingFromTuning(const Tuning* tuningDefinition, TuningTableMap::Root root);
+    static std::shared_ptr<TuningTableMap> NewPeriodicMappingFromTuning(const Tuning* tuningDefinition, TuningTableMap::Root root);
+
+    static std::shared_ptr<TuningTableMap> NewMappingFromTuning(const Tuning* tuningDefinition, TuningTableMap::Root root, Everytone::MappingType mappingType);
 };
 
