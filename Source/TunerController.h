@@ -78,10 +78,10 @@ public:
 
 
     void loadSourceTuning(const CentsDefinition& tuningDefinition);
-    //void loadSourceTuning(const CentsDefinition& tuningDefinition, const TuningTableMap::Definition& mapDefinition);
+    void loadSourceTuning(const CentsDefinition& tuningDefinition, const TuningTableMap::Definition& mapDefinition);
 
     void loadTargetTuning(const CentsDefinition& tuningDefinition);
-    //void loadTargetTuning(const CentsDefinition& tuningDefinition, const TuningTableMap::Definition& mapDefinition);
+    void loadTargetTuning(const CentsDefinition& tuningDefinition, const TuningTableMap::Definition& mapDefinition);
 
     void remapSource(const TuningTableMap::Definition& mapDefinition);
     void remapTarget(const TuningTableMap::Definition& mapDefinition);

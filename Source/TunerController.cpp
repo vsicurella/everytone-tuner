@@ -59,10 +59,24 @@ void TunerController::loadSourceTuning(const CentsDefinition& tuningDefinition)
     setSourceTuning(newTuning, mapForTuning(newTuning.get(), false));
 }
 
+void TunerController::loadSourceTuning(const CentsDefinition& tuningDefinition, const TuningTableMap::Definition& mapDefinition)
+{
+    auto newTuning = std::make_shared<Tuning>(tuningDefinition);
+    auto newMapping = std::make_shared<TuningTableMap>(mapDefinition);
+    setSourceTuning(newTuning, newMapping);
+}
+
 void TunerController::loadTargetTuning(const CentsDefinition& tuningDefinition)
 {
     auto newTuning = std::make_shared<Tuning>(tuningDefinition);
     setTargetTuning(newTuning, mapForTuning(newTuning.get(), true));
+}
+
+void TunerController::loadTargetTuning(const CentsDefinition& tuningDefinition, const TuningTableMap::Definition& mapDefinition)
+{
+    auto newTuning = std::make_shared<Tuning>(tuningDefinition);
+    auto newMapping = std::make_shared<TuningTableMap>(mapDefinition);
+    setTargetTuning(newTuning, newMapping);
 }
 
 void TunerController::remapSource(const TuningTableMap::Definition& mapDefinition)
