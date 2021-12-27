@@ -18,7 +18,8 @@ NewTuningPanel::NewTuningPanel(juce::ApplicationCommandManager* cmdManagerIn)
     equalTemperamentInterface->addTuningWatcher(this);
 
     saveButton.reset(new juce::TextButton(juce::translate("Save"), juce::translate("Confirm new tuning and go back to main window.")));
-    saveButton->setCommandToTrigger(cmdManager, Everytone::Commands::Save, false);
+    //saveButton->setCommandToTrigger(cmdManager, Everytone::Commands::Save, false);
+    saveButton->onClick = [&]() { saveTuning(); };
     addAndMakeVisible(*saveButton);
 
     backButton.reset(new juce::TextButton(juce::translate("Cancel"), juce::translate("Cancel tuning changes and go back to main window.")));
@@ -27,7 +28,7 @@ NewTuningPanel::NewTuningPanel(juce::ApplicationCommandManager* cmdManagerIn)
 
     previewButton.reset(new juce::TextButton(juce::translate("Preview"), juce::translate("Enable tuning changes while you edit")));
     previewButton->setClickingTogglesState(true);
-    addAndMakeVisible(*previewButton);
+    //addAndMakeVisible(*previewButton);
 
     addTab("Equal", juce::Colours::transparentBlack, equalTemperamentInterface.get(), false, NewTuningTabs::EqualTemperament);
 

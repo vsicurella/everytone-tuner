@@ -60,11 +60,10 @@ namespace Everytone
 	enum Commands
 	{
 		Back = 1,
-		Save,
+		ShowMenu,
 		NewTuning,
 		OpenTuning,
-		NewMapping,
-		OpenMapping,
+		EditReference,
 		ShowOptions,
 	};
 

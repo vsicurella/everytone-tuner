@@ -11,19 +11,32 @@
 
 //==============================================================================
 MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), menuModel(static_cast<juce::ApplicationCommandManager*>(this))
+    : AudioProcessorEditor (&p), audioProcessor (p)
 {
     tuningBackup = std::make_unique<MappedTuning>(*audioProcessor.currentTarget());
 
-    menuBar.reset(new juce::MenuBarComponent(&menuModel));
-    addAndMakeVisible(*menuBar);
+    auto currentTarget = audioProcessor.currentTarget();
 
-    overviewPanel.reset(new OverviewPanel(audioProcessor.options()));
-    overviewPanel->setTuningDisplayed(audioProcessor.currentTarget());
-    addAndMakeVisible(overviewPanel.get());
+    infoBar = std::make_unique<InfoBar>(this);
+    infoBar->setDisplayedTuning(currentTarget);
+    addAndMakeVisible(*infoBar);
 
+    menuPanel = std::make_unique<MenuPanel>(this);
+    addChildComponent(*menuPanel);
+
+    overviewPanel = std::make_unique<OverviewPanel>(audioProcessor.options());
+    overviewPanel->setTuningDisplayed(currentTarget);
     overviewPanel->addTuningWatcher(this);
     overviewPanel->addOptionsWatcher(this);
+    addAndMakeVisible(*overviewPanel);
+
+    newTuningPanel = std::make_unique<NewTuningPanel>(this);
+    newTuningPanel->addTuningWatcher(this);
+    addChildComponent(*newTuningPanel);
+
+    optionsPanel = std::make_unique<OptionsPanel>(audioProcessor.options());
+    optionsPanel->addOptionsWatcher(this);
+    addChildComponent(*optionsPanel);
     
     audioProcessor.addTunerControllerWatcher(this);
 
@@ -53,9 +66,11 @@ MultimapperAudioProcessorEditor::~MultimapperAudioProcessorEditor()
     logger->setCallback([](juce::StringRef) {});
 #endif
 
+    logWindow = nullptr;
+    optionsPanel = nullptr;
     newTuningPanel = nullptr;
     overviewPanel = nullptr;
-    logWindow = nullptr;
+    menuPanel = nullptr;
 
     audioProcessor.removeTunerControllerWatcher(this);
 }
@@ -69,7 +84,7 @@ void MultimapperAudioProcessorEditor::paint (juce::Graphics& g)
 void MultimapperAudioProcessorEditor::resized()
 {
     double menuHeight = getHeight() * 0.11;
-    menuBar->setBounds(getLocalBounds().withBottom(menuHeight));
+    infoBar->setBounds(getLocalBounds().withBottom(menuHeight));
     
     int margin = 5;
 
@@ -88,12 +103,14 @@ void MultimapperAudioProcessorEditor::sourceTuningChanged(const std::shared_ptr<
 
 void MultimapperAudioProcessorEditor::targetTuningChanged(const std::shared_ptr<MappedTuning>& target)
 {
+    infoBar->setDisplayedTuning(target.get());
     overviewPanel->setTuningDisplayed(target.get());
+    tuningBackup = std::make_unique<MappedTuning>(*audioProcessor.currentTarget());
 }
 
 void MultimapperAudioProcessorEditor::targetDefinitionLoaded(TuningChanger* changer, CentsDefinition definition)
 {
-    audioProcessor.loadTuningTarget(definition);
+    commitTuning(definition);
 }
 
 void MultimapperAudioProcessorEditor::targetMappedTuningLoaded(TuningChanger* changer, CentsDefinition tuningDefinition, TuningTableMap::Definition mapDefinition)
@@ -168,7 +185,7 @@ void MultimapperAudioProcessorEditor::getAllCommands(juce::Array<juce::CommandID
     commands =
     {
         Everytone::Back,
-        Everytone::Save,
+        Everytone::ShowMenu,
         Everytone::NewTuning,
         Everytone::OpenTuning,
         Everytone::ShowOptions
@@ -186,10 +203,16 @@ void MultimapperAudioProcessorEditor::getCommandInfo(juce::CommandID commandID, 
         result.setActive(contentComponent != overviewPanel.get());
         break;
 
-    case Everytone::Save:
-        result = juce::ApplicationCommandInfo(Everytone::Commands::Save);
-        result.setInfo("Save", "Save currently edited tuning", "", 0);
-        result.addDefaultKeypress('s', juce::ModifierKeys::ctrlModifier);
+    //case Everytone::Save:
+    //    result = juce::ApplicationCommandInfo(Everytone::Commands::Save);
+    //    result.setInfo("Save", "Save currently edited tuning", "", 0);
+    //    result.addDefaultKeypress('s', juce::ModifierKeys::ctrlModifier);
+    //    break;
+
+    case Everytone::ShowMenu:
+        result = juce::ApplicationCommandInfo(Everytone::Commands::ShowMenu);
+        result.setInfo("Show Menu", "Create or edit tunings and other preferences", "Options", 0);
+        result.addDefaultKeypress('m', juce::ModifierKeys::ctrlModifier);
         break;
 
     case Everytone::NewTuning:
@@ -223,17 +246,23 @@ bool MultimapperAudioProcessorEditor::perform(const juce::ApplicationCommandTarg
     case Everytone::Back:
         return performBack(info);
 
-    case Everytone::Save:
-        return performSave(info);
+    //case Everytone::Save:
+    //    return performSave(info);
+
+    case Everytone::ShowMenu:
+        setContentComponent(menuPanel.get());
+        return true;
 
     case Everytone::NewTuning:
-        return performNewTuning(info);
+        setContentComponent(newTuningPanel.get());
+        return true;
     
     case Everytone::OpenTuning:
         return performOpenTuning(info);
 
     case Everytone::ShowOptions:
-        return performShowOptions(info);
+        setContentComponent(optionsPanel.get());
+        return true;
 
     default:
         // forgot to add command handler?
@@ -279,19 +308,6 @@ bool MultimapperAudioProcessorEditor::performSave(const juce::ApplicationCommand
     return true;
 }
 
-bool MultimapperAudioProcessorEditor::performNewTuning(const juce::ApplicationCommandTarget::InvocationInfo& info)
-{
-    if (newTuningPanel == nullptr)
-    {
-        newTuningPanel.reset(new NewTuningPanel(this));
-        addChildComponent(*newTuningPanel);
-    }
-    
-    setContentComponent(newTuningPanel.get());
-
-    return true;
-}
-
 bool MultimapperAudioProcessorEditor::performOpenTuning(const juce::ApplicationCommandTarget::InvocationInfo& info)
 {
     fileChooser = std::make_unique<juce::FileChooser>("Choose a .scl or .tun file", juce::File() /* TODO */, "*.scl;*.tun");
@@ -310,23 +326,10 @@ bool MultimapperAudioProcessorEditor::performOpenTuning(const juce::ApplicationC
     return true;
 }
 
-bool MultimapperAudioProcessorEditor::performShowOptions(const juce::ApplicationCommandTarget::InvocationInfo& info)
-{
-    if (optionsPanel == nullptr)
-    {
-        optionsPanel = std::make_unique<OptionsPanel>(audioProcessor.options());
-        optionsPanel->addOptionsWatcher(this);
-        addChildComponent(*optionsPanel);
-    }
-
-    setContentComponent(optionsPanel.get());
-    return true;
-}
-
 void MultimapperAudioProcessorEditor::commitTuning(CentsDefinition tuningDefinition)
 {
     audioProcessor.loadTuningTarget(tuningDefinition);
-    tuningBackup = std::make_unique<MappedTuning>(*audioProcessor.currentTarget());
+    setContentComponent(overviewPanel.get());
 }
 
 void MultimapperAudioProcessorEditor::setContentComponent(juce::Component* component)
@@ -336,6 +339,9 @@ void MultimapperAudioProcessorEditor::setContentComponent(juce::Component* compo
 
     contentComponent = component;
     contentComponent->setVisible(true);
+
+    infoBar->setButtonBackState(contentComponent != overviewPanel.get());
+
     resized();
 }
 

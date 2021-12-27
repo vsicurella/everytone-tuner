@@ -10,8 +10,9 @@
 
 #include "PluginProcessor.h"
 #include "LogWindow.h"
+#include "ui/InfoBar.h"
+#include "ui/MenuPanel.h"
 #include "ui/OverviewPanel.h"
-#include "ui/MenuBar.h"
 #include "ui/NewTuningPanel.h"
 #include "ui/OptionsPanel.h"
 #include "io/TuningFileParser.h"
@@ -84,11 +85,7 @@ public:
 
     bool performSave(const juce::ApplicationCommandTarget::InvocationInfo& info);
 
-    bool performNewTuning(const juce::ApplicationCommandTarget::InvocationInfo& info);
-
     bool performOpenTuning(const juce::ApplicationCommandTarget::InvocationInfo& info);
-
-    bool performShowOptions(const juce::ApplicationCommandTarget::InvocationInfo& info);
 
     //==============================================================================
 
@@ -107,11 +104,9 @@ private:
 
     std::unique_ptr<MappedTuning> tuningBackup;
 
-    MenuBarModel menuModel;
-
-    std::unique_ptr<juce::MenuBarComponent> menuBar;
-
     juce::Component* contentComponent = nullptr;
+    std::unique_ptr<InfoBar> infoBar;
+    std::unique_ptr<MenuPanel> menuPanel;
     std::unique_ptr<OverviewPanel> overviewPanel;
     std::unique_ptr<NewTuningPanel> newTuningPanel;
     std::unique_ptr<OptionsPanel> optionsPanel;
