@@ -86,6 +86,10 @@
       </GROUP>
       <FILE id="TlWn9G" name="MidiVoice.cpp" compile="1" resource="0" file="Source/MidiVoice.cpp"/>
       <FILE id="cdGlcX" name="MidiVoice.h" compile="0" resource="0" file="Source/MidiVoice.h"/>
+      <FILE id="Q52jed" name="MidiVoiceInterpolator.h" compile="0" resource="0"
+            file="Source/MidiVoiceInterpolator.h"/>
+      <FILE id="NkK0pj" name="MidiVoiceInterpolator.cpp" compile="1" resource="0"
+            file="Source/MidiVoiceInterpolator.cpp"/>
       <FILE id="h3R26G" name="TunerController.h" compile="0" resource="0"
             file="Source/TunerController.h"/>
       <FILE id="QKYQ2p" name="TunerController.cpp" compile="1" resource="0"

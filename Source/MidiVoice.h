@@ -19,13 +19,13 @@ struct LinkedController
 
 class MidiVoice
 {
-    int midiChannel = -1;
-    int midiNote = -1;
+    const int midiChannel = -1;
+    const int midiNote = -1;
 
     juce::uint8 velocity = 0;
     juce::uint8 aftertouch = 0;
 
-    int assignedChannel = -1;
+    const int assignedChannel = -1;
 
     juce::Array<LinkedController> controllers;
 

@@ -86,7 +86,9 @@ const MidiVoice* MidiVoiceController::addVoice(int midiChannel, int midiNote, ju
     if (newIndex >= 0 && newIndex < MULTIMAPPER_MAX_VOICES)
     {
         lastChannelAssigned = newIndex;
-        voices.set(newIndex, new MidiVoice(midiChannel, midiNote, velocity, newIndex + 1, tuningController.getTuner()));
+        auto newVoice = new MidiVoice(midiChannel, midiNote, velocity, newIndex + 1, tuningController.getTuner());
+        voices.set(newIndex, newVoice);
+        activeVoices.addIfNotAlreadyThere(newVoice);
         return getVoice(newIndex);
     }
 
@@ -105,9 +107,10 @@ MidiVoice MidiVoiceController::removeVoice(int index)
 {
     if (index >= 0 && index < MULTIMAPPER_MAX_VOICES)
     {
-        auto voice = *voices[index];
+        auto voice = voices[index];
         voices.set(index, new MidiVoice());
-        return voice;
+        activeVoices.removeAllInstancesOf(voice);
+        return *voice;
     }
     return MidiVoice();
 }

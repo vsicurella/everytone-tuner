@@ -105,6 +105,13 @@ namespace Everytone
 		Overwrite,	// Overwrite oldest note if voice limit is met
 	};
 
+	enum class BendMode
+	{
+		Static,		// Send one pitchbend per note Note On
+		Persistent,	// Send pitchbend messages while notes are on
+		Dynamic		// Send pitchbend messages to active notes when tuning changes
+	};
+
 	struct Options
 	{
 		MappingMode mappingMode;

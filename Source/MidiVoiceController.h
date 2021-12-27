@@ -17,9 +17,22 @@
 
 class MidiVoiceController
 {
+public:
+
+    class Watcher
+    {
+    public:
+
+        virtual void voiceAdded(MidiVoice* voice) {}
+        virtual void voiceRemoved(MidiVoice* voice) {}
+    };
+
+
+private:
     TunerController& tuningController;
 
     juce::OwnedArray<MidiVoice> voices;
+    juce::Array<MidiVoice*> activeVoices;
 
     juce::Array<bool> midiChannelDisabled;
 
