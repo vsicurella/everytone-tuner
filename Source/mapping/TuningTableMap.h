@@ -125,15 +125,15 @@ public:
     The root MIDI Channel & Note marks 0 periods, and will output the rootTuningIndex parameter.
     The rootTuningIndex is automatically set if it's argument is out of bounds, which is default.
     */
-    static TuningTableMap::Definition LinearMappingDefinition(int rootMidiChannel, int rootMidiNote, int tuningRootIndex)
+    static TuningTableMap::Definition LinearMappingDefinition(int rootMidiChannel, int rootMidiNote, int tuningRootIndex, int tuningTableSize)
     {
-        int midiIndex = mod((rootMidiChannel - 1) * 128 + rootMidiNote, 2048);
+        int midiIndex = mod((rootMidiChannel - 1) * 128 + rootMidiNote, tuningTableSize);
 
         auto mapFunction = Map<int>::FunctionDefinition
         {
             2048,
             0,
-            [&](int x) { return mod(x - midiIndex + tuningRootIndex, 2048); },
+            [&](int x) { return mod(x - midiIndex + tuningRootIndex, tuningTableSize); },
             0
         };
 

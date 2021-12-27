@@ -10,7 +10,7 @@
 #include "PluginEditor.h"
 #include "TuningHelpers.h"
 
-#if RUN_MULTIMAPPER_TESTS && 0
+#if RUN_MULTIMAPPER_TESTS
     #include "./tests/Map_Test_Generator.h"
     #include "./tests/MultichannelMap_Test.h"
     #include "./tests/Tuning_tests.h"
@@ -40,7 +40,7 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
 #endif
 
 
-#if RUN_MULTIMAPPER_TESTS && 0
+#if RUN_MULTIMAPPER_TESTS
     DBG("Running tests...");
 
     Map_Test_Generator mapTests;

@@ -242,7 +242,7 @@ public:
 
     void setTranspose(int transposeIn) { transpose = transposeIn; }
 
-    int closestIndexTo(T value) /* needs testing */
+    int closestIndexTo(T value)
     {
         int valuePeriod = (patternBase == 0)
             ? 0
@@ -260,7 +260,12 @@ public:
                 : baseOffset + patternBase + mapPattern[0];
 
             difference = abs(value - mapValue);
-            if (difference < discrepancy)
+
+            // TODO Might want to handle this differently...
+            auto rDifference = round(difference * 10e8);
+            auto rDiscrepancy = round(discrepancy * 10e8);
+
+            if (rDifference < rDiscrepancy)
             {
                 discrepancy = difference;
                 closestIndex = indexOffset + i;

@@ -84,6 +84,8 @@ public:
 
 	virtual CentsDefinition getDefinition() const;
 
+	virtual int getTuningTableSize() const;
+
 	virtual double getVirtualPeriod() const;
 	virtual double getVirtualSize() const;
 

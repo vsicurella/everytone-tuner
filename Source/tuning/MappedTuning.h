@@ -80,4 +80,13 @@ public:
     virtual double frequencyAt(int midiNote, int midiChannel) const;
 
     virtual double mtsAt(int midiNote, int midiChannel) const;
+
+public:
+
+    static std::unique_ptr<MappedTuning> StandardTuning()
+    {
+        auto standardTuning = std::make_shared<Tuning>(Tuning::StandardTuningDefinition());
+        auto standardMapping = std::make_shared<TuningTableMap>(TuningTableMap::StandardMappingDefinition());
+        return std::make_unique<MappedTuning>(standardTuning, standardMapping);
+    }
 };

@@ -66,23 +66,12 @@ public:
 
     /*
         Creates a MultichannelMap that have linear maps that are offset by a period from each other.
-        The root MIDI Channel & Note marks 0 periods, and will output the rootTuningIndex parameter.
-        The rootTuningIndex is automatically set if it's argument is out of bounds, which is default.
+        The root MIDI Channel & Note marks 0 periods, and will output the tuningRootIndex parameter.
     */
-    static TuningTableMap::Definition PeriodicMappingDefinition(int period, int rootMidiChannel, int rootMidiNote, int rootTuningIndex = -1)
+    static TuningTableMap::Definition PeriodicMappingDefinition(int period, int rootMidiChannel, int rootMidiNote, int tuningRootIndex, int tuningTableSize)
     {
-        // Multichannel MIDI Note index from 0 through 2047
-        int rootMidiNoteIndex = (rootMidiChannel - 1) * 128 + rootMidiNote;
-
-        int rootMidiChannelIndex = rootMidiChannel - 1;
-
-        if (rootTuningIndex < 0 || rootTuningIndex >= 2048)
-        {
-            rootTuningIndex = rootMidiNoteIndex;
-        }
-
-        // The first tuning table index
-        int currentTuningIndex = mod(rootTuningIndex - rootMidiNote - period * rootMidiChannelIndex, 2048);
+        int channelPeriodOffset = -(rootMidiChannel - 1) * period;
+        int currentTuningIndex = mod(channelPeriodOffset + tuningRootIndex + rootMidiNote, tuningTableSize);
 
         std::vector<Map<int>> maps;
         for (int m = 0; m < 16; m++)
@@ -91,18 +80,18 @@ public:
             {
                 128,
                 currentTuningIndex,
-                [=](int x) { return mod(x, 2048); }
+                [=](int x) { return mod(x, tuningTableSize); }
             };
 
             maps.push_back(Map<int>(fd));
 
-            currentTuningIndex = mod(currentTuningIndex + period, 2048);
+            currentTuningIndex = mod(currentTuningIndex + period, tuningTableSize);
         }
 
         MultichannelMap::Definition d =
         {
             TuningTableMap::Root { rootMidiChannel, rootMidiNote },
-            maps                /* maps */
+            maps
         };
 
         return DefineTuningTableMap(d);

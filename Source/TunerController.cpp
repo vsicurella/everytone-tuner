@@ -303,13 +303,13 @@ std::shared_ptr<TuningTableMap> TunerController::mapForTuning(const Tuning* tuni
 
 std::shared_ptr<TuningTableMap> TunerController::NewLinearMappingFromTuning(const Tuning* tuning, TuningTableMap::Root root)
 {
-    auto definition = TuningTableMap::LinearMappingDefinition(root.midiChannel, root.midiNote, tuning->getRootIndex());
+    auto definition = TuningTableMap::LinearMappingDefinition(root.midiChannel, root.midiNote, tuning->getRootIndex(), tuning->getTuningTableSize());
     return std::make_shared<TuningTableMap>(definition);
 }
 
 std::shared_ptr<TuningTableMap> TunerController::NewPeriodicMappingFromTuning(const Tuning* tuning, TuningTableMap::Root root)
 {
-    auto definition = MultichannelMap::PeriodicMappingDefinition((int)tuning->getVirtualSize(), root.midiChannel, root.midiNote, tuning->getRootIndex());
+    auto definition = MultichannelMap::PeriodicMappingDefinition((int)tuning->getVirtualSize(), root.midiChannel, root.midiNote, tuning->getRootIndex(), tuning->getTuningTableSize());
     return std::make_shared<TuningTableMap>(definition);
 }
 

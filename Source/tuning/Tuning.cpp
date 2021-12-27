@@ -12,6 +12,8 @@
 
 Tuning::Tuning(CentsDefinition definition)
     : tuningSize(definition.intervalCents.size()),
+      virtualPeriod(definition.virtualPeriod),
+      virtualSize(definition.virtualSize),
       TuningBase(definition.rootFrequency, definition.name, definition.description)
 {
 	setupCentsMap(definition.intervalCents);
@@ -19,7 +21,8 @@ Tuning::Tuning(CentsDefinition definition)
 
 Tuning::Tuning(const Tuning& tuning)
     : tuningSize(tuning.tuningSize),
-      periodCents(tuning.periodCents),
+      virtualPeriod(tuning.virtualPeriod),
+      virtualSize(tuning.virtualSize),
       TuningBase(tuning.rootFrequency, tuning.name, tuning.description)
 {
     setupCentsMap(tuning.getIntervalCentsTable());
@@ -136,12 +139,13 @@ int Tuning::closestIndexToCents(double centsFromRoot) const
 {
     if (tuningSize == 1)
     {
-        return rootIndex + (int)round(centsFromRoot / periodCents);
+        auto stepsFromRoot = roundN(6, centsFromRoot / periodCents);
+        return (int)round(rootIndex + stepsFromRoot);
     }
 
     // This assumes the scale pattern doesn't have intervals that jump beyond the period
 
-    return centsMap->closestIndexTo(centsFromRoot);
+    return centsMap->closestIndexTo(centsFromRoot) + rootIndex;
 }
 
 bool Tuning::operator==(const Tuning& tuning)
@@ -157,6 +161,11 @@ bool Tuning::operator!=(const Tuning& tuning)
 CentsDefinition Tuning::getDefinition() const
 {
     return CentsDefinition{ centsTable, rootFrequency, name, description, virtualPeriod, virtualSize };
+}
+
+int Tuning::getTuningTableSize() const
+{
+    return lookupTableSize;
 }
 
 double Tuning::getVirtualPeriod() const
