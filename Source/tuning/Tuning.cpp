@@ -30,6 +30,8 @@ Tuning::Tuning(const Tuning& tuning)
 
 void Tuning::setupCentsMap(const juce::Array<double>& cents)
 {
+    centsTable = cents;
+
     periodCents = cents.getLast();
     periodRatio = centsToRatio(periodCents);
 
