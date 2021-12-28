@@ -96,6 +96,9 @@ static TuningTableMap::Definition parseTuningTableMapTree(juce::ValueTree tree)
     auto patternNode = tree.getChildWithName(Everytone::ID::Pattern);
     const int mapSize = patternNode.getNumChildren();
 
+    if (mapSize == 0)
+        return TuningTableMap::StandardMappingDefinition();
+
     Map<int>::Pattern pattern;
     for (int i = 0; i < mapSize; i++)
     {
