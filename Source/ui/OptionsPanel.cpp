@@ -44,6 +44,17 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     addAndMakeVisible(*channelRulesBoxLabel);
 
 
+    bendModeBox = std::make_unique<juce::ComboBox>("bendModeBox");
+    bendModeBox->addItem("Static", (int)Everytone::BendMode::Static);
+    bendModeBox->addItem("Persistent", (int)Everytone::BendMode::Persistent);
+    bendModeBox->setSelectedId((int)options.bendMode);
+    bendModeBox->onChange = [&]() { optionsWatchers.call(&OptionsWatcher::bendModeChanged, Everytone::BendMode(bendModeBox->getSelectedId())); };
+    addAndMakeVisible(*bendModeBox);
+
+    auto bendModeLabel = labels.add(new juce::Label("BendModeLabel", "Pitchbend Mode:"));
+    bendModeLabel->attachToComponent(bendModeBox.get(), false);
+    addAndMakeVisible(*bendModeLabel);
+
     mpeZoneBox = std::make_unique<juce::ComboBox>("mpeZoneBox");
     mpeZoneBox->addItem("Lower", (int)Everytone::MpeZone::Lower);
     mpeZoneBox->addItem("Upper", (int)Everytone::MpeZone::Upper);
@@ -102,7 +113,8 @@ void OptionsPanel::resized()
     juce::FlexBox leftHalf;
     leftHalf.flexDirection = juce::FlexBox::Direction::column;
     leftHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *channelModeBox).withMargin(controlMargin));
-    leftHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *channelRulesBox).withMargin(controlMargin));
+    //leftHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *channelRulesBox).withMargin(controlMargin));
+    leftHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *bendModeBox).withMargin(controlMargin));
 
     juce::FlexBox rightHalf;
     rightHalf.flexDirection = juce::FlexBox::Direction::column;

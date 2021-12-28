@@ -30,7 +30,7 @@ private:
 
     std::unique_ptr<juce::ComboBox> channelModeBox;
     std::unique_ptr<juce::ComboBox> channelRulesBox;
-    
+    std::unique_ptr<juce::ComboBox> bendModeBox;
     std::unique_ptr<juce::ComboBox> mpeZoneBox;
     std::unique_ptr<juce::Label> voiceLimitValueLabel;
 
