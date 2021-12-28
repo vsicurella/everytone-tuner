@@ -175,21 +175,27 @@ bool MidiVoiceController::channelIsFree(int channelIndex, MidiPitch pitchToAssig
 void MidiVoiceController::setChannelDisabled(int midiChannel, bool disabled)
 {
     midiChannelDisabled.set(midiChannel - 1, disabled);
+    auto message = "MIDI Channel " + juce::String((int)midiChannel);
+    message += (disabled) ? " was disabled" : " was enabled";
+    juce::Logger::writeToLog(message);
 }
 
 void MidiVoiceController::setChannelMode(Everytone::ChannelMode mode)
 {
     channelMode = mode;
+    juce::Logger::writeToLog("ChannelMode set to " + juce::String((int)channelMode));
 }
 
 void MidiVoiceController::setMpeZone(Everytone::MpeZone zone)
 {
     mpeZone = zone;
+    juce::Logger::writeToLog("MPE Zone set to " + juce::String((int)mpeZone));
 }
 
 void MidiVoiceController::setVoiceLimit(int limit)
 {
     voiceLimit = limit;
+    juce::Logger::writeToLog("VoiceLimit set to " + juce::String((int)voiceLimit));
 }
 
 int MidiVoiceController::nextAvailableVoiceIndex() const

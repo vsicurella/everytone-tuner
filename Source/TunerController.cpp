@@ -211,8 +211,12 @@ void TunerController::setPitchbendRange(int pitchbendRangeIn)
     if (pitchbendRangeIn > 0 && pitchbendRangeIn < 128)
     {
         pitchbendRange = pitchbendRangeIn;
+        juce::Logger::writeToLog("Pitchbend range set to " + juce::String(pitchbendRange));
         updateCurrentTuner();
+        return;
     }
+
+    juce::Logger::writeToLog("Pitchbend range of " + juce::String(pitchbendRangeIn) + " was ignored.");
 }
 
 void TunerController::loadSourceTuning(const CentsDefinition& definition, bool updateTuner)

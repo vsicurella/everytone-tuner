@@ -57,8 +57,6 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     getKeyMappings()->addKeyPress(Everytone::Commands::Back, juce::KeyPress::createFromDescription("ctrl + -"));
 
     addKeyListener(getKeyMappings());
-
-    setContentComponent(optionsPanel.get()); // debug
 }
 
 MultimapperAudioProcessorEditor::~MultimapperAudioProcessorEditor()
