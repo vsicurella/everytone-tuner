@@ -49,14 +49,9 @@ juce::Array<MidiVoice> MidiVoiceInterpolator::getAndClearVoiceTargets()
 void MidiVoiceInterpolator::setBendMode(Everytone::BendMode bendModeIn)
 {
     bendMode = bendModeIn;
-
+    juce::Logger::writeToLog("Set BendMode to " + juce::String((int)bendModeIn));
     switch (bendMode)
     {
-    case Everytone::BendMode::Static:
-        stopTimer();
-        clearVoiceTargets();
-        return;
-
     case Everytone::BendMode::Dynamic:
     case Everytone::BendMode::Persistent:
         startTimer(updateRateMs);
@@ -64,6 +59,10 @@ void MidiVoiceInterpolator::setBendMode(Everytone::BendMode bendModeIn)
 
     default:
         jassertfalse;
+    case Everytone::BendMode::Static:
+        stopTimer();
+        clearVoiceTargets();
+        return;
     }
 }
 

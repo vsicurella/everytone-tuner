@@ -65,6 +65,7 @@ public:
     void midiModeChanged(Everytone::MidiMode newMidiMode) override;
     void voiceLimitChanged(int newVoiceLimit) override;
     void pitchbendRangeChanged(int pitchbendRange) override;
+    void bendModeChanged(Everytone::BendMode newBendMode) override;
 
     //==============================================================================
     // ApplicationCommandManager implementation

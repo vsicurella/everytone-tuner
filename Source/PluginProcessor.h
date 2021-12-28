@@ -114,6 +114,8 @@ public:
 
     void setPitchbendRange(int pitchbendRange);
 
+    void setBendMode(Everytone::BendMode bendMode);
+
     void setOptions(Everytone::Options optionsIn);
 
     //==============================================================================

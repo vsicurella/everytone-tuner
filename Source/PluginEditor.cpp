@@ -57,6 +57,8 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     getKeyMappings()->addKeyPress(Everytone::Commands::Back, juce::KeyPress::createFromDescription("ctrl + -"));
 
     addKeyListener(getKeyMappings());
+
+    setContentComponent(optionsPanel.get()); // debug
 }
 
 MultimapperAudioProcessorEditor::~MultimapperAudioProcessorEditor()
@@ -162,6 +164,11 @@ void MultimapperAudioProcessorEditor::pitchbendRangeChanged(int pitchbendRange)
 {
     // User inputs bipolar form, so multiply for absolute range
     audioProcessor.setPitchbendRange(pitchbendRange * 2);
+}
+
+void MultimapperAudioProcessorEditor::bendModeChanged(Everytone::BendMode newBendMode)
+{
+    audioProcessor.setBendMode(newBendMode);
 }
 
 juce::ApplicationCommandTarget* MultimapperAudioProcessorEditor::getFirstCommandTarget(juce::CommandID commandID)

@@ -27,6 +27,8 @@ public:
     MidiVoiceInterpolator(MidiVoiceController& voiceController, Everytone::BendMode bendMode = Everytone::BendMode::Static);
     ~MidiVoiceInterpolator();
 
+    Everytone::BendMode getBendMode() const { return bendMode; }
+
     // juce::Timer implementation
     void timerCallback() override;
 

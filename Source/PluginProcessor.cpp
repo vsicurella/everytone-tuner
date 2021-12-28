@@ -385,6 +385,7 @@ Everytone::Options MultimapperAudioProcessor::options() const
         Everytone::MpeZone::Lower,
         Everytone::MidiMode::Mono,
         Everytone::VoiceRule::Ignore,
+        voiceInterpolator->getBendMode(),
         voiceController->getVoiceLimit(),
         tunerController->getPitchbendRange()
     };
@@ -450,11 +451,17 @@ void MultimapperAudioProcessor::setPitchbendRange(int pitchbendRange)
     tunerController->setPitchbendRange(pitchbendRange);
 }
 
+void MultimapperAudioProcessor::setBendMode(Everytone::BendMode bendMode)
+{
+    voiceInterpolator->setBendMode(bendMode);
+}
+
 void MultimapperAudioProcessor::setOptions(Everytone::Options optionsIn)
 {
     setAutoMappingType(optionsIn.mappingType);
     setMappingMode(optionsIn.mappingMode);
     setChannelMode(optionsIn.channelMode);
+    setBendMode(optionsIn.bendMode);
     setVoiceLimit(optionsIn.voiceLimit);
     setPitchbendRange(optionsIn.pitchbendRange);
 }
