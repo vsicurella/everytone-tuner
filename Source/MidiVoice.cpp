@@ -34,7 +34,7 @@ void MidiVoice::updatePitch()
     auto previousPitch = currentPitch;
     currentPitch = tuner->getMidiPitch(midiChannel, midiNote);
 
-#if JUCE_DEBUG
+#if JUCE_DEBUG && 0
     auto ch = juce::String(midiChannel);
     auto note = juce::String(midiNote);
     auto input = "\t(" + ch + ", " + note + ") -> ";
