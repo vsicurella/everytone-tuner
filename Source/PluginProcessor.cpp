@@ -22,6 +22,7 @@
 MultimapperAudioProcessor::MultimapperAudioProcessor()
     : tunerController(std::make_unique<TunerController>()),
       voiceController(std::make_unique<MidiVoiceController>(*tunerController)),
+      voiceInterpolator(std::make_unique<MidiVoiceInterpolator>(*voiceController, Everytone::BendMode::Persistent)),
 
 #ifndef JucePlugin_PreferredChannelConfigurations
      AudioProcessor (BusesProperties()
@@ -297,8 +298,21 @@ MultimapperLog* MultimapperAudioProcessor::getLog() const
 void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
 {
     juce::MidiBuffer processedBuffer;
-    int sample = 0; 
+    int sample = 0;
 
+    // Update active voices
+    auto voiceTargets = voiceInterpolator->getAndClearVoiceTargets();
+    for (auto voice : voiceTargets)
+    {
+        if (voice.getAssignedChannel() >= 0)
+        {
+            processedBuffer.addEvent(voice.getPitchbend(), sample++);
+        }
+        else
+            jassertfalse;
+    }
+
+    // Process new messages
     for (auto metadata : buffer)
     {
         auto msg = metadata.getMessage();

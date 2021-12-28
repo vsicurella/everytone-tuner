@@ -55,14 +55,23 @@ const MidiVoice* MidiVoiceController::getVoice(const juce::MidiMessage& msg) con
 
 int MidiVoiceController::numVoices() const
 {
-    int num = 0;
-    for (int i = 0; i < voices.size(); i++)
-    {
-        if (getVoice(i)->getAssignedChannel() >= 0)
-            num++;
-    }
+    //int num = 0;
+    //for (int i = 0; i < voices.size(); i++)
+    //{
+    //    if (getVoice(i)->getAssignedChannel() >= 0)
+    //        num++;
+    //}
 
-    return num;
+    //return num;
+    return activeVoices.size();
+}
+
+juce::Array<MidiVoice> MidiVoiceController::getActiveVoices() const
+{
+    juce::Array<MidiVoice> activeVoicesCopy;
+    for (auto voice : activeVoices)
+        activeVoicesCopy.add(*voice);
+    return activeVoicesCopy;
 }
 
 int MidiVoiceController::channelOfVoice(int midiChannel, int midiNote) const
@@ -107,10 +116,10 @@ MidiVoice MidiVoiceController::removeVoice(int index)
 {
     if (index >= 0 && index < MULTIMAPPER_MAX_VOICES)
     {
-        auto voice = voices[index];
+        activeVoices.removeAllInstancesOf(voices[index]);
+        auto voice = *voices[index];
         voices.set(index, new MidiVoice());
-        activeVoices.removeAllInstancesOf(voice);
-        return *voice;
+        return voice;
     }
     return MidiVoice();
 }

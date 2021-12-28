@@ -11,6 +11,7 @@
 #include "TuningChanger.h"
 #include "TunerController.h"
 #include "MidiVoiceController.h"
+#include "MidiVoiceInterpolator.h"
 
 class MultimapperLog : public juce::Logger
 {
@@ -128,6 +129,7 @@ private:
 
     std::unique_ptr<TunerController> tunerController;
     std::unique_ptr<MidiVoiceController> voiceController;
+    std::unique_ptr<MidiVoiceInterpolator> voiceInterpolator;
     
     std::unique_ptr<MultimapperLog> logger;
 

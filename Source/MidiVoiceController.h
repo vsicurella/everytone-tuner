@@ -80,6 +80,7 @@ public:
     //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;
 
     int numVoices() const;
+    juce::Array<MidiVoice> getActiveVoices() const;
 
     int channelOfVoice(int midiChannel, int midiNote) const;
     int channelOfVoice(const juce::MidiMessage& msg) const;

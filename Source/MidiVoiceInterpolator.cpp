@@ -9,3 +9,75 @@
 */
 
 #include "MidiVoiceInterpolator.h"
+
+MidiVoiceInterpolator::MidiVoiceInterpolator(MidiVoiceController& voiceControllerIn, Everytone::BendMode bendModeIn)
+    : voiceController(voiceControllerIn)
+{
+    setBendMode(bendModeIn);
+}
+
+MidiVoiceInterpolator::~MidiVoiceInterpolator()
+{
+
+}
+
+
+// juce::Timer implementation
+void MidiVoiceInterpolator::timerCallback()
+{
+    updateTargetVoices();
+}
+
+
+juce::Array<MidiVoice>MidiVoiceInterpolator:: getVoiceTargets() const
+{
+    return activeVoiceTargets;
+}
+
+void MidiVoiceInterpolator::clearVoiceTargets()
+{
+    activeVoiceTargets.clearQuick();
+}
+
+juce::Array<MidiVoice> MidiVoiceInterpolator::getAndClearVoiceTargets()
+{
+    auto voices = activeVoiceTargets;
+    activeVoiceTargets.clearQuick();
+    return voices;
+}
+
+void MidiVoiceInterpolator::setBendMode(Everytone::BendMode bendModeIn)
+{
+    bendMode = bendModeIn;
+
+    switch (bendMode)
+    {
+    case Everytone::BendMode::Static:
+        stopTimer();
+        clearVoiceTargets();
+        return;
+
+    case Everytone::BendMode::Dynamic:
+    case Everytone::BendMode::Persistent:
+        startTimer(updateRateMs);
+        return;
+
+    default:
+        jassertfalse;
+    }
+}
+
+void MidiVoiceInterpolator::updateTargetVoices()
+{
+    switch (bendMode)
+    {
+    case Everytone::BendMode::Persistent:
+        activeVoiceTargets = voiceController.getActiveVoices();
+        break;
+
+    case Everytone::BendMode::Dynamic:
+        // TODO
+        jassertfalse;
+        break;
+    }
+}

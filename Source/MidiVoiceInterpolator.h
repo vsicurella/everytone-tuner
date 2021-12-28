@@ -12,8 +12,10 @@
 #include "TunerController.h"
 #include "MidiVoiceController.h"
 
-class MidiVoiceInterpolator : public juce::Timer, public TunerController::Watcher
+class MidiVoiceInterpolator : public juce::Timer
 {
+    const MidiVoiceController& voiceController;
+
     Everytone::BendMode bendMode = Everytone::BendMode::Static;
 
     juce::Array<MidiVoice> activeVoiceTargets;
@@ -22,11 +24,21 @@ class MidiVoiceInterpolator : public juce::Timer, public TunerController::Watche
 
 public:
 
-    MidiVoiceInterpolator(Everytone::BendMode bendMode = Everytone::BendMode::Static);
+    MidiVoiceInterpolator(MidiVoiceController& voiceController, Everytone::BendMode bendMode = Everytone::BendMode::Static);
     ~MidiVoiceInterpolator();
 
     // juce::Timer implementation
     void timerCallback() override;
 
+    juce::Array<MidiVoice> getVoiceTargets() const;
 
+    void clearVoiceTargets();
+
+    juce::Array<MidiVoice> getAndClearVoiceTargets();
+
+    void setBendMode(Everytone::BendMode bendModeIn);
+
+private:
+
+    void updateTargetVoices();
 };
