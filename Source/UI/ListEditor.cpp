@@ -90,31 +90,35 @@ void ListEditor::paintCell(juce::Graphics& g, int rowNumber, int columnId, int w
 juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId, bool rowIsSelected, juce::Component* existingComponentToUpdate)
 {
     auto column = ListEditorHeader::Columns(columnId);
+    auto indexString = juce::String(rowNumber + 1);
 
     if (existingComponentToUpdate == nullptr)
     {
-        auto indexString = juce::String(rowNumber);
         switch (column)
         {
         case ListEditorHeader::Columns::Index:
         {
-            auto indexLabel = new juce::Label("Index" + indexString + "Label", indexString);
+            auto indexLabel = new juce::Label();
             indexLabel->setJustificationType(juce::Justification::centred);
             existingComponentToUpdate = indexLabel;
             break;
         }
         case ListEditorHeader::Columns::Interval:
         {
-            auto interval = definition.intervalCents[rowNumber];
-            auto intervalString = juce::String(interval);
-            auto intervalLabel = new juce::Label("Interval" + indexString + "Label", intervalString);
+            auto intervalLabel = new juce::Label();
             intervalLabel->setJustificationType(juce::Justification::centred);
+            intervalLabel->onTextChange = [&, intervalLabel, rowNumber]()
+            {
+                double newInterval = intervalLabel->getText().getDoubleValue();
+                modifyInterval(rowNumber, newInterval);
+            };
             existingComponentToUpdate = intervalLabel;
             break;
         }
         case ListEditorHeader::Columns::Type:
         {
-            auto typeLabel = new juce::Label("Type" + indexString + "Label", "cents");
+            auto typeLabel = new juce::Label();
+            typeLabel->setText("cents", juce::NotificationType::dontSendNotification);
             existingComponentToUpdate = typeLabel;
             return typeLabel;
         }
@@ -131,18 +135,13 @@ juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId
         }
         case ListEditorHeader::Columns::Delete:
         {
-            // Don't allow to delete period
-            if (rowNumber < getNumRows() - 1)
+            auto deleteButton = new juce::TextButton("Delete" + indexString + "Button", "Remove this interval");
+            deleteButton->setButtonText("x");
+            deleteButton->onClick = [&, rowNumber]()
             {
-                auto deleteButton = new juce::TextButton("Delete" + indexString + "Button", "Remove this interval");
-                deleteButton->setButtonText("x");
-                deleteButton->onClick = [&, rowNumber]()
-                {
-                    removeInterval(rowNumber);
-                };
-                return deleteButton;
-            }
-            return nullptr;
+                removeInterval(rowNumber);
+            };
+            return deleteButton;
         }
         default:
             jassertfalse;
@@ -155,28 +154,33 @@ juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId
     case ListEditorHeader::Columns::Index:
     {
         auto label = dynamic_cast<juce::Label*>(existingComponentToUpdate);
-        label->setText(juce::String(rowNumber), juce::NotificationType::dontSendNotification);
+        label->setName("Index" + indexString + "Label");
+        label->setText(indexString, juce::NotificationType::dontSendNotification);
         return label;
     }
     case ListEditorHeader::Columns::Interval:
     {
         auto label = dynamic_cast<juce::Label*>(existingComponentToUpdate);
-        if (label != nullptr)
-        {
-            label->setText(juce::String(definition.intervalCents[rowNumber]), juce::NotificationType::dontSendNotification);
-            label->setEditable(inEditMode, false, true);
-            label->onTextChange = [&, rowNumber]()
-            {
-                double newInterval = label->getText().getDoubleValue();
-                modifyInterval(rowNumber, newInterval);
-            };
-        }
+        auto intervalString = juce::String(definition.intervalCents[rowNumber]);
+        label->setName("Interval" + indexString + "Label");
+        label->setText(intervalString, juce::NotificationType::dontSendNotification);
+        label->setEditable(inEditMode, false, true);
         return label;
     }
     case ListEditorHeader::Columns::Type:
+    {
         auto label = dynamic_cast<juce::Label*>(existingComponentToUpdate);
+        label->setName("Type" + indexString + "Label");
         label->setText("cents", juce::NotificationType::dontSendNotification);
         return label;
+    }
+    case ListEditorHeader::Columns::Delete:
+        if (definition.intervalCents.size() == 1)
+        {
+            delete existingComponentToUpdate;
+            existingComponentToUpdate = nullptr;
+        }
+        break;
     }
 
     return existingComponentToUpdate;
