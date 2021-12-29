@@ -55,6 +55,7 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     bendModeLabel->attachToComponent(bendModeBox.get(), false);
     addAndMakeVisible(*bendModeLabel);
 
+
     mpeZoneBox = std::make_unique<juce::ComboBox>("mpeZoneBox");
     mpeZoneBox->addItem("Lower", (int)Everytone::MpeZone::Lower);
     mpeZoneBox->addItem("Upper", (int)Everytone::MpeZone::Upper);
@@ -77,7 +78,8 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     };
     addAndMakeVisible(*voiceLimitValueLabel);
 
-    auto voiceLimitLabel = labels.add(new juce::Label("VoiceLimitLabel", "Voice Limit:"));
+    voiceLimitLabel = labels.add(new juce::Label("VoiceLimitLabel", "Voice Limit:"));
+    voiceLimitLabel->setJustificationType(juce::Justification::centredRight);
     voiceLimitLabel->attachToComponent(voiceLimitValueLabel.get(), true);
     addAndMakeVisible(*voiceLimitLabel);
 }
@@ -102,13 +104,20 @@ void OptionsPanel::resized()
     auto w = getWidth();
     auto h = getHeight();
     
+    float margin = 0.015f;
+    margin *= (w > h) ? w : h;
+        
     auto halfWidth = w * 0.5;
     
-    auto controlWidth = halfWidth * 0.75f;
+    auto controlWidth = (w - margin * 4) * 0.5f;
     auto controlHeight = h * 0.125;
     auto labelHeight = controlHeight * 0.75;
+
+    for (auto label : labels)
+        label->setSize(controlWidth, labelHeight);
     
-    auto controlMargin = juce::FlexItem::Margin(labelHeight + 5, w / 15.0f, 0, 0);
+    auto controlMargin = juce::FlexItem::Margin(margin);
+    controlMargin.top += labelHeight;
 
     juce::FlexBox leftHalf;
     leftHalf.flexDirection = juce::FlexBox::Direction::column;
@@ -118,19 +127,23 @@ void OptionsPanel::resized()
 
     juce::FlexBox rightHalf;
     rightHalf.flexDirection = juce::FlexBox::Direction::column;
-    rightHalf.alignItems = juce::FlexBox::AlignItems::flexEnd;
-    rightHalf.items.add(juce::FlexItem(halfWidth, controlHeight, *mpeZoneBox).withMargin(controlMargin));
-    rightHalf.items.add(juce::FlexItem(w * 0.1, controlHeight, *voiceLimitValueLabel).withMargin(controlMargin));
+    rightHalf.alignItems = juce::FlexBox::AlignItems::flexStart;
+    rightHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *mpeZoneBox).withMargin(controlMargin));
+
+    auto voiceLimitWidth = voiceLimitValueLabel->getFont().getStringWidth("999999") + margin;
+    auto voiceLimitLabelWidth = voiceLimitLabel->getFont().getStringWidth(voiceLimitLabel->getText());
+    auto voiceLimitItemMargin = controlMargin;
+    voiceLimitItemMargin.left = voiceLimitLabelWidth + margin;
+    rightHalf.items.add(juce::FlexItem(voiceLimitWidth, controlHeight, *voiceLimitValueLabel).withMargin(voiceLimitItemMargin));
+
+    auto layoutMargin = juce::FlexItem::Margin(0, margin, 0, margin);
 
     juce::FlexBox flexBox;
     flexBox.flexDirection = juce::FlexBox::Direction::row;
     flexBox.alignContent = juce::FlexBox::AlignContent::center;
-    flexBox.justifyContent = juce::FlexBox::JustifyContent::flexStart;
-    flexBox.items.add(juce::FlexItem(halfWidth, h, leftHalf));
-    flexBox.items.add(juce::FlexItem(halfWidth, h, rightHalf));
-
-    for (auto label : labels)
-        label->setSize(controlWidth, labelHeight);
+    flexBox.justifyContent = juce::FlexBox::JustifyContent::center;
+    flexBox.items.add(juce::FlexItem(halfWidth, h, leftHalf).withMargin(layoutMargin));
+    flexBox.items.add(juce::FlexItem(halfWidth, h, rightHalf).withMargin(layoutMargin));
 
     flexBox.performLayout(getLocalBounds());
 }
