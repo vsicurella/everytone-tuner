@@ -14,6 +14,7 @@
 #include "ui/MenuPanel.h"
 #include "ui/OverviewPanel.h"
 #include "ui/NewTuningPanel.h"
+#include "ui/MappingPanel.h"
 #include "ui/OptionsPanel.h"
 #include "io/TuningFileParser.h"
 
@@ -25,7 +26,6 @@ class MultimapperAudioProcessorEditor  : public juce::AudioProcessorEditor,
                                          public juce::ApplicationCommandTarget,
                                          public TunerController::Watcher,
                                          public TuningWatcher,
-                                         public TuningChanger,
                                          public OptionsWatcher
 {
 public:
@@ -106,11 +106,17 @@ private:
     std::unique_ptr<MappedTuning> tuningBackup;
 
     juce::Component* contentComponent = nullptr;
+
     std::unique_ptr<InfoBar> infoBar;
     std::unique_ptr<MenuPanel> menuPanel;
+
+    std::unique_ptr<ListEditor> listEditorModel;
+
     std::unique_ptr<OverviewPanel> overviewPanel;
     std::unique_ptr<NewTuningPanel> newTuningPanel;
+    std::unique_ptr<MappingPanel> mappingPanel;
     std::unique_ptr<OptionsPanel> optionsPanel;
+
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 

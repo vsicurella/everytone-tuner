@@ -1,0 +1,162 @@
+/*
+  ==============================================================================
+
+    ListEditor.cpp
+    Created: 28 Dec 2021 9:03:41pm
+    Author:  Vincenzo
+
+  ==============================================================================
+*/
+
+#include "ListEditor.h"
+
+ListEditorHeader::ListEditorHeader(bool inEditMode)
+{
+    addColumn("#",          (int)Columns::Index, 48);
+    addColumn("Interval",   (int)Columns::Interval, 96);
+    addColumn("Type",       (int)Columns::Type, 72);
+
+    if (inEditMode)
+    {
+        addColumn("", (int)Columns::InsertAbove, 48);
+        addColumn("", (int)Columns::Delete, 48);
+    }
+}
+
+ListEditor::ListEditor(bool editMode, const TuningBase* tuningIn)
+    : inEditMode(editMode)
+{
+    setTuning(tuningIn);
+}
+
+void ListEditor::setTuning(const TuningBase* tuningIn)
+{
+    tuning = tuningIn;
+
+    if (tuning == nullptr)
+    {
+        definition = CentsDefinition();
+        definition.intervalCents = {};
+        return;
+    }
+
+    definition = tuning->getDefinition();
+}
+
+void ListEditor::sendCentsDefinitionUpdateChange()
+{
+    tuningWatchers.call(&TuningWatcher::targetDefinitionLoaded, this, definition);
+}
+
+// juce::TablelistModel implemetnation
+
+int ListEditor::getNumRows()
+{
+    if (tuning == nullptr)
+        return 0;
+
+    return definition.intervalCents.size();
+}
+
+void ListEditor::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
+{
+
+}
+
+void ListEditor::paintCell(juce::Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
+{
+
+}
+
+juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId, bool rowIsSelected, juce::Component* existingComponentToUpdate)
+{
+    auto column = ListEditorHeader::Columns(columnId);
+
+    if (existingComponentToUpdate == nullptr)
+    {
+        auto indexString = juce::String(rowNumber);
+        switch (column)
+        {
+        case ListEditorHeader::Columns::Index:
+        {
+            auto indexLabel = new juce::Label("Index" + indexString + "Label", indexString);
+            indexLabel->setJustificationType(juce::Justification::centred);
+            existingComponentToUpdate = indexLabel;
+            break;
+        }
+        case ListEditorHeader::Columns::Interval:
+        {
+            auto interval = definition.intervalCents[rowNumber];
+            auto intervalString = juce::String(interval);
+            auto intervalLabel = new juce::Label("Interval" + indexString + "Label", intervalString);
+            intervalLabel->setJustificationType(juce::Justification::centred);
+            existingComponentToUpdate = intervalLabel;
+            break;
+        }
+        case ListEditorHeader::Columns::Type:
+        {
+            auto typeLabel = new juce::Label("Type" + indexString + "Label", "cents");
+            existingComponentToUpdate = typeLabel;
+            return typeLabel;
+        }
+        case ListEditorHeader::Columns::InsertAbove:
+        {
+            if (inEditMode)
+            {
+                auto insertButton = new juce::TextButton("Insert" + indexString + "Button", "^");
+                insertButton->onClick = [&]()
+                {
+                    definition.intervalCents.insert(rowNumber, definition.intervalCents[rowNumber]);
+                    sendCentsDefinitionUpdateChange();
+                };
+                return insertButton;
+            }
+            return nullptr;
+        }
+        case ListEditorHeader::Columns::Delete:
+        {
+            if (inEditMode)
+            {
+                auto deleteButton = new juce::TextButton("Delete" + indexString + "Button", "x");
+                deleteButton->onClick = [&]()
+                {
+                    definition.intervalCents.removeRange(rowNumber, 1);
+                    sendCentsDefinitionUpdateChange();
+                };
+                return deleteButton;
+            }
+            return nullptr;
+        }
+        default:
+            jassertfalse;
+            return nullptr;
+        }
+    }
+    
+    switch (column)
+    {
+    case ListEditorHeader::Columns::Index:
+    {
+        auto label = dynamic_cast<juce::Label*>(existingComponentToUpdate);
+        label->setText(juce::String(rowNumber), juce::NotificationType::dontSendNotification);
+        return label;
+    }
+    case ListEditorHeader::Columns::Interval:
+    {
+        auto label = dynamic_cast<juce::Label*>(existingComponentToUpdate);
+        if (label != nullptr)
+        {
+            label->setText(juce::String(definition.intervalCents[rowNumber]), juce::NotificationType::dontSendNotification);
+            label->setEditable(inEditMode, false, true);
+        }
+        return label;
+    }
+    case ListEditorHeader::Columns::Type:
+        auto label = dynamic_cast<juce::Label*>(existingComponentToUpdate);
+        label->setText("cents", juce::NotificationType::dontSendNotification);
+        return label;
+    }
+
+    return existingComponentToUpdate;
+}
+
