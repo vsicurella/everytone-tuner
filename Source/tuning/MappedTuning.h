@@ -44,6 +44,8 @@ public:
     
     virtual void setRootFrequency(double frequency) override;
     
+    virtual juce::Array<double> getIntervalCentsList() const override;
+
     virtual double centsAt(int index) const override;
     virtual double frequencyAt(int index) const override;
     virtual double mtsAt(int index) const override;

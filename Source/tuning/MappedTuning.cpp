@@ -38,6 +38,11 @@ void MappedTuning::setRootFrequency(double frequency)
     return tuning->setRootFrequency(frequency);
 }
 
+juce::Array<double> MappedTuning::getIntervalCentsList() const
+{
+    return tuning->getIntervalCentsList();
+}
+
 double MappedTuning::centsAt(int index) const
 {
     return tuning->centsAt(index);

@@ -118,8 +118,8 @@ private:
         double expectedPeriod = params.expectedIntervalCentsTable[params.expectedTuningSize - 1];
         expect_equals(expectedPeriod, tuning->getPeriodCents(), "getPeriodCents()");
         
-        test_table(params.expectedTuningSize, params.expectedIntervalCentsTable, tuning->getIntervalCentsTable(), "getIntervalCentsTable()");
-        test_table(params.expectedTuningSize, params.expectedRatioTable, tuning->getIntervalRatioTable(), "getIntervalRatioTable");
+        test_table(params.expectedTuningSize, params.expectedIntervalCentsTable, tuning->getIntervalCentsList(), "getIntervalCentsList()");
+        test_table(params.expectedTuningSize, params.expectedRatioTable, tuning->getIntervalRatioList(), "getIntervalRatioList");
 
         test_table(params.expectedTableSize, params.expectedFrequencyTable, tuning->getFrequencyTable(), "getFrequencyTable");
         test_table(params.expectedTableSize, params.expectedMtsTable, tuning->getMtsTable(), "getMtsTable()");

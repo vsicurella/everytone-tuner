@@ -32,7 +32,7 @@ static juce::ValueTree tuningToValueTree(const Tuning* tuning, juce::Identifier 
 {
     auto tree = juce::ValueTree(name);
     
-    auto intervals = tuning->getIntervalCentsTable();
+    auto intervals = tuning->getIntervalCentsList();
     auto intervalTree = arrayToValueTree(intervals, Everytone::ID::IntervalTable, Everytone::ID::Cents);
     tree.addChild(intervalTree, 0, nullptr);
 

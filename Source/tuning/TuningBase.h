@@ -11,6 +11,7 @@
 #pragma once
 #include <JuceHeader.h>
 #include "TuningMath.h"
+#include "CentsDefinition.h"
 
 class TuningBase
 {
@@ -43,6 +44,19 @@ public:
 	virtual void setDescription(juce::String descIn) { description = descIn; }
 
 	virtual void setRootFrequency(double frequency) = 0;
+
+	virtual juce::Array<double> getIntervalCentsList() const = 0;
+
+	virtual CentsDefinition getDefinition() const
+	{
+		return CentsDefinition
+		{
+			getIntervalCentsList(),
+			getRootFrequency(),
+			getName(),
+			getDescription(),
+		};
+	}
 
 	virtual double centsAt(int index) const = 0;
 	virtual double centsFromRoot(int steps) const { return centsAt(steps - rootIndex); }

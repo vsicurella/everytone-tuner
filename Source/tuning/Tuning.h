@@ -97,8 +97,8 @@ public:
 
 	virtual int getScaleDegree(int index) const;
 
-	virtual juce::Array<double> getIntervalCentsTable() const;
-	virtual juce::Array<double> getIntervalRatioTable() const;
+	virtual juce::Array<double> getIntervalCentsList() const override;
+	virtual juce::Array<double> getIntervalRatioList() const;
 
 	virtual juce::Array<double> getFrequencyTable() const;
 	virtual juce::Array<double> getMtsTable() const;

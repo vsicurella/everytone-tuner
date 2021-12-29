@@ -25,7 +25,7 @@ Tuning::Tuning(const Tuning& tuning)
       virtualSize(tuning.virtualSize),
       TuningBase(tuning.rootFrequency, tuning.name, tuning.description)
 {
-    setupCentsMap(tuning.getIntervalCentsTable());
+    setupCentsMap(tuning.getIntervalCentsList());
 }
 
 void Tuning::setupCentsMap(const juce::Array<double>& cents)
@@ -205,7 +205,7 @@ int Tuning::getScaleDegree(int index) const
     return centsMap->mapIndexAt(index);
 }
 
-juce::Array<double> Tuning::getIntervalCentsTable() const
+juce::Array<double> Tuning::getIntervalCentsList() const
 {
     // Don't include unison
     juce::Array<double> cents;
@@ -217,7 +217,7 @@ juce::Array<double> Tuning::getIntervalCentsTable() const
     return cents;
 }
 
-juce::Array<double> Tuning::getIntervalRatioTable() const
+juce::Array<double> Tuning::getIntervalRatioList() const
 {
     // Don't include unison
     juce::Array<double> ratios;
