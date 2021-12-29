@@ -28,45 +28,45 @@ class TuningFileParser
 
 public:
 
-	// TODO: move somewhere more common?
+    // TODO: move somewhere more common?
 
-	enum TuningType
-	{
-		INV = 0,	// Invalid
-		SCL,		// Scala
-		TUN,		// Anamark Tun 2.0
-	};
-
-public:
-
-	TuningFileParser() {};
-	TuningFileParser(juce::String filepath);
-	TuningFileParser(juce::File file);
-	~TuningFileParser();
-
-	void loadFile(juce::String absoluteFilePath);
-
-	void readFile(juce::File file);
-
-	CentsDefinition getTuningDefinition() const;
-
-	TuningType getTuningType() const;
+    enum TuningType
+    {
+        INV = 0,    // Invalid
+        SCL,        // Scala
+        TUN,        // Anamark Tun 2.0
+    };
 
 public:
-	
-	static int determineTuningType(juce::File tuningFileIn);
 
-	static CentsDefinition parseScalaFileDefinition(juce::File scalaFile);
+    TuningFileParser() {};
+    TuningFileParser(juce::String filepath);
+    TuningFileParser(juce::File file);
+    ~TuningFileParser();
 
-	static CentsDefinition parseTunFileDefinition(juce::File tunFile);
+    void loadFile(juce::String absoluteFilePath);
+
+    void readFile(juce::File file);
+
+    CentsDefinition getTuningDefinition() const;
+
+    TuningType getTuningType() const;
+
+public:
+    
+    static int determineTuningType(juce::File tuningFileIn);
+
+    static CentsDefinition parseScalaFileDefinition(juce::File scalaFile);
+
+    static CentsDefinition parseTunFileDefinition(juce::File tunFile);
 
 private:
 
-	void parseTuning(juce::File file);
+    void parseTuning(juce::File file);
 
 private:
 
-	//juce::String filePath;
-	TuningType type = TuningType::INV;
-	std::unique_ptr<CentsDefinition> tuningDefinition;
+    //juce::String filePath;
+    TuningType type = TuningType::INV;
+    std::unique_ptr<CentsDefinition> tuningDefinition;
 };
