@@ -18,8 +18,8 @@ ListEditorHeader::ListEditorHeader(bool inEditMode)
 
     if (inEditMode)
     {
-        addColumn("", (int)Columns::InsertAbove, 48);
-        addColumn("", (int)Columns::Delete, 48);
+        addColumn("", (int)Columns::InsertAbove, 24);
+        addColumn("", (int)Columns::Delete, 24);
     }
 }
 
@@ -47,6 +47,25 @@ void ListEditor::sendCentsDefinitionUpdateChange()
 {
     tuningWatchers.call(&TuningWatcher::targetDefinitionLoaded, this, definition);
 }
+
+void ListEditor::insertInterval(int indexToInsert, double centsValue)
+{
+    definition.intervalCents.insert(indexToInsert, centsValue);
+    sendCentsDefinitionUpdateChange();
+}
+
+void ListEditor::modifyInterval(int indexToModify, double centsValue)
+{
+    definition.intervalCents.set(indexToModify, centsValue);
+    sendCentsDefinitionUpdateChange();
+}
+
+void ListEditor::removeInterval(int indexToRemove)
+{
+    definition.intervalCents.removeRange(indexToRemove, 1);
+    sendCentsDefinitionUpdateChange();
+}
+
 
 // juce::TablelistModel implemetnation
 
@@ -101,27 +120,25 @@ juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId
         }
         case ListEditorHeader::Columns::InsertAbove:
         {
-            if (inEditMode)
+            auto insertButton = new juce::TextButton("Insert" + indexString + "Button", "Insert a new interval above this one");
+            insertButton->setButtonText("^");
+            insertButton->onClick = [&, rowNumber]()
             {
-                auto insertButton = new juce::TextButton("Insert" + indexString + "Button", "^");
-                insertButton->onClick = [&]()
-                {
-                    definition.intervalCents.insert(rowNumber, definition.intervalCents[rowNumber]);
-                    sendCentsDefinitionUpdateChange();
-                };
-                return insertButton;
-            }
-            return nullptr;
+                insertInterval(rowNumber, definition.intervalCents[rowNumber]);
+                sendCentsDefinitionUpdateChange();
+            };
+            return insertButton;
         }
         case ListEditorHeader::Columns::Delete:
         {
-            if (inEditMode)
+            // Don't allow to delete period
+            if (rowNumber < getNumRows() - 1)
             {
-                auto deleteButton = new juce::TextButton("Delete" + indexString + "Button", "x");
-                deleteButton->onClick = [&]()
+                auto deleteButton = new juce::TextButton("Delete" + indexString + "Button", "Remove this interval");
+                deleteButton->setButtonText("x");
+                deleteButton->onClick = [&, rowNumber]()
                 {
-                    definition.intervalCents.removeRange(rowNumber, 1);
-                    sendCentsDefinitionUpdateChange();
+                    removeInterval(rowNumber);
                 };
                 return deleteButton;
             }
@@ -148,6 +165,11 @@ juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId
         {
             label->setText(juce::String(definition.intervalCents[rowNumber]), juce::NotificationType::dontSendNotification);
             label->setEditable(inEditMode, false, true);
+            label->onTextChange = [&, rowNumber]()
+            {
+                double newInterval = label->getText().getDoubleValue();
+                modifyInterval(rowNumber, newInterval);
+            };
         }
         return label;
     }

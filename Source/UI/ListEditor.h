@@ -35,8 +35,6 @@ class ListEditor : public juce::TableListBoxModel, public TuningChanger
 
     CentsDefinition definition;
 
-
-
 public:
 
     ListEditor(bool inEditMode = false, const TuningBase* tuning = nullptr);
@@ -44,6 +42,10 @@ public:
     void setTuning(const TuningBase* tuning);
 
     void sendCentsDefinitionUpdateChange();
+
+    void insertInterval(int indexToInsert, double centsValue);
+    void modifyInterval(int indexToModify, double centsValue);
+    void removeInterval(int indexToRemove);
 
     // juce::TablelistModel implemetnation
    

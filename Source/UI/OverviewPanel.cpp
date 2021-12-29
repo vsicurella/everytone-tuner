@@ -53,7 +53,7 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 	//descriptionlabel->attachToComponent(descriptionTextBox.get(), false);
 
 	listEditorComponent = std::make_unique<juce::TableListBox>("ListEditorComponent");
-	listEditorComponent->setHeader(std::make_unique<ListEditorHeader>(false));
+	listEditorComponent->setHeader(std::make_unique<ListEditorHeader>(true));
 	addAndMakeVisible(listEditorComponent.get());
 }
 
