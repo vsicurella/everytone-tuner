@@ -10,7 +10,7 @@
 
 #include "TuningTableViewer.h"
 
-TuningTableViewer::TuningTableViewer(IntervalListModel* intervalListModel, const Tuning* tuningIn)
+TuningTableViewer::TuningTableViewer(IntervalListModel* intervalListModel, const MappedTuning* tuningIn)
     : juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
     if (intervalListModel == nullptr)
@@ -26,20 +26,36 @@ TuningTableViewer::TuningTableViewer(IntervalListModel* intervalListModel, const
     tuningTable = std::make_unique<juce::TableListBox>("TuningTable", tuningModel.get());
     tuningTable->setHeader(std::make_unique<TuningTableHeader>());
 
-    setTuning(tuningIn);
+    mappingModel = std::make_unique<MappingTableModel>();
+    mappingTable = std::make_unique<juce::TableListBox>("MappingTable", mappingModel.get());
+    mappingTable->setHeader(std::make_unique<MappingTableHeader>());
 
     addTab("Intervals", juce::Colour(), intervalTable.get(), false);
     addTab("Tuning Table", juce::Colour(), tuningTable.get(), false);
+    addTab("Mapping", juce::Colour(), mappingTable.get(), false);
+
+    set(tuningIn);
 }
 
 TuningTableViewer::~TuningTableViewer()
 {
+    mappingTable = nullptr;
+    mappingModel = nullptr;
     tuningTable = nullptr;
     intervalTable = nullptr;
     intervalModel = nullptr;
 }
 
-void TuningTableViewer::setTuning(const Tuning* tuningIn)
+void TuningTableViewer::set(const MappedTuning* tuningIn)
+{
+    if (tuningIn == nullptr)
+        return;
+
+    set(tuningIn->getTuning());
+    set(tuningIn->getMapping());
+}
+
+void TuningTableViewer::set(const Tuning* tuningIn)
 {
     tuning = tuningIn;
 
@@ -51,3 +67,11 @@ void TuningTableViewer::setTuning(const Tuning* tuningIn)
     intervalTable->updateContent();
     tuningTable->updateContent();
 }
+
+void TuningTableViewer::set(const TuningTableMap* mappingIn)
+{
+    mapping = mappingIn;
+    mappingModel->setMapping(mapping);
+    mappingTable->updateContent();
+}
+

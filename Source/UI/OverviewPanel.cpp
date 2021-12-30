@@ -135,9 +135,10 @@ void OverviewPanel::resized()
 }
 
 
-void OverviewPanel::setTuningDisplayed(const MappedTuning* mappedTuning)
+void OverviewPanel::setTuningDisplayed(const MappedTuning* mappedTuningIn)
 {
-	tuning = mappedTuning->getTuning();
+	mappedTuning = mappedTuningIn;
+	auto tuning = mappedTuning->getTuning();
 
 	tuningNameBox->setText(tuning->getName(), juce::NotificationType::dontSendNotification);
 	descriptionEditor->setText(tuning->getDescription(), juce::NotificationType::dontSendNotification);
@@ -161,7 +162,7 @@ void OverviewPanel::setTuningDisplayed(const MappedTuning* mappedTuning)
 	//setRootFrequencyLabel(juce::String(tuning->getRootFrequency()) + " hz");
 
 	//listEditorComponent->updateContent();
-	tuningTableViewer->setTuning(tuning);
+	tuningTableViewer->set(mappedTuning);
 }
 
 void OverviewPanel::setListEditorModel(IntervalListModel* listEditor)
@@ -169,7 +170,7 @@ void OverviewPanel::setListEditorModel(IntervalListModel* listEditor)
 	//listEditorComponent->setModel(listEditor);
 	tuningTableViewer = nullptr;
 	tuningTableViewer = std::make_unique<TuningTableViewer>(listEditor);
-	tuningTableViewer->setTuning(tuning);
+	tuningTableViewer->set(mappedTuning);
 	addAndMakeVisible(*tuningTableViewer);
 	resized();
 }

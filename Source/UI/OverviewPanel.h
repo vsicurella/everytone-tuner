@@ -34,7 +34,7 @@ public:
 
 private:
 
-	const Tuning* tuning = nullptr;
+	const MappedTuning* mappedTuning = nullptr;
 
 	std::unique_ptr<juce::Label> tuningNameBox;
 	std::unique_ptr<juce::Label> tuningSizeBox;

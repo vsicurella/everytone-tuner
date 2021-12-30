@@ -11,10 +11,13 @@
 #pragma once
 #include "./TuningTableViewerModel.h"
 #include "./IntervalListEditor.h"
+#include "./MappingTableModel.h"
 
 class TuningTableViewer : public juce::TabbedComponent
 {
+    const MappedTuning* mappedTuning;
     const Tuning* tuning;
+    const TuningTableMap* mapping;
 
     std::unique_ptr<IntervalListModel> intervalModel;
     std::unique_ptr<juce::TableListBox> intervalTable;
@@ -22,13 +25,17 @@ class TuningTableViewer : public juce::TabbedComponent
     std::unique_ptr<TuningTableViewerModel> tuningModel;
     std::unique_ptr<juce::TableListBox> tuningTable;
 
+    std::unique_ptr<MappingTableModel> mappingModel;
+    std::unique_ptr<juce::TableListBox> mappingTable;
+
 public:
 
     // If passed in IntervalListModel is nullptr, it will be created and managed by this component
-    TuningTableViewer(IntervalListModel* intervalListModel = nullptr, const Tuning* tuningIn = nullptr);
+    TuningTableViewer(IntervalListModel* intervalListModel = nullptr, const MappedTuning* tuningIn = nullptr);
 
     ~TuningTableViewer();
 
-
-    void setTuning(const Tuning* tuningIn);
+    void set(const MappedTuning* tuningIn);
+    void set(const Tuning* tuningIn);
+    void set(const TuningTableMap* tuningIn);
 };
