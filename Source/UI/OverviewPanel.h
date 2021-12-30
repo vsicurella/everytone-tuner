@@ -12,7 +12,7 @@
 
 #include "../tuning/MappedTuning.h"
 #include "../TuningChanger.h"
-#include "ListEditor.h"
+#include "TuningTableViewer.h"
 
 class OverviewPanel  : public juce::Component, public TuningChanger, public OptionsChanger
 {
@@ -34,11 +34,8 @@ public:
 
 private:
 
-	juce::ValueTree optionsNode;
-	juce::Font font;
+	const Tuning* tuning = nullptr;
 
-    //==============================================================================
-	
 	std::unique_ptr<juce::Label> tuningNameBox;
 	std::unique_ptr<juce::Label> tuningSizeBox;
 	std::unique_ptr<juce::Label> tuningPeriodBox;
@@ -46,8 +43,9 @@ private:
 	std::unique_ptr<juce::Label> descriptionTextLabel;
 	std::unique_ptr<juce::TextEditor> descriptionEditor;
 
-	std::unique_ptr<ListEditorHeader> listEditorHeader;
-	std::unique_ptr<juce::TableListBox> listEditorComponent;
+	//std::unique_ptr<ListEditorHeader> listEditorHeader;
+	//std::unique_ptr<juce::TableListBox> listEditorComponent;
+	std::unique_ptr<TuningTableViewer> tuningTableViewer;
 
 	juce::OwnedArray<juce::Label> labels;
 
@@ -55,6 +53,6 @@ private:
 	juce::Array<juce::Rectangle<int>> debugBoxes;
 #endif
 
-    //====================================================================w==========
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OverviewPanel)
 };

@@ -52,9 +52,12 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 	//addAndMakeVisible(tuningPeriodLabel);
 	//descriptionlabel->attachToComponent(descriptionTextBox.get(), false);
 
-	listEditorComponent = std::make_unique<juce::TableListBox>("ListEditorComponent");
-	listEditorComponent->setHeader(std::make_unique<ListEditorHeader>(true));
-	addAndMakeVisible(listEditorComponent.get());
+	//listEditorComponent = std::make_unique<juce::TableListBox>("ListEditorComponent");
+	//listEditorComponent->setHeader(std::make_unique<ListEditorHeader>(true));
+	//addAndMakeVisible(listEditorComponent.get());
+
+	tuningTableViewer = std::make_unique<TuningTableViewer>();
+	addAndMakeVisible(*tuningTableViewer);
 }
 
 OverviewPanel::~OverviewPanel()
@@ -105,7 +108,7 @@ void OverviewPanel::resized()
 	//tuningInfo.items.add(juce::FlexItem(halfWidth, controlHeight, *tuningPeriodBox).withMargin(tuningMargin));
 	tuningInfo.items.add(juce::FlexItem(halfWidth, h, *descriptionEditor));
 	
-	tuningInfo.items.add(juce::FlexItem(halfWidth, h, *listEditorComponent));
+	tuningInfo.items.add(juce::FlexItem(halfWidth, h, *tuningTableViewer));
 	
 	//juce::FlexBox main;
 	//main.justifyContent = juce::FlexBox::JustifyContent::flexStart;
@@ -134,7 +137,8 @@ void OverviewPanel::resized()
 
 void OverviewPanel::setTuningDisplayed(const MappedTuning* mappedTuning)
 {
-	auto tuning = mappedTuning->getTuning();
+	tuning = mappedTuning->getTuning();
+
 	tuningNameBox->setText(tuning->getName(), juce::NotificationType::dontSendNotification);
 	descriptionEditor->setText(tuning->getDescription(), juce::NotificationType::dontSendNotification);
 
@@ -156,12 +160,18 @@ void OverviewPanel::setTuningDisplayed(const MappedTuning* mappedTuning)
 	//
 	//setRootFrequencyLabel(juce::String(tuning->getRootFrequency()) + " hz");
 
-	listEditorComponent->updateContent();
+	//listEditorComponent->updateContent();
+	tuningTableViewer->setTuning(tuning);
 }
 
 void OverviewPanel::setListEditorModel(ListEditor* listEditor)
 {
-	listEditorComponent->setModel(listEditor);
+	//listEditorComponent->setModel(listEditor);
+	tuningTableViewer = nullptr;
+	tuningTableViewer = std::make_unique<TuningTableViewer>(listEditor);
+	tuningTableViewer->setTuning(tuning);
+	addAndMakeVisible(*tuningTableViewer);
+	resized();
 }
 
 //

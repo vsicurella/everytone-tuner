@@ -7,6 +7,14 @@
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
       <FILE id="oMI0GT" name="Common.h" compile="0" resource="0" file="Source/Common.h"/>
       <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="ui">
+        <FILE id="BKMfF7" name="TuningTableViewer.cpp" compile="1" resource="0"
+              file="Source/ui/TuningTableViewer.cpp"/>
+        <FILE id="WQOl3W" name="TuningTableViewer.h" compile="0" resource="0"
+              file="Source/ui/TuningTableViewer.h"/>
+        <FILE id="tv2q6E" name="TuningTableViewerModel.cpp" compile="1" resource="0"
+              file="Source/ui/TuningTableViewerModel.cpp"/>
+        <FILE id="CMLqaR" name="TuningTableViewerModel.h" compile="0" resource="0"
+              file="Source/ui/TuningTableViewerModel.h"/>
         <FILE id="O0B4rW" name="MappingPanel.cpp" compile="1" resource="0"
               file="Source/UI/MappingPanel.cpp"/>
         <FILE id="dLTTCc" name="MappingPanel.h" compile="0" resource="0" file="Source/UI/MappingPanel.h"/>
