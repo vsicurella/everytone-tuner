@@ -25,7 +25,7 @@ public:
 
 	void setTuningDisplayed(const MappedTuning* tuning);
 
-	void setListEditorModel(ListEditor* listEditor);
+	void setListEditorModel(IntervalListModel* listEditor);
 
 	//==============================================================================
 
@@ -43,7 +43,7 @@ private:
 	std::unique_ptr<juce::Label> descriptionTextLabel;
 	std::unique_ptr<juce::TextEditor> descriptionEditor;
 
-	//std::unique_ptr<ListEditorHeader> listEditorHeader;
+	//std::unique_ptr<IntervalListHeader> listEditorHeader;
 	//std::unique_ptr<juce::TableListBox> listEditorComponent;
 	std::unique_ptr<TuningTableViewer> tuningTableViewer;
 

@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    ListEditor.h
+    IntervalListEditor.h
     Created: 28 Dec 2021 9:03:41pm
     Author:  Vincenzo
 
@@ -12,7 +12,7 @@
 #include "../TuningChanger.h"
 #include "../tuning/MappedTuning.h"
 
-class ListEditorHeader : public juce::TableHeaderComponent
+class IntervalListHeader : public juce::TableHeaderComponent
 {
 public:
     enum class Columns
@@ -24,10 +24,10 @@ public:
         Delete
     };
 
-    ListEditorHeader(bool inEditMode);
+    IntervalListHeader(bool inEditMode);
 };
 
-class ListEditor : public juce::TableListBoxModel, public TuningChanger
+class IntervalListModel : public juce::TableListBoxModel, public TuningChanger
 {
     bool inEditMode = false;
 
@@ -37,7 +37,7 @@ class ListEditor : public juce::TableListBoxModel, public TuningChanger
 
 public:
 
-    ListEditor(bool inEditMode = false, const TuningBase* tuning = nullptr);
+    IntervalListModel(bool inEditMode = false, const TuningBase* tuning = nullptr);
 
     void setTuning(const TuningBase* tuning);
 

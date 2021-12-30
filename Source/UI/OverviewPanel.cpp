@@ -53,7 +53,7 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 	//descriptionlabel->attachToComponent(descriptionTextBox.get(), false);
 
 	//listEditorComponent = std::make_unique<juce::TableListBox>("ListEditorComponent");
-	//listEditorComponent->setHeader(std::make_unique<ListEditorHeader>(true));
+	//listEditorComponent->setHeader(std::make_unique<IntervalListHeader>(true));
 	//addAndMakeVisible(listEditorComponent.get());
 
 	tuningTableViewer = std::make_unique<TuningTableViewer>();
@@ -164,7 +164,7 @@ void OverviewPanel::setTuningDisplayed(const MappedTuning* mappedTuning)
 	tuningTableViewer->setTuning(tuning);
 }
 
-void OverviewPanel::setListEditorModel(ListEditor* listEditor)
+void OverviewPanel::setListEditorModel(IntervalListModel* listEditor)
 {
 	//listEditorComponent->setModel(listEditor);
 	tuningTableViewer = nullptr;

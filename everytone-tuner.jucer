@@ -7,6 +7,10 @@
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
       <FILE id="oMI0GT" name="Common.h" compile="0" resource="0" file="Source/Common.h"/>
       <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="ui">
+        <FILE id="xcZSj4" name="MappingTableModel.cpp" compile="1" resource="0"
+              file="Source/ui/MappingTableModel.cpp"/>
+        <FILE id="E1h8UT" name="MappingTableModel.h" compile="0" resource="0"
+              file="Source/ui/MappingTableModel.h"/>
         <FILE id="BKMfF7" name="TuningTableViewer.cpp" compile="1" resource="0"
               file="Source/ui/TuningTableViewer.cpp"/>
         <FILE id="WQOl3W" name="TuningTableViewer.h" compile="0" resource="0"
@@ -18,8 +22,10 @@
         <FILE id="O0B4rW" name="MappingPanel.cpp" compile="1" resource="0"
               file="Source/UI/MappingPanel.cpp"/>
         <FILE id="dLTTCc" name="MappingPanel.h" compile="0" resource="0" file="Source/UI/MappingPanel.h"/>
-        <FILE id="UPS8Yi" name="ListEditor.cpp" compile="1" resource="0" file="Source/UI/ListEditor.cpp"/>
-        <FILE id="zLQVWq" name="ListEditor.h" compile="0" resource="0" file="Source/UI/ListEditor.h"/>
+        <FILE id="UPS8Yi" name="IntervalListEditor.cpp" compile="1" resource="0"
+              file="Source/UI/IntervalListEditor.cpp"/>
+        <FILE id="zLQVWq" name="IntervalListEditor.h" compile="0" resource="0"
+              file="Source/UI/IntervalListEditor.h"/>
         <FILE id="kMYrL4" name="InfoBar.h" compile="0" resource="0" file="Source/ui/InfoBar.h"/>
         <FILE id="lonJVi" name="MenuPanel.cpp" compile="1" resource="0" file="Source/ui/MenuPanel.cpp"/>
         <FILE id="kduc6g" name="MenuPanel.h" compile="0" resource="0" file="Source/ui/MenuPanel.h"/>

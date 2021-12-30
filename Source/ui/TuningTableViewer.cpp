@@ -10,17 +10,17 @@
 
 #include "TuningTableViewer.h"
 
-TuningTableViewer::TuningTableViewer(ListEditor* listEditorModel, const Tuning* tuningIn)
+TuningTableViewer::TuningTableViewer(IntervalListModel* intervalListModel, const Tuning* tuningIn)
     : juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
-    if (listEditorModel == nullptr)
+    if (intervalListModel == nullptr)
     {
-        intervalModel = std::make_unique<ListEditor>(false);
-        listEditorModel = intervalModel.get();
+        intervalModel = std::make_unique<IntervalListModel>(false);
+        intervalListModel = intervalModel.get();
     }
 
-    intervalTable = std::make_unique<juce::TableListBox>("IntervalTable", listEditorModel);
-    intervalTable->setHeader(std::make_unique<ListEditorHeader>(false));
+    intervalTable = std::make_unique<juce::TableListBox>("IntervalTable", intervalListModel);
+    intervalTable->setHeader(std::make_unique<IntervalListHeader>(false));
     
     tuningModel = std::make_unique<TuningTableViewerModel>();
     tuningTable = std::make_unique<juce::TableListBox>("TuningTable", tuningModel.get());

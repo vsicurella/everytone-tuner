@@ -1,16 +1,16 @@
 /*
   ==============================================================================
 
-    ListEditor.cpp
+    IntervalListModel.cpp
     Created: 28 Dec 2021 9:03:41pm
     Author:  Vincenzo
 
   ==============================================================================
 */
 
-#include "ListEditor.h"
+#include "IntervalListEditor.h"
 
-ListEditorHeader::ListEditorHeader(bool inEditMode)
+IntervalListHeader::IntervalListHeader(bool inEditMode)
 {
     addColumn("#",          (int)Columns::Index, 48);
     addColumn("Interval",   (int)Columns::Interval, 96);
@@ -23,13 +23,13 @@ ListEditorHeader::ListEditorHeader(bool inEditMode)
     }
 }
 
-ListEditor::ListEditor(bool editMode, const TuningBase* tuningIn)
+IntervalListModel::IntervalListModel(bool editMode, const TuningBase* tuningIn)
     : inEditMode(editMode)
 {
     setTuning(tuningIn);
 }
 
-void ListEditor::setTuning(const TuningBase* tuningIn)
+void IntervalListModel::setTuning(const TuningBase* tuningIn)
 {
     tuning = tuningIn;
 
@@ -43,24 +43,24 @@ void ListEditor::setTuning(const TuningBase* tuningIn)
     definition = tuning->getDefinition();
 }
 
-void ListEditor::sendCentsDefinitionUpdateChange()
+void IntervalListModel::sendCentsDefinitionUpdateChange()
 {
     tuningWatchers.call(&TuningWatcher::targetDefinitionLoaded, this, definition);
 }
 
-void ListEditor::insertInterval(int indexToInsert, double centsValue)
+void IntervalListModel::insertInterval(int indexToInsert, double centsValue)
 {
     definition.intervalCents.insert(indexToInsert, centsValue);
     sendCentsDefinitionUpdateChange();
 }
 
-void ListEditor::modifyInterval(int indexToModify, double centsValue)
+void IntervalListModel::modifyInterval(int indexToModify, double centsValue)
 {
     definition.intervalCents.set(indexToModify, centsValue);
     sendCentsDefinitionUpdateChange();
 }
 
-void ListEditor::removeInterval(int indexToRemove)
+void IntervalListModel::removeInterval(int indexToRemove)
 {
     definition.intervalCents.removeRange(indexToRemove, 1);
     sendCentsDefinitionUpdateChange();
@@ -69,7 +69,7 @@ void ListEditor::removeInterval(int indexToRemove)
 
 // juce::TablelistModel implemetnation
 
-int ListEditor::getNumRows()
+int IntervalListModel::getNumRows()
 {
     if (tuning == nullptr)
         return 0;
@@ -77,33 +77,33 @@ int ListEditor::getNumRows()
     return definition.intervalCents.size();
 }
 
-void ListEditor::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
+void IntervalListModel::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
 {
 
 }
 
-void ListEditor::paintCell(juce::Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
+void IntervalListModel::paintCell(juce::Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
 {
 
 }
 
-juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId, bool rowIsSelected, juce::Component* existingComponentToUpdate)
+juce::Component* IntervalListModel::refreshComponentForCell(int rowNumber, int columnId, bool rowIsSelected, juce::Component* existingComponentToUpdate)
 {
-    auto column = ListEditorHeader::Columns(columnId);
+    auto column = IntervalListHeader::Columns(columnId);
     auto indexString = juce::String(rowNumber + 1);
 
     if (existingComponentToUpdate == nullptr)
     {
         switch (column)
         {
-        case ListEditorHeader::Columns::Index:
+        case IntervalListHeader::Columns::Index:
         {
             auto indexLabel = new juce::Label();
             indexLabel->setJustificationType(juce::Justification::centred);
             existingComponentToUpdate = indexLabel;
             break;
         }
-        case ListEditorHeader::Columns::Interval:
+        case IntervalListHeader::Columns::Interval:
         {
             auto intervalLabel = new juce::Label();
             intervalLabel->setJustificationType(juce::Justification::centred);
@@ -115,14 +115,14 @@ juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId
             existingComponentToUpdate = intervalLabel;
             break;
         }
-        case ListEditorHeader::Columns::Type:
+        case IntervalListHeader::Columns::Type:
         {
             auto typeLabel = new juce::Label();
             typeLabel->setText("cents", juce::NotificationType::dontSendNotification);
             existingComponentToUpdate = typeLabel;
             return typeLabel;
         }
-        case ListEditorHeader::Columns::InsertAbove:
+        case IntervalListHeader::Columns::InsertAbove:
         {
             auto insertButton = new juce::TextButton("Insert" + indexString + "Button", "Insert a new interval above this one");
             insertButton->setButtonText("^");
@@ -133,7 +133,7 @@ juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId
             };
             return insertButton;
         }
-        case ListEditorHeader::Columns::Delete:
+        case IntervalListHeader::Columns::Delete:
         {
             auto deleteButton = new juce::TextButton("Delete" + indexString + "Button", "Remove this interval");
             deleteButton->setButtonText("x");
@@ -151,14 +151,14 @@ juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId
     
     switch (column)
     {
-    case ListEditorHeader::Columns::Index:
+    case IntervalListHeader::Columns::Index:
     {
         auto label = dynamic_cast<juce::Label*>(existingComponentToUpdate);
         label->setName("Index" + indexString + "Label");
         label->setText(indexString, juce::NotificationType::dontSendNotification);
         return label;
     }
-    case ListEditorHeader::Columns::Interval:
+    case IntervalListHeader::Columns::Interval:
     {
         auto label = dynamic_cast<juce::Label*>(existingComponentToUpdate);
         auto intervalString = juce::String(definition.intervalCents[rowNumber]);
@@ -167,14 +167,14 @@ juce::Component* ListEditor::refreshComponentForCell(int rowNumber, int columnId
         label->setEditable(inEditMode, false, true);
         return label;
     }
-    case ListEditorHeader::Columns::Type:
+    case IntervalListHeader::Columns::Type:
     {
         auto label = dynamic_cast<juce::Label*>(existingComponentToUpdate);
         label->setName("Type" + indexString + "Label");
         label->setText("cents", juce::NotificationType::dontSendNotification);
         return label;
     }
-    case ListEditorHeader::Columns::Delete:
+    case IntervalListHeader::Columns::Delete:
         if (definition.intervalCents.size() == 1)
         {
             delete existingComponentToUpdate;
