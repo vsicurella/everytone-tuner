@@ -14,58 +14,76 @@
 
 #include "TuningBase.h"
 #include "../mapping/Map.h"
-#include "CentsDefinition.h"
 
 class TuningTable : public TuningBase
 {
+public:
+
+	struct Definition
+	{
+		juce::Array<double> frequencies;
+		int rootIndex = -1;
+		juce::String name;
+		juce::String description;
+		juce::String periodString;
+		double virtualPeriod = 0;
+		double virtualSize = 0;
+	};
+
+private:
+
 	// Parameters	
-	juce::Array<double> centsTable;
+	juce::Array<double> frequencyTable;
 
-	int lookupTableSize;
-
-	// Mainly for equal/rank-1 temperaments to record the divided period
+	// In case the file can provide some context for the tuning table
+	juce::String periodString;
 	double virtualPeriod = 0;
 	double virtualSize = 0;
 
 	// Metadata
-	int tuningSize;
-	std::unique_ptr<Map<double>> centsMap;
-
-	juce::Array<double> ratioTable;
-    juce::Array<double> frequencyTable;
     juce::Array<double> mtsTable;
-
-	double periodCents;
-	double periodRatio;
-
 	double rootMts;
-
-
-	// Debug
-	double dbgFreqTable[2048];
-	double dbgMtsTable[2048];
 
 private:
 
-	void setupCentsMap(const juce::Array<double>& cents);
+	void refreshTableMetadata();
 
-	void setupRootAndTableSize();
+protected:
 
-	void rebuildTables();
+	void setVirtualPeriod(double period, juce::String periodStr = "");
+
+	void setVirtualSize(double size);
+
+	void setTableWithFrequencies(juce::Array<double> frequencies, int newRootIndex = -1);
+
+	void setTableWithMts(juce::Array<double> mts, int newRootIndex = -1);
 
 public:
 
-	/*
-		Expects a full interval table in cents, ending with period. May or may not include unison.
-	*/
-	TuningTable(CentsDefinition definition=CentsDefinition());
+	TuningTable(Definition definition);
 
     TuningTable(const TuningTable&);
 
+	virtual bool operator==(const TuningTable&);
+	virtual bool operator!=(const TuningTable&);
+
+	virtual int getTableSize() const;
+
+	virtual double getVirtualPeriod() const;
+	virtual double getVirtualSize() const;
+
+	virtual double getRootMts() const;
+
+	virtual juce::Array<double> getIntervalCentsList() const override;
+	virtual juce::Array<double> getIntervalRatioList() const;
+
+	virtual juce::Array<double> getFrequencyTable() const;
+	virtual juce::Array<double> getMtsTable() const;
+	//virtual juce::Array<MTSTriplet> getMTSDataTable() const; // this should have some parameters, or maybe even be static
+
 	// TuningBase implementation
 
-	virtual int getTuningSize() const override { return tuningSize; }
-
+	virtual void setRootIndex(int newRootIndex) override;
 	virtual void setRootFrequency(double frequency) override;
 
 	virtual double centsAt(int index) const override;
@@ -76,38 +94,12 @@ public:
 	virtual int closestIndexToFrequency(double frequency, bool useLookup) const;
 
 	virtual int closestIndexToCents(double centsFromRoot) const override;
-	
-	// TuningTable declarations 
 
-	virtual bool operator==(const TuningTable&);
-	virtual bool operator!=(const TuningTable&);
+private:
 
-	virtual CentsDefinition getDefinition() const;
+	static juce::Array<double> frequencyToMtsTable(juce::Array<double> frequenciesIn);
 
-	virtual int getTuningTableSize() const;
-
-	virtual double getVirtualPeriod() const;
-	virtual double getVirtualSize() const;
-
-	virtual double getPeriodCents() const;
-	virtual double getPeriodSemitones() const;
-	virtual double getPeriodRatio() const;
-
-	virtual double getRootMts() const;
-
-	virtual int getScaleDegree(int index) const;
-
-	virtual juce::Array<double> getIntervalCentsList() const override;
-	virtual juce::Array<double> getIntervalRatioList() const;
-
-	virtual juce::Array<double> getFrequencyTable() const;
-	virtual juce::Array<double> getMtsTable() const;
-	//virtual juce::Array<MTSTriplet> getMTSDataTable() const; // this should have some parameters, or maybe even be static
-
-	virtual double calculateFrequencyFromRoot(int stepsFromRoot) const;
-	virtual double calculateCentsFromRoot(int stepsFromRoot) const;
-	virtual double calculateSemitonesFromRoot(int stepsFromRoot) const;
-	virtual double calculateMtsFromRoot(int stepsFromRoot) const;
+	static juce::Array<double> mtsToFrequencyTable(juce::Array<double> mtsIn);
 
 public:
 

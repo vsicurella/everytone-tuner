@@ -43,6 +43,7 @@ public:
 	virtual void setName(juce::String nameIn) { name = nameIn; };
 	virtual void setDescription(juce::String descIn) { description = descIn; }
 
+	virtual void setRootIndex(int newRootIndex) = 0;
 	virtual void setRootFrequency(double frequency) = 0;
 
 	virtual juce::Array<double> getIntervalCentsList() const = 0;

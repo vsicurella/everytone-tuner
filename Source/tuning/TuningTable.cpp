@@ -10,96 +10,66 @@
 
 #include "TuningTable.h"
 
-TuningTable::TuningTable(CentsDefinition definition)
-    : tuningSize(definition.intervalCents.size()),
+TuningTable::TuningTable(TuningTable::Definition definition)
+    : frequencyTable(definition.frequencies),
+      periodString(definition.periodString),
       virtualPeriod(definition.virtualPeriod),
       virtualSize(definition.virtualSize),
-      TuningBase(definition.rootFrequency, definition.name, definition.description)
+      TuningBase(definition.frequencies[definition.rootIndex], definition.name, definition.description)
+      
 {
-	setupCentsMap(definition.intervalCents);
+    refreshTableMetadata();
 }
 
 TuningTable::TuningTable(const TuningTable& tuning)
-    : tuningSize(tuning.tuningSize),
+    : frequencyTable(tuning.frequencyTable),
+      periodString(tuning.periodString),
       virtualPeriod(tuning.virtualPeriod),
       virtualSize(tuning.virtualSize),
-      TuningBase(tuning.rootFrequency, tuning.name, tuning.description)
+      TuningBase(tuning.rootFrequency, tuning.name, tuning.description),
+      mtsTable(tuning.mtsTable),
+      rootMts(tuning.rootMts)
 {
-    setupCentsMap(tuning.getIntervalCentsList());
 }
 
-void TuningTable::setupCentsMap(const juce::Array<double>& cents)
+void TuningTable::refreshTableMetadata()
 {
-    centsTable = cents;
-
-    periodCents = cents.getLast();
-    periodRatio = centsToRatio(periodCents);
-
-    auto tuningShifted = juce::Array<double>(cents);
-    tuningShifted.remove(tuningShifted.getLast());
-    tuningShifted.insert(0, 0);    
-
-    Map<double>::Definition definition =
-    {
-        tuningSize,
-        tuningShifted.data(),
-        periodCents,
-        0,                     /* pattern rootIndex */
-        0, /* tuning index rootIndex */
-    };
-
-    centsMap.reset(new Map<double>(definition));
-
-    rebuildTables();
+    // Rebuild MTS table
+    mtsTable = frequencyToMtsTable(frequencyTable);
+    rootMts = frequencyToMTS(rootFrequency);
 }
 
-void TuningTable::setupRootAndTableSize()
+void TuningTable::setVirtualPeriod(double period, juce::String periodStr = "")
 {
-    double lowestRatio = MTS_LOWEST_FREQ / rootFrequency;
-    double lowestCents = ratioToCents(lowestRatio);
-    int lowestFromRoot = centsMap->closestIndexTo(lowestCents);
-
-    double highestRatio = MTS_HIGHEST_FREQ / rootFrequency;
-    double highestCents = ratioToCents(highestRatio);
-    int highestFromRoot = centsMap->closestIndexTo(highestCents);
-
-    rootIndex = -lowestFromRoot;
-    lookupTableSize = highestFromRoot - lowestFromRoot + 1;
-
-    //juce::Logger::writeToLog("Best mapping, rootIndex: " + juce::String(lowestToNewRoot) + ", size: " + juce::String(tableSize));
+    virtualPeriod = period;
+    periodString = periodStr;
 }
 
-void TuningTable::rebuildTables()
+void TuningTable::setVirtualSize(double size)
 {
-    setupRootAndTableSize();
+    virtualSize = size;
+}
 
-    // Build ratio table
-    double cents, ratio;
-    for (int i = 0; i < tuningSize; i++)
-    {
-        cents = centsMap->at(i);
-        ratio = centsToRatio(cents);
-        ratioTable.set(i, ratio);
-    }
+void TuningTable::setTableWithFrequencies(juce::Array<double> frequencies, int newRootIndex)
+{
+    if (newRootIndex < 0)
+        newRootIndex = rootIndex;
 
-    double periodRatio = centsToRatio(periodCents);
-    rootMts = roundN(10, frequencyToMTS(rootFrequency));
     
-    // Build Frequency and MTS freq tables
-    int offset;
-    double intervalRatio, frequency, size = tuningSize;
-    for (int t = 0; t < lookupTableSize; t++)
-    {
-        offset = t - rootIndex;
-        frequency = calculateFrequencyFromRoot(offset);
-        
-        frequencyTable.set(t, frequency);
-        double mts = roundN(10, frequencyToMTS(frequency));
-        mtsTable.set(t, mts);
+}
 
-        dbgFreqTable[t] = frequency;
-        dbgMtsTable[t] = mts;
-    }
+void TuningTable::setTableWithMts(juce::Array<double> mts, int newRootIndex)
+{
+    if (newRootIndex < 0)
+        newRootIndex = rootIndex;
+
+
+}
+
+void TuningTable::setRootIndex(int newRootIndex)
+{
+    rootIndex = newRootIndex;
+    rootFrequency = frequencyTable[rootIndex]; // probably should do some checking
 }
 
 void TuningTable::setRootFrequency(double frequency)
@@ -116,13 +86,13 @@ double TuningTable::centsAt(int index) const
 
 double TuningTable::frequencyAt(int index) const
 {
-    auto tableIndex = mod(index, lookupTableSize);
+    auto tableIndex = mod(index, getTableSize());
     return frequencyTable[tableIndex];
 }
 
 double TuningTable::mtsAt(int index) const
 {
-    auto tableIndex = mod(index, lookupTableSize);
+    auto tableIndex = mod(index, getTableSize());
     return mtsTable[tableIndex];
 }
 
@@ -160,14 +130,9 @@ bool TuningTable::operator!=(const TuningTable& tuning)
     return !operator==(tuning);
 }
 
-CentsDefinition TuningTable::getDefinition() const
+int TuningTable::getTableSize() const
 {
-    return CentsDefinition{ centsTable, rootFrequency, name, description, virtualPeriod, virtualSize };
-}
-
-int TuningTable::getTuningTableSize() const
-{
-    return lookupTableSize;
+    return frequencyTable.size();
 }
 
 double TuningTable::getVirtualPeriod() const
@@ -180,34 +145,13 @@ double TuningTable::getVirtualSize() const
     return virtualSize;
 }
 
-double TuningTable::getPeriodCents() const
-{
-    return periodCents;
-}
-
-double TuningTable::getPeriodSemitones() const
-{
-    return periodCents * 0.01;
-}
-
-double TuningTable::getPeriodRatio() const
-{
-    return periodRatio;
-}
-
 double TuningTable::getRootMts() const
 {
     return rootMts;
 }
 
-int TuningTable::getScaleDegree(int index) const
-{
-    return centsMap->mapIndexAt(index);
-}
-
 juce::Array<double> TuningTable::getIntervalCentsList() const
 {
-    // Don't include unison
     juce::Array<double> cents;
     for (int i = 1; i <= tuningSize; i++)
     {
@@ -219,7 +163,6 @@ juce::Array<double> TuningTable::getIntervalCentsList() const
 
 juce::Array<double> TuningTable::getIntervalRatioList() const
 {
-    // Don't include unison
     juce::Array<double> ratios;
     for (int i = 1; i < tuningSize; i++)
     {
@@ -240,28 +183,30 @@ juce::Array<double> TuningTable::getMtsTable() const
     return mtsTable;
 }
 
-double TuningTable::calculateFrequencyFromRoot(int stepsFromRoot) const
+juce::Array<double> TuningTable::frequencyToMtsTable(juce::Array<double> frequenciesIn)
 {
-    auto cents = centsMap->at(stepsFromRoot);
-    auto ratio = centsToRatio(cents);
-    return rootFrequency * ratio;
+    auto mtsTable = juce::Array<double>(frequenciesIn.size());
+    for (int n = 0; n < frequenciesIn.size(); n++)
+    {
+        auto freq = frequenciesIn[n];
+        double mts = roundN(10, frequencyToMTS(freq));
+        mtsTable.set(n, mts);
+    }
+    return mtsTable;
 }
 
-double TuningTable::calculateMtsFromRoot(int stepsFromRoot) const
+juce::Array<double> TuningTable::mtsToFrequencyTable(juce::Array<double> mtsIn)
 {
-    auto freq = calculateFrequencyFromRoot(stepsFromRoot);
-    return frequencyToMTS(freq);
+    auto frequencyTable = juce::Array<double>(mtsIn.size());
+    for (int n = 0; n < mtsIn.size(); n++)
+    {
+        auto mts = mtsIn[n];
+        double frequency = roundN(10, mtsToFrequency(mts));
+        frequencyTable.set(n, mts);
+    }
+    return frequencyTable;
 }
 
-double TuningTable::calculateCentsFromRoot(int stepsFromRoot) const
-{
-    return centsFromRoot(stepsFromRoot);
-}
-
-double TuningTable::calculateSemitonesFromRoot(int stepsFromRoot) const
-{
-    return calculateCentsFromRoot(stepsFromRoot) * 0.01;
-}
 
 //
 //juce::Array<MTSTriplet> TuningTable::getMTSDataTable() const
