@@ -28,7 +28,7 @@ private:
         }
     }
 
-    void test_closest_index(const Tuning* tuning, juce::String name, int inputSize, const double* inputMtsList, const int* expectedIndices, const double* expectedMts=nullptr)
+    void test_closest_index(const TuningTable* tuning, juce::String name, int inputSize, const double* inputMtsList, const int* expectedIndices, const double* expectedMts=nullptr)
     { 
         for (int i = 0; i < inputSize; i++)
         {
@@ -54,7 +54,7 @@ public:
     struct GetAndSetParams
     {
         int expectedTuningSize = 0;
-        Tuning* tuning;
+        TuningTable* tuning;
         CentsDefinition expectedDefinition;
         
         const double* expectedIntervalCentsTable = nullptr;
@@ -124,7 +124,7 @@ private:
         test_table(params.expectedTableSize, params.expectedFrequencyTable, tuning->getFrequencyTable(), "getFrequencyTable");
         test_table(params.expectedTableSize, params.expectedMtsTable, tuning->getMtsTable(), "getMtsTable()");
 
-        Tuning copied = Tuning(*tuning);
+        TuningTable copied = TuningTable(*tuning);
         expect(copied == *tuning, "Copied tuning failed with == operator");
 
         beginTest(testName + " Setters");
@@ -168,7 +168,7 @@ private:
 
     void defaultTuningTest()
     {
-        Tuning tuning;
+        TuningTable tuning;
         CentsDefinition definition;
 
         const int size = 12;
@@ -227,7 +227,7 @@ private:
         doTests("Default", params, false);
 
         // Standard Tuning constructor
-        auto standardTuning = Tuning::StandardTuning();
+        auto standardTuning = TuningTable::StandardTuning();
         CentsDefinition stdDefinition{ { 100.0 }, 440.0, juce::String("12-edo"), juce::String("The octave divided into 12 equal steps."), 1200.0, 12 };
         GetAndSetParams stdParams = GetAndSetParams(params);
         stdParams.tuning = standardTuning.get();
@@ -237,7 +237,7 @@ private:
         doTests("Standard Tuning", stdParams, false);
 
         // Standard Tuning + Copy Constructor
-        Tuning copiedTuning = Tuning(*standardTuning);
+        TuningTable copiedTuning = TuningTable(*standardTuning);
         auto copiedParams = GetAndSetParams(stdParams);
         copiedParams.tuning = &copiedTuning;
         doTests("Copied Tuning", copiedParams);
@@ -258,7 +258,7 @@ private:
             0,
         };
 
-        Tuning tuning(definition);
+        TuningTable tuning(definition);
 
         const double expectedRatioTable[size] = { 1.0226114356012683, 1.0457341482224871, 1.0693796985710673, 1.0935599087586108, 1.1182868682116351, 1.1435729397159466, 1.169430765597687, 1.1958732740441411, 1.2229136855674683, 1.2505655196145868, 1.2788426013265188, 1.307759068450572, 1.337329378408817, 1.3675683155263922, 1.3984909984232523, 1.4301128875730533, 1.4624497930329556, 1.4955178823482085, 1.5293336886354705, 1.5639141188489016, 1.5992764622331679, 1.6354383989675778, 1.6724180090056746, 1.710233781114708, 1.748904622119497, 1.7884498663553128, 1.8288892853345031, 1.8702430976316942, 1.9125319789925097, 1.9557770726708654, 2.0 };
 
@@ -320,7 +320,7 @@ private:
         const double expectedIntervalCentsTable[size] = { 35.29411764705883 };
 
         auto definition = CentsDefinition::CentsDivisions(34);
-        Tuning tuning(definition);
+        TuningTable tuning(definition);
 
         const double expectedRatioTable[size] = { 1.0205959096 };
 

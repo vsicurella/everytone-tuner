@@ -28,7 +28,7 @@ static juce::ValueTree arrayToValueTree(ARR array, juce::Identifier id, juce::Id
     return tree;
 }
 
-static juce::ValueTree tuningToValueTree(const Tuning* tuning, juce::Identifier name = Everytone::ID::Tuning)
+static juce::ValueTree tuningToValueTree(const TuningTable* tuning, juce::Identifier name = Everytone::ID::Tuning)
 {
     auto tree = juce::ValueTree(name);
     

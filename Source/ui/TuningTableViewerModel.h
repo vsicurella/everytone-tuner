@@ -32,13 +32,13 @@ public:
 
 class TuningTableViewerModel : public juce::TableListBoxModel
 {
-    const Tuning* tuning = nullptr;
+    const TuningTable* tuning = nullptr;
 
 public:
 
-    TuningTableViewerModel(const Tuning* tuningIn = nullptr);
+    TuningTableViewerModel(const TuningTable* tuningIn = nullptr);
 
-    void setTuning(const Tuning* tuningIn);
+    void setTuning(const TuningTable* tuningIn);
 
     int getNumRows() override;
 

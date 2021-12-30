@@ -1,11 +1,11 @@
 /*
   ==============================================================================
 
-    Tuning.h
+    TuningTable.h
     Created: 20 November 2021 1:00pm
     Author:  Vincenzo Sicurella
 
-	A Tuning with a lookup table that maps itself with the MTS range.
+	A TuningTable with a lookup table that maps itself with the MTS range.
 
   ==============================================================================
 */
@@ -77,7 +77,7 @@ public:
 
 	virtual int closestIndexToCents(double centsFromRoot) const override;
 	
-	// Tuning declarations 
+	// TuningTable declarations 
 
 	virtual bool operator==(const TuningTable&);
 	virtual bool operator!=(const TuningTable&);

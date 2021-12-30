@@ -55,7 +55,7 @@ void TuningTableViewer::set(const MappedTuning* tuningIn)
     set(tuningIn->getMapping());
 }
 
-void TuningTableViewer::set(const Tuning* tuningIn)
+void TuningTableViewer::set(const TuningTable* tuningIn)
 {
     tuning = tuningIn;
 

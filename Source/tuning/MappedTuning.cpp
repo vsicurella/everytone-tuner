@@ -10,7 +10,7 @@
 
 #include "MappedTuning.h"
 
-MappedTuning::MappedTuning(std::shared_ptr<Tuning> tuningIn, std::shared_ptr<TuningTableMap> mappingIn)
+MappedTuning::MappedTuning(std::shared_ptr<TuningTable> tuningIn, std::shared_ptr<TuningTableMap> mappingIn)
     : tuning(tuningIn),
       mapping(mappingIn),
       TuningBase(tuningIn->getRootIndex(), tuningIn->getRootFrequency(), tuningIn->getName(), tuningIn->getDescription()) {}

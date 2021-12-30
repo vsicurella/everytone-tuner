@@ -16,7 +16,7 @@
 class TuningTableViewer : public juce::TabbedComponent
 {
     const MappedTuning* mappedTuning;
-    const Tuning* tuning;
+    const TuningTable* tuning;
     const TuningTableMap* mapping;
 
     std::unique_ptr<IntervalListModel> intervalModel;
@@ -36,6 +36,6 @@ public:
     ~TuningTableViewer();
 
     void set(const MappedTuning* tuningIn);
-    void set(const Tuning* tuningIn);
+    void set(const TuningTable* tuningIn);
     void set(const TuningTableMap* tuningIn);
 };

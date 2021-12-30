@@ -100,7 +100,7 @@ public:
         //    definition.name = juce::String(roundN(3, cents)) + " cET";
         //    definition.description = description;
 
-        //tuning.reset(new Tuning(definition));
+        //tuning.reset(new TuningTable(definition));
         //tuningWatchers.call(&TuningWatcher::tuningTargetChanged, this, tuning.get());
 
         double divisions = divisionsSlider->getValue();

@@ -80,8 +80,8 @@ private:
 
         beginTest(testName + " Getters");
 
-        expect_pointers(static_cast<const Tuning*>(source->getTuning()), tuner->tuningSource(), "tuningSource");
-        expect_pointers(static_cast<const Tuning*>(target->getTuning()), tuner->tuningTarget(), "tuningTarget");
+        expect_pointers(static_cast<const TuningTable*>(source->getTuning()), tuner->tuningSource(), "tuningSource");
+        expect_pointers(static_cast<const TuningTable*>(target->getTuning()), tuner->tuningTarget(), "tuningTarget");
         expect_pointers(static_cast<const TuningTableMap*>(source->getMapping()), tuner->mappingSource(), "mappingSource");
         expect_pointers(static_cast<const TuningTableMap*>(target->getMapping()), tuner->mappingTarget(), "mappingTarget");
         expect_exact(params.pitchbendRange, tuner->getPitchbendMax(), "pitchbendRange");
@@ -136,7 +136,7 @@ public:
         auto stdTuning = MappedTuning::StandardTuning();
 
         auto ode22def = CentsDefinition::CentsDivisions(22.0, 1200.0, 261.6255653);        
-        auto ode22atC262 = std::make_shared<Tuning>(ode22def);
+        auto ode22atC262 = std::make_shared<TuningTable>(ode22def);
 
         int ch = 4;
         int note = 0;
@@ -171,7 +171,7 @@ public:
         auto stdTuning = MappedTuning::StandardTuning();
 
         auto ode31def = CentsDefinition::CentsDivisions(31.0, 1200.0, 440);
-        auto ode31at440 = std::make_shared<Tuning>(ode31def);
+        auto ode31at440 = std::make_shared<TuningTable>(ode31def);
 
         int ch = 5;
         int note = 0;

@@ -86,8 +86,6 @@ CentsDefinition TuningFileParser::parseScalaFileDefinition(juce::File scalaFile)
         centsTable.add(line);
     }
 
-    //auto reference = Tuning::Reference{ 1, baseNote, baseFreq };
-
     auto name = juce::String(sclImport.GetTuningName());
     if (juce::File::isAbsolutePath(name))
     {

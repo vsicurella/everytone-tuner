@@ -38,16 +38,16 @@ class MidiNoteTuner
 
 public:
     
-	MidiNoteTuner(std::shared_ptr<Tuning> sourceTuning, 
+	MidiNoteTuner(std::shared_ptr<TuningTable> sourceTuning, 
 				  std::shared_ptr<TuningTableMap> sourceMapping,
-		          std::shared_ptr<Tuning> targetTuning, 
+		          std::shared_ptr<TuningTable> targetTuning, 
 		          std::shared_ptr<TuningTableMap> targetMapping,
 				  int pitchbendRange = 4);
 	MidiNoteTuner(const std::shared_ptr<MappedTuning>& mappedSource, const std::shared_ptr<MappedTuning>& mappedTarget, int pitchbendRange = 4);
     ~MidiNoteTuner();
 
-	const Tuning* tuningSource() const { return sourceTuning->getTuning(); }
-	const Tuning* tuningTarget() const { return targetTuning->getTuning(); }
+	const TuningTable* tuningSource() const { return sourceTuning->getTuning(); }
+	const TuningTable* tuningTarget() const { return targetTuning->getTuning(); }
 
 	const TuningTableMap* mappingSource() const { return sourceTuning->getMapping(); }
 	const TuningTableMap* mappingTarget() const { return targetTuning->getMapping(); }

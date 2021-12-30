@@ -16,7 +16,7 @@
 
 class MappedTuning : public TuningBase
 {
-    std::shared_ptr<Tuning> tuning;
+    std::shared_ptr<TuningTable> tuning;
     std::shared_ptr<TuningTableMap> mapping;
 
 public:
@@ -34,7 +34,7 @@ private:
 
 public:
     
-    MappedTuning(std::shared_ptr<Tuning> tuning, std::shared_ptr<TuningTableMap> mapping);
+    MappedTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping);
     MappedTuning(const MappedTuning& mappedTuning);
     ~MappedTuning();
 
@@ -55,11 +55,11 @@ public:
 
     // MappedTuning declarations
 
-    Tuning* getTuning() const { return tuning.get(); }
+    TuningTable* getTuning() const { return tuning.get(); }
 
     TuningTableMap* getMapping() const { return mapping.get(); }
 
-    std::shared_ptr<Tuning> shareTuning() const { return tuning; }
+    std::shared_ptr<TuningTable> shareTuning() const { return tuning; }
 
     std::shared_ptr<TuningTableMap> shareMapping() const { return mapping; }
 
@@ -87,7 +87,7 @@ public:
 
     static std::unique_ptr<MappedTuning> StandardTuning()
     {
-        auto standardTuning = std::make_shared<Tuning>(Tuning::StandardTuningDefinition());
+        auto standardTuning = std::make_shared<TuningTable>(TuningTable::StandardTuningDefinition());
         auto standardMapping = std::make_shared<TuningTableMap>(TuningTableMap::StandardMappingDefinition());
         return std::make_unique<MappedTuning>(standardTuning, standardMapping);
     }

@@ -12,9 +12,9 @@
 
 
 MidiNoteTuner::MidiNoteTuner(
-	std::shared_ptr<Tuning> sourceTuningIn, 
+	std::shared_ptr<TuningTable> sourceTuningIn, 
 	std::shared_ptr<TuningTableMap> sourceMappingIn,
-	std::shared_ptr<Tuning> targetTuningIn, 
+	std::shared_ptr<TuningTable> targetTuningIn, 
 	std::shared_ptr<TuningTableMap> targetMappingIn, 
 	int pitchbendRangeIn
 )	: sourceTuning(std::make_unique<MappedTuning>(sourceTuningIn, sourceMappingIn)),

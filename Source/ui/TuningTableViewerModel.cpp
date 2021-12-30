@@ -10,12 +10,12 @@
 
 #include "TuningTableViewerModel.h"
 
-TuningTableViewerModel::TuningTableViewerModel(const Tuning* tuningIn)
+TuningTableViewerModel::TuningTableViewerModel(const TuningTable* tuningIn)
 {
     setTuning(tuningIn);
 }
 
-void TuningTableViewerModel::setTuning(const Tuning* tuningIn)
+void TuningTableViewerModel::setTuning(const TuningTable* tuningIn)
 {
     tuning = tuningIn;
 }

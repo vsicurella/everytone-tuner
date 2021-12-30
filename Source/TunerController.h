@@ -106,16 +106,16 @@ public:
 
 private:
 
-    std::shared_ptr<TuningTableMap> mapForTuning(const Tuning* tuning, bool isTarget);
+    std::shared_ptr<TuningTableMap> mapForTuning(const TuningTable* tuning, bool isTarget);
 
     void loadSourceTuning(const CentsDefinition& definition, bool updateTuner);
     void loadTargetTuning(const CentsDefinition& definition, bool updateTuner);
 
-    void setSourceTuning(std::shared_ptr<Tuning> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner = true);
-    void setTargetTuning(std::shared_ptr<Tuning> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner = true);
+    void setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner = true);
+    void setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner = true);
 
-    void setTunings(std::shared_ptr<Tuning> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
-                    std::shared_ptr<Tuning> targetTuning, std::shared_ptr<TuningTableMap> targetMapping);
+    void setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
+                    std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping);
 
     void updateCurrentTuner();
 
@@ -124,9 +124,9 @@ private:
 public:
 
     // For use in "Auto Mapping" mode with tunings created in the app
-    static std::shared_ptr<TuningTableMap> NewLinearMappingFromTuning(const Tuning* tuningDefinition, TuningTableMap::Root root);
-    static std::shared_ptr<TuningTableMap> NewPeriodicMappingFromTuning(const Tuning* tuningDefinition, TuningTableMap::Root root);
+    static std::shared_ptr<TuningTableMap> NewLinearMappingFromTuning(const TuningTable* tuningDefinition, TuningTableMap::Root root);
+    static std::shared_ptr<TuningTableMap> NewPeriodicMappingFromTuning(const TuningTable* tuningDefinition, TuningTableMap::Root root);
 
-    static std::shared_ptr<TuningTableMap> NewMappingFromTuning(const Tuning* tuningDefinition, TuningTableMap::Root root, Everytone::MappingType mappingType);
+    static std::shared_ptr<TuningTableMap> NewMappingFromTuning(const TuningTable* tuningDefinition, TuningTableMap::Root root, Everytone::MappingType mappingType);
 };
 

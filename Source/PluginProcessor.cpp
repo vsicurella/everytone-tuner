@@ -256,7 +256,7 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     //}
 
     // For now, always load standard source mapping
-    auto sourceTuningDefinition = Tuning::StandardTuningDefinition();
+    auto sourceTuningDefinition = TuningTable::StandardTuningDefinition();
     auto sourceMapDefinition = TuningTableMap::StandardMappingDefinition();
 
     CentsDefinition targetTuningDefinition;
