@@ -80,9 +80,9 @@ public:
 
     //==============================================================================
 
-    const MappedTuning* currentSource() const { return tunerController->readTuningSource(); }
+    const MappedTuningTable* currentSource() const { return tunerController->readTuningSource(); }
 
-    const MappedTuning* currentTarget() const { return tunerController->readTuningTarget(); }
+    const MappedTuningTable* currentTarget() const { return tunerController->readTuningTarget(); }
 
     Everytone::Options options() const;
 
@@ -96,7 +96,7 @@ public:
 
     void setTargetTuningRootFrequency(double frequency);
     void setTargetMappingRoot(TuningTableMap::Root root);
-    void setTargetMappedTuningRoot(MappedTuning::Root root);
+    void setTargetMappedTuningRoot(MappedTuningTable::Root root);
 
     //void loadNoteMapping(const TuningTableMap& map);
 

@@ -15,7 +15,7 @@ TuningTable::TuningTable(TuningTable::Definition definition)
       periodString(definition.periodString),
       virtualPeriod(definition.virtualPeriod),
       virtualSize(definition.virtualSize),
-      TuningBase(definition.frequencies[definition.rootIndex], definition.name, definition.description)
+      TuningTableBase(definition.rootIndex, definition.frequencies[definition.rootIndex], definition.name, definition.description)
       
 {
     refreshTableMetadata();
@@ -26,7 +26,7 @@ TuningTable::TuningTable(const TuningTable& tuning)
       periodString(tuning.periodString),
       virtualPeriod(tuning.virtualPeriod),
       virtualSize(tuning.virtualSize),
-      TuningBase(tuning.rootFrequency, tuning.name, tuning.description),
+      TuningTableBase(tuning.rootIndex, tuning.rootFrequency, tuning.name, tuning.description),
       mtsTable(tuning.mtsTable),
       rootMts(tuning.rootMts)
 {

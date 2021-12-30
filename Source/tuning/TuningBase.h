@@ -38,6 +38,7 @@ public:
 
 	virtual int getRootIndex() const { return rootIndex; }
 	virtual double getRootFrequency() const { return rootFrequency; }
+	virtual double getRootMts() const { return frequencyToMTS(rootFrequency); }
 	virtual int getTuningSize() const = 0;
 
 	virtual void setName(juce::String nameIn) { name = nameIn; };
@@ -45,19 +46,6 @@ public:
 
 	virtual void setRootIndex(int newRootIndex) = 0;
 	virtual void setRootFrequency(double frequency) = 0;
-
-	virtual juce::Array<double> getIntervalCentsList() const = 0;
-
-	virtual CentsDefinition getDefinition() const
-	{
-		return CentsDefinition
-		{
-			getIntervalCentsList(),
-			getRootFrequency(),
-			getName(),
-			getDescription(),
-		};
-	}
 
 	virtual double centsAt(int index) const = 0;
 	virtual double centsFromRoot(int steps) const { return centsAt(steps - rootIndex); }

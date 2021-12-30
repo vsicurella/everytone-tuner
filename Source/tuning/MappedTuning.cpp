@@ -10,84 +10,110 @@
 
 #include "MappedTuning.h"
 
-MappedTuning::MappedTuning(std::shared_ptr<TuningTable> tuningIn, std::shared_ptr<TuningTableMap> mappingIn)
+MappedTuningTable::MappedTuningTable(std::shared_ptr<TuningTable> tuningIn, std::shared_ptr<TuningTableMap> mappingIn)
     : tuning(tuningIn),
       mapping(mappingIn),
-      TuningBase(tuningIn->getRootIndex(), tuningIn->getRootFrequency(), tuningIn->getName(), tuningIn->getDescription()) {}
+      TuningTableBase(tuningIn->getRootIndex(), tuningIn->getRootFrequency(), tuningIn->getName(), tuningIn->getDescription()) {}
 
 
-MappedTuning::MappedTuning(const MappedTuning& mappedTuning)
+MappedTuningTable::MappedTuningTable(const MappedTuningTable& mappedTuning)
     : tuning(mappedTuning.shareTuning()),
       mapping(mappedTuning.shareMapping()),
-      TuningBase(mappedTuning.getTuning()->getRootIndex(), mappedTuning.getTuning()->getRootFrequency(), mappedTuning.getTuning()->getName(), mappedTuning.getTuning()->getDescription()) {}
+      TuningTableBase(mappedTuning.getTuning()->getRootIndex(), mappedTuning.getTuning()->getRootFrequency(), mappedTuning.getTuning()->getName(), mappedTuning.getTuning()->getDescription()) {}
 
-MappedTuning::~MappedTuning()
+MappedTuningTable::~MappedTuningTable()
 {
     mapping = nullptr;
     tuning = nullptr;
 }
 
-int MappedTuning::getTuningSize() const
+int MappedTuningTable::getTuningSize() const
 {
     return tuning->getTuningSize();
 }
 
-void MappedTuning::setRootFrequency(double frequency)
+void MappedTuningTable::setRootFrequency(double frequency)
 {
     // TODO change mapping?
     return tuning->setRootFrequency(frequency);
 }
 
-juce::Array<double> MappedTuning::getIntervalCentsList() const
-{
-    return tuning->getIntervalCentsList();
-}
-
-double MappedTuning::centsAt(int index) const
+double MappedTuningTable::centsAt(int index) const
 {
     return tuning->centsAt(index);
 }
 
-double MappedTuning::frequencyAt(int index) const
+double MappedTuningTable::frequencyAt(int index) const
 {
     return tuning->frequencyAt(index);
 }
 
-int MappedTuning::closestIndexToFrequency(double frequency) const
+int MappedTuningTable::closestIndexToFrequency(double frequency) const
 {
     return tuning->closestIndexToFrequency(frequency);
 }
 
-int MappedTuning::closestIndexToMts(double mts) const
+int MappedTuningTable::closestIndexToMts(double mts) const
 {
     return tuning->closestIndexToMts(mts);
 }
 
-double MappedTuning::mtsAt(int index) const
+double MappedTuningTable::mtsAt(int index) const
 {
     return tuning->mtsAt(index);
 }
 
-int MappedTuning::tuningIndexAt(int midiNote, int midiChannel) const
+int MappedTuningTable::getTableSize() const
+{
+    return tuning->getTableSize();
+}
+
+double MappedTuningTable::getVirtualPeriod() const
+{
+    return tuning->getVirtualPeriod();
+}
+
+double MappedTuningTable::getVirtualSize() const
+{
+    return tuning->getVirtualSize();
+}
+
+double MappedTuningTable::getRootMts() const
+{
+    return tuning->getRootMts();
+}
+
+juce::Array<double> MappedTuningTable::getFrequencyTable() const
+{
+    return tuning->getFrequencyTable();
+}
+
+juce::Array<double> MappedTuningTable::getMtsTable() const
+{
+    return tuning->getMtsTable();
+}
+
+int MappedTuningTable::tuningIndexAt(int midiNote, int midiChannel) const
 {
     auto mapped = mapping->getMappedNote(midiChannel, midiNote);
     return mapped.index;
 }
 
-double MappedTuning::centsAt(int midiNote, int midiChannel) const
+double MappedTuningTable::centsAt(int midiNote, int midiChannel) const
 {
     auto index = tuningIndexAt(midiNote, midiChannel);
     return tuning->centsAt(index);
 }
 
-double MappedTuning::frequencyAt(int midiNote, int midiChannel) const
+double MappedTuningTable::frequencyAt(int midiNote, int midiChannel) const
 {
     auto index = tuningIndexAt(midiNote, midiChannel);
     return tuning->frequencyAt(index);
 }
 
-double MappedTuning::mtsAt(int midiNote, int midiChannel) const
+double MappedTuningTable::mtsAt(int midiNote, int midiChannel) const
 {
     auto index = tuningIndexAt(midiNote, midiChannel);
     return tuning->mtsAt(index);
 }
+

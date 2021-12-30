@@ -12,7 +12,7 @@
 #include "MappingPanel.h"
 
 //==============================================================================
-MappingPanel::MappingPanel(Everytone::Options options, MappedTuning* tuningIn)
+MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuningIn)
 {
 	rootMidiChannelBox.reset(new juce::Label("rootMidiChannelBox", "1"));
 	addAndMakeVisible(rootMidiChannelBox.get());
@@ -149,7 +149,7 @@ void MappingPanel::resized()
 	mappingBox.performLayout(getLocalBounds());
 }
 
-void MappingPanel::setMappedTuning(MappedTuning* tuningIn)
+void MappingPanel::setMappedTuning(MappedTuningTable* tuningIn)
 {
 
 }
@@ -170,7 +170,7 @@ void MappingPanel::mappingTypeButtonClicked()
 }
 
 
-void MappingPanel::setTuningDisplayed(const MappedTuning* mappedTuning)
+void MappingPanel::setTuningDisplayed(const MappedTuningTable* mappedTuning)
 {
 	auto tuning = mappedTuning->getTuning();
 	auto mapping = mappedTuning->getMapping();
@@ -181,7 +181,7 @@ void MappingPanel::setTuningDisplayed(const MappedTuning* mappedTuning)
 
 void MappingPanel::tuningReferenceEdited()
 {
-	MappedTuning::Root newRoot;
+	MappedTuningTable::Root newRoot;
 
 	auto channelInput = rootMidiChannelBox->getText().trim();
 	int channelValue = -1;

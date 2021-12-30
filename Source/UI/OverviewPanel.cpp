@@ -135,7 +135,7 @@ void OverviewPanel::resized()
 }
 
 
-void OverviewPanel::setTuningDisplayed(const MappedTuning* mappedTuningIn)
+void OverviewPanel::setTuningDisplayed(const MappedTuningTable* mappedTuningIn)
 {
 	mappedTuning = mappedTuningIn;
 	auto tuning = mappedTuning->getTuning();

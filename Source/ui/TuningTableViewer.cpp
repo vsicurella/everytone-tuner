@@ -10,7 +10,7 @@
 
 #include "TuningTableViewer.h"
 
-TuningTableViewer::TuningTableViewer(IntervalListModel* intervalListModel, const MappedTuning* tuningIn)
+TuningTableViewer::TuningTableViewer(IntervalListModel* intervalListModel, const MappedTuningTable* tuningIn)
     : juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
     if (intervalListModel == nullptr)
@@ -46,7 +46,7 @@ TuningTableViewer::~TuningTableViewer()
     intervalModel = nullptr;
 }
 
-void TuningTableViewer::set(const MappedTuning* tuningIn)
+void TuningTableViewer::set(const MappedTuningTable* tuningIn)
 {
     if (tuningIn == nullptr)
         return;

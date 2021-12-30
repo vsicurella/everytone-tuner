@@ -23,7 +23,7 @@ public:
 
 public:
 
-	void setTuningDisplayed(const MappedTuning* tuning);
+	void setTuningDisplayed(const MappedTuningTable* tuning);
 
 	void setListEditorModel(IntervalListModel* listEditor);
 
@@ -34,7 +34,7 @@ public:
 
 private:
 
-	const MappedTuning* mappedTuning = nullptr;
+	const MappedTuningTable* mappedTuning = nullptr;
 
 	std::unique_ptr<juce::Label> tuningNameBox;
 	std::unique_ptr<juce::Label> tuningSizeBox;

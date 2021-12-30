@@ -411,7 +411,7 @@ void MultimapperAudioProcessor::setTargetMappingRoot(TuningTableMap::Root root)
     tunerController->setTargetMapRoot(root);
 }
 
-void MultimapperAudioProcessor::setTargetMappedTuningRoot(MappedTuning::Root root)
+void MultimapperAudioProcessor::setTargetMappedTuningRoot(MappedTuningTable::Root root)
 {
     tunerController->setTargetMappedTuningRoot(root);
 }

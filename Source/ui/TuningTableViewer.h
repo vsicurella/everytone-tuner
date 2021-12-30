@@ -15,7 +15,7 @@
 
 class TuningTableViewer : public juce::TabbedComponent
 {
-    const MappedTuning* mappedTuning;
+    const MappedTuningTable* mappedTuning;
     const TuningTable* tuning;
     const TuningTableMap* mapping;
 
@@ -31,11 +31,11 @@ class TuningTableViewer : public juce::TabbedComponent
 public:
 
     // If passed in IntervalListModel is nullptr, it will be created and managed by this component
-    TuningTableViewer(IntervalListModel* intervalListModel = nullptr, const MappedTuning* tuningIn = nullptr);
+    TuningTableViewer(IntervalListModel* intervalListModel = nullptr, const MappedTuningTable* tuningIn = nullptr);
 
     ~TuningTableViewer();
 
-    void set(const MappedTuning* tuningIn);
+    void set(const MappedTuningTable* tuningIn);
     void set(const TuningTable* tuningIn);
     void set(const TuningTableMap* tuningIn);
 };

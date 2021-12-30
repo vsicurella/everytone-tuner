@@ -36,8 +36,8 @@ public:
     virtual void targetMappingRootChanged(TuningChanger* changer, TuningTableMap::Root root) {};
 
     // Used to update all references
-    virtual void sourceMappedTuningRootChanged(TuningChanger* changer, MappedTuning::Root root) {};
-    virtual void targetMappedTuningRootChanged(TuningChanger* changer, MappedTuning::Root root) {};
+    virtual void sourceMappedTuningRootChanged(TuningChanger* changer, MappedTuningTable::Root root) {};
+    virtual void targetMappedTuningRootChanged(TuningChanger* changer, MappedTuningTable::Root root) {};
 
 };
 

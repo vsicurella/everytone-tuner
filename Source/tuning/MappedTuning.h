@@ -11,10 +11,10 @@
 */
 
 #pragma once
-#include "Tuning.h"
+#include "TuningTable.h"
 #include "../mapping/TuningTableMap.h"
 
-class MappedTuning : public TuningBase
+class MappedTuningTable : public TuningTableBase
 {
     std::shared_ptr<TuningTable> tuning;
     std::shared_ptr<TuningTableMap> mapping;
@@ -34,28 +34,13 @@ private:
 
 public:
     
-    MappedTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping);
-    MappedTuning(const MappedTuning& mappedTuning);
-    ~MappedTuning();
-
-    // TuningBase implementation
-
-    virtual int getTuningSize() const override;
-    
-    virtual void setRootFrequency(double frequency) override;
-    
-    virtual juce::Array<double> getIntervalCentsList() const override;
-
-    virtual double centsAt(int index) const override;
-    virtual double frequencyAt(int index) const override;
-    virtual double mtsAt(int index) const override;
-  
-    virtual int closestIndexToFrequency(double frequency) const override;
-    virtual int closestIndexToMts(double mts) const override;
+    MappedTuningTable(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping);
+    MappedTuningTable(const MappedTuningTable& mappedTuning);
+    ~MappedTuningTable();
 
     // MappedTuning declarations
 
-    TuningTable* getTuning() const { return tuning.get(); }
+    TuningTableBase* getTuning() const { return tuning.get(); }
 
     TuningTableMap* getMapping() const { return mapping.get(); }
 
@@ -63,9 +48,9 @@ public:
 
     std::shared_ptr<TuningTableMap> shareMapping() const { return mapping; }
 
-    MappedTuning::Root getRoot() const
+    MappedTuningTable::Root getRoot() const
     {
-        MappedTuning::Root root =
+        MappedTuningTable::Root root =
         {
             mapping->getRootMidiChannel(),
             mapping->getRootMidiNote(),
@@ -83,12 +68,39 @@ public:
 
     virtual double mtsAt(int midiNote, int midiChannel) const;
 
+
+    // TuningTableBase implementation
+
+    virtual int getTableSize() const override;
+
+    virtual double getVirtualPeriod() const override;
+    virtual double getVirtualSize() const override;
+
+    virtual double getRootMts() const override;
+
+    virtual juce::Array<double> getFrequencyTable() const override;
+    virtual juce::Array<double> getMtsTable() const override;
+
+    // TuningBase implementation
+
+    virtual int getTuningSize() const override;
+
+    virtual void setRootFrequency(double frequency) override;
+
+    virtual double centsAt(int index) const override;
+    virtual double frequencyAt(int index) const override;
+    virtual double mtsAt(int index) const override;
+
+    virtual int closestIndexToFrequency(double frequency) const override;
+    virtual int closestIndexToMts(double mts) const override;
+
+
 public:
 
-    static std::unique_ptr<MappedTuning> StandardTuning()
+    static std::unique_ptr<MappedTuningTable> StandardTuning()
     {
         auto standardTuning = std::make_shared<TuningTable>(TuningTable::StandardTuningDefinition());
         auto standardMapping = std::make_shared<TuningTableMap>(TuningTableMap::StandardMappingDefinition());
-        return std::make_unique<MappedTuning>(standardTuning, standardMapping);
+        return std::make_unique<MappedTuningTable>(standardTuning, standardMapping);
     }
 };

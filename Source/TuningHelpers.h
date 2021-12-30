@@ -134,7 +134,7 @@ static TuningTableMap::Definition parseTuningTableMapTree(juce::ValueTree tree)
     return definition;
 }
 
-static juce::ValueTree mappedTuningToValueTree(const MappedTuning* mappedTuning, juce::Identifier name)
+static juce::ValueTree mappedTuningToValueTree(const MappedTuningTable* mappedTuning, juce::Identifier name)
 {
     auto tuningTree = tuningToValueTree(mappedTuning->getTuning());
     auto mappingTree = tuningTableMapToValueTree(mappedTuning->getMapping());

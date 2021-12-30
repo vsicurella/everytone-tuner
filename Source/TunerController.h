@@ -23,8 +23,8 @@ public:
     class Watcher
     {
     public:
-        virtual void sourceTuningChanged(const std::shared_ptr<MappedTuning>& source) {}
-        virtual void targetTuningChanged(const std::shared_ptr<MappedTuning>& target) {}
+        virtual void sourceTuningChanged(const std::shared_ptr<MappedTuningTable>& source) {}
+        virtual void targetTuningChanged(const std::shared_ptr<MappedTuningTable>& target) {}
     };
 
 private:
@@ -32,8 +32,8 @@ private:
     TuningTableMap::Root sourceMapRoot;
     TuningTableMap::Root targetMapRoot;
 
-    std::shared_ptr<MappedTuning> currentTuningSource;
-    std::shared_ptr<MappedTuning> currentTuningTarget;
+    std::shared_ptr<MappedTuningTable> currentTuningSource;
+    std::shared_ptr<MappedTuningTable> currentTuningTarget;
 
     std::shared_ptr<MidiNoteTuner> currentTuner;
 
@@ -63,8 +63,8 @@ public:
     TuningTableMap::Root getSourceMapRoot() const { return sourceMapRoot; }
     TuningTableMap::Root getTargetMapRoot() const { return targetMapRoot; }
 
-    const MappedTuning* readTuningSource() const { return currentTuningSource.get(); }
-    const MappedTuning* readTuningTarget() const { return currentTuningTarget.get(); }
+    const MappedTuningTable* readTuningSource() const { return currentTuningSource.get(); }
+    const MappedTuningTable* readTuningTarget() const { return currentTuningTarget.get(); }
 
     Everytone::MappingMode getMappingMode() const { return mappingMode; }
     Everytone::MappingType getMappingType() const { return mappingType; }
@@ -92,8 +92,8 @@ public:
     void setSourceMapRoot(TuningTableMap::Root root);
     void setTargetMapRoot(TuningTableMap::Root root);
 
-    void setSourceMappedTuningRoot(MappedTuning::Root root);
-    void setTargetMappedTuningRoot(MappedTuning::Root root);
+    void setSourceMappedTuningRoot(MappedTuningTable::Root root);
+    void setTargetMappedTuningRoot(MappedTuningTable::Root root);
 
     void loadTunings(const CentsDefinition& sourceTuningDefinition, const CentsDefinition& targetTuningDefinition);
     void loadTunings(const CentsDefinition& sourceTuningDefinition, const TuningTableMap::Definition& sourceMapDefinition,

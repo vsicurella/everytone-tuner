@@ -111,7 +111,7 @@ void TunerController::setTargetMapRoot(TuningTableMap::Root root)
     setTargetMappedTuningRoot({ root.midiChannel, root.midiNote, currentTuningTarget->getRootFrequency() });
 }
 
-void TunerController::setSourceMappedTuningRoot(MappedTuning::Root root)
+void TunerController::setSourceMappedTuningRoot(MappedTuningTable::Root root)
 {
     bool tuningChanged = currentTuningSource->getRootFrequency() != root.frequency;
     bool mappingChanged = sourceMapRoot.midiChannel != root.midiChannel || sourceMapRoot.midiNote != root.midiNote;
@@ -138,7 +138,7 @@ void TunerController::setSourceMappedTuningRoot(MappedTuning::Root root)
         setTargetTuning(tuning, mapping);
 }
 
-void TunerController::setTargetMappedTuningRoot(MappedTuning::Root root)
+void TunerController::setTargetMappedTuningRoot(MappedTuningTable::Root root)
 {
     bool tuningChanged = currentTuningTarget->getRootFrequency() != root.frequency;
     bool mappingChanged = targetMapRoot.midiChannel != root.midiChannel || targetMapRoot.midiNote != root.midiNote;
@@ -234,7 +234,7 @@ void TunerController::loadTargetTuning(const CentsDefinition& definition, bool u
 void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner)
 {
     sourceMapRoot = mapping->getRoot();
-    currentTuningSource = std::make_shared<MappedTuning>(tuning, mapping);
+    currentTuningSource = std::make_shared<MappedTuningTable>(tuning, mapping);
     juce::Logger::writeToLog("Loaded new source tuning: " + tuning->getDescription());
 
     if (updateTuner)
@@ -247,7 +247,7 @@ void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, std::
 void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner)
 {
     targetMapRoot = mapping->getRoot();
-    currentTuningTarget = std::make_shared<MappedTuning>(tuning, mapping);
+    currentTuningTarget = std::make_shared<MappedTuningTable>(tuning, mapping);
     juce::Logger::writeToLog("Loaded new target tuning: " + tuning->getDescription());
 
     if (updateTuner)

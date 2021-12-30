@@ -32,23 +32,23 @@ class MappingPanel  : public juce::Component, public TuningChanger, public Optio
 
     juce::OwnedArray<juce::Label> labels;
 
-    MappedTuning* tuning;
+    MappedTuningTable* tuning;
 
 public:
-    MappingPanel(Everytone::Options options, MappedTuning* tuningIn = nullptr);
+    MappingPanel(Everytone::Options options, MappedTuningTable* tuningIn = nullptr);
     ~MappingPanel() override;
 
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    void setTuningDisplayed(const MappedTuning* tuning);
+    void setTuningDisplayed(const MappedTuningTable* tuning);
 
     void mappingTypeButtonClicked();
 
     void tuningReferenceEdited();
     
     void setPitchbendRangeText(int pitchbendRange);
-    void setMappedTuning(MappedTuning* tuningIn);
+    void setMappedTuning(MappedTuningTable* tuningIn);
     
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MappingPanel)

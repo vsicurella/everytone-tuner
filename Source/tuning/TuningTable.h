@@ -15,7 +15,23 @@
 #include "TuningBase.h"
 #include "../mapping/Map.h"
 
-class TuningTable : public TuningBase
+class TuningTableBase : public TuningBase
+{
+public:
+
+	TuningTableBase(int rootIndexIn, double rootFrequencyIn, juce::String nameIn = juce::String(), juce::String descriptionIn = juce::String())
+		: TuningBase(rootIndexIn, rootFrequencyIn, nameIn, descriptionIn) {}
+
+	virtual int getTableSize() const = 0;
+
+	virtual double getVirtualPeriod() const = 0;
+	virtual double getVirtualSize() const = 0;
+
+	virtual juce::Array<double> getFrequencyTable() const = 0;
+	virtual juce::Array<double> getMtsTable() const = 0;
+};
+
+class TuningTable : public TuningTableBase
 {
 public:
 
@@ -69,19 +85,22 @@ public:
 	virtual bool operator==(const TuningTable&);
 	virtual bool operator!=(const TuningTable&);
 
-	virtual int getTableSize() const;
+	// TuningTableBase implementation
 
-	virtual double getVirtualPeriod() const;
-	virtual double getVirtualSize() const;
+	virtual int getTableSize() const override;
 
-	virtual double getRootMts() const;
+	virtual double getVirtualPeriod() const override;
+	virtual double getVirtualSize() const override;
+
+	virtual double getRootMts() const override;
+
+	virtual juce::Array<double> getFrequencyTable() const override;
+	virtual juce::Array<double> getMtsTable() const override;
+	//virtual juce::Array<MTSTriplet> getMTSDataTable() const; // this should have some parameters, or maybe even be static
 
 	//virtual juce::Array<double> getIntervalCentsList() const override;
 	//virtual juce::Array<double> getIntervalRatioList() const;
 
-	virtual juce::Array<double> getFrequencyTable() const;
-	virtual juce::Array<double> getMtsTable() const;
-	//virtual juce::Array<MTSTriplet> getMTSDataTable() const; // this should have some parameters, or maybe even be static
 
 	// TuningBase implementation
 

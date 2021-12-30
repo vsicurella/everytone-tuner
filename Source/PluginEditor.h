@@ -39,9 +39,9 @@ public:
     //==============================================================================
     // TunerController::Watcher implementation
 
-    void sourceTuningChanged(const std::shared_ptr<MappedTuning>& source) override;
+    void sourceTuningChanged(const std::shared_ptr<MappedTuningTable>& source) override;
 
-    void targetTuningChanged(const std::shared_ptr<MappedTuning>& target) override;
+    void targetTuningChanged(const std::shared_ptr<MappedTuningTable>& target) override;
 
 
     //==============================================================================
@@ -53,7 +53,7 @@ public:
 
     void targetRootFrequencyChanged(TuningChanger* changer, double frequency) override;
 
-    void targetMappedTuningRootChanged(TuningChanger* changer, MappedTuning::Root root) override;
+    void targetMappedTuningRootChanged(TuningChanger* changer, MappedTuningTable::Root root) override;
 
     //==============================================================================
     // OptionsWatcher implementation
@@ -103,7 +103,7 @@ private:
     // access the processor object that created it.
     MultimapperAudioProcessor& audioProcessor;
 
-    std::unique_ptr<MappedTuning> tuningBackup;
+    std::unique_ptr<MappedTuningTable> tuningBackup;
 
     juce::Component* contentComponent = nullptr;
 

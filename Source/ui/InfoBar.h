@@ -91,7 +91,7 @@ public:
         flexbox.performLayout(getLocalBounds());
     }
 
-    void setDisplayedTuning(const MappedTuning* tuning)
+    void setDisplayedTuning(const MappedTuningTable* tuning)
     {
         nameValueLabel->setText(tuning->getName(), juce::NotificationType::dontSendNotification);
 

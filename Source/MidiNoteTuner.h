@@ -28,8 +28,8 @@ struct MidiPitch
 
 class MidiNoteTuner
 {
-	const std::shared_ptr<MappedTuning> sourceTuning;
-	const std::shared_ptr<MappedTuning> targetTuning;
+	const std::shared_ptr<MappedTuningTable> sourceTuning;
+	const std::shared_ptr<MappedTuningTable> targetTuning;
 
 	int pitchbendRange; // total bipolar range of pitchbend in semitones
 
@@ -43,7 +43,7 @@ public:
 		          std::shared_ptr<TuningTable> targetTuning, 
 		          std::shared_ptr<TuningTableMap> targetMapping,
 				  int pitchbendRange = 4);
-	MidiNoteTuner(const std::shared_ptr<MappedTuning>& mappedSource, const std::shared_ptr<MappedTuning>& mappedTarget, int pitchbendRange = 4);
+	MidiNoteTuner(const std::shared_ptr<MappedTuningTable>& mappedSource, const std::shared_ptr<MappedTuningTable>& mappedTarget, int pitchbendRange = 4);
     ~MidiNoteTuner();
 
 	const TuningTable* tuningSource() const { return sourceTuning->getTuning(); }
@@ -52,8 +52,8 @@ public:
 	const TuningTableMap* mappingSource() const { return sourceTuning->getMapping(); }
 	const TuningTableMap* mappingTarget() const { return targetTuning->getMapping(); }
 
-	const MappedTuning* mappedSource() const { return sourceTuning.get(); }
-	const MappedTuning* mappedTarget() const { return targetTuning.get(); }
+	const MappedTuningTable* mappedSource() const { return sourceTuning.get(); }
+	const MappedTuningTable* mappedTarget() const { return targetTuning.get(); }
     
     juce::Array<int> getPitchbendTable() const;
 

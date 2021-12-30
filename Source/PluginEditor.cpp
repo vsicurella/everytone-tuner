@@ -13,7 +13,7 @@
 MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    tuningBackup = std::make_unique<MappedTuning>(*audioProcessor.currentTarget());
+    tuningBackup = std::make_unique<MappedTuningTable>(*audioProcessor.currentTarget());
 
     auto currentTarget = audioProcessor.currentTarget();
 
@@ -106,17 +106,17 @@ void MultimapperAudioProcessorEditor::resized()
 
 }
 
-void MultimapperAudioProcessorEditor::sourceTuningChanged(const std::shared_ptr<MappedTuning>& source)
+void MultimapperAudioProcessorEditor::sourceTuningChanged(const std::shared_ptr<MappedTuningTable>& source)
 {
 
 }
 
-void MultimapperAudioProcessorEditor::targetTuningChanged(const std::shared_ptr<MappedTuning>& target)
+void MultimapperAudioProcessorEditor::targetTuningChanged(const std::shared_ptr<MappedTuningTable>& target)
 {
     infoBar->setDisplayedTuning(target.get());
     intervalListModel->setTuning(target.get());
     overviewPanel->setTuningDisplayed(target.get());
-    tuningBackup = std::make_unique<MappedTuning>(*audioProcessor.currentTarget());
+    tuningBackup = std::make_unique<MappedTuningTable>(*audioProcessor.currentTarget());
 }
 
 void MultimapperAudioProcessorEditor::targetDefinitionLoaded(TuningChanger* changer, CentsDefinition definition)
@@ -134,7 +134,7 @@ void MultimapperAudioProcessorEditor::targetRootFrequencyChanged(TuningChanger* 
     audioProcessor.setTargetTuningRootFrequency(frequency);
 }
 
-void MultimapperAudioProcessorEditor::targetMappedTuningRootChanged(TuningChanger* changer, MappedTuning::Root root)
+void MultimapperAudioProcessorEditor::targetMappedTuningRootChanged(TuningChanger* changer, MappedTuningTable::Root root)
 {
     audioProcessor.setTargetMappedTuningRoot(root);
 }
