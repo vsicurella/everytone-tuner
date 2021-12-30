@@ -73,6 +73,8 @@ struct CentsDefinition
 	}
 	bool operator!=(const CentsDefinition& d) const { return !operator==(d); }
 
+	juce::String getPeriodString() const { return juce::String(virtualPeriod) + " cents"; }
+
 	static CentsDefinition CentsDivisions(double divisions, double periodCents = 1200.0, double frequency = 440.0)
 	{
 		double step = periodCents / divisions;

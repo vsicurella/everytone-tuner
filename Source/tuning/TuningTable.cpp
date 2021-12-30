@@ -55,7 +55,9 @@ void TuningTable::setTableWithFrequencies(juce::Array<double> frequencies, int n
     if (newRootIndex < 0)
         newRootIndex = rootIndex;
 
-    
+    frequencyTable = frequencies;
+    rootFrequency = frequencyTable[rootIndex];
+    refreshTableMetadata();
 }
 
 void TuningTable::setTableWithMts(juce::Array<double> mts, int newRootIndex)
@@ -63,7 +65,25 @@ void TuningTable::setTableWithMts(juce::Array<double> mts, int newRootIndex)
     if (newRootIndex < 0)
         newRootIndex = rootIndex;
 
+    mtsTable = mts;
+    frequencyTable = mtsToFrequencyTable(mtsTable);
+    rootFrequency = frequencyTable[rootIndex];
+    rootMts = frequencyToMTS(rootFrequency);
+}
 
+void TuningTable::transposeTableByNewRootFrequency(double newRootFrequency)
+{
+    double transposeRatio = newRootFrequency / rootFrequency;
+    auto previousTable = frequencyTable;
+
+    for (int i = 0; i < previousTable.size(); i++)
+    {
+        auto newFrequency = roundN(8, previousTable[i] * transposeRatio);
+        frequencyTable.set(i, newFrequency);
+    }
+
+    rootFrequency = newRootFrequency;
+    refreshTableMetadata();
 }
 
 void TuningTable::setRootIndex(int newRootIndex)
@@ -75,13 +95,13 @@ void TuningTable::setRootIndex(int newRootIndex)
 void TuningTable::setRootFrequency(double frequency)
 {
     // TODO check mts limits?
-    rootFrequency = frequency;
-    rebuildTables();
+    transposeTableByNewRootFrequency(frequency);
 }
 
 double TuningTable::centsAt(int index) const
 {
-	return centsMap->at(index);
+    auto ratio = frequencyTable[index] / rootFrequency;
+	return ratioToCents(ratio);
 }
 
 double TuningTable::frequencyAt(int index) const
@@ -98,26 +118,25 @@ double TuningTable::mtsAt(int index) const
 
 int TuningTable::closestIndexToFrequency(double frequency) const
 {
-    return closestIndexToFrequency(frequency, true);
-}
-
-int TuningTable::closestIndexToFrequency(double frequency, bool useLookup) const
-{
-    double centsFromRoot = ratioToCents(frequency / rootFrequency);
-    return closestIndexToCents(centsFromRoot);
+    // Uncertain if quotients should be preferred with "closest frequency"
+    double difference, discrepancy = 10e10;
+    int closestIndex = -1;
+    for (int i = 0; i < frequencyTable.size(); i++)
+    {
+        difference = abs(roundN(8, frequency - frequencyTable[i]));
+        if (difference < discrepancy)
+        {
+            discrepancy = difference;
+            closestIndex = i;
+        }
+    }
+    return closestIndex;
 }
 
 int TuningTable::closestIndexToCents(double centsFromRoot) const
 {
-    if (tuningSize == 1)
-    {
-        auto stepsFromRoot = roundN(6, centsFromRoot / periodCents);
-        return (int)round(rootIndex + stepsFromRoot);
-    }
-
-    // This assumes the scale pattern doesn't have intervals that jump beyond the period
-
-    return centsMap->closestIndexTo(centsFromRoot) + rootIndex;
+    auto frequency = rootFrequency * centsToRatio(centsFromRoot);
+    return closestIndexToFrequency(frequency);
 }
 
 bool TuningTable::operator==(const TuningTable& tuning)
@@ -150,28 +169,42 @@ double TuningTable::getRootMts() const
     return rootMts;
 }
 
-juce::Array<double> TuningTable::getIntervalCentsList() const
-{
-    juce::Array<double> cents;
-    for (int i = 1; i <= tuningSize; i++)
-    {
-        cents.set(i, centsMap->at(i));
-    }
-
-    return cents;
-}
-
-juce::Array<double> TuningTable::getIntervalRatioList() const
-{
-    juce::Array<double> ratios;
-    for (int i = 1; i < tuningSize; i++)
-    {
-        ratios.set(i - 1, ratioTable[i]);
-    }
-    ratios.set(tuningSize - 1, periodRatio);
-
-    return ratios;
-}
+//juce::Array<double> TuningTable::getIntervalCentsList() const
+//{
+//    auto lowestFrequency = MTS_HIGHEST_FREQ;
+//    for (auto freq : frequencyTable)
+//    {
+//        if (freq < lowestFrequency)
+//            lowestFrequency = freq;
+//    }
+//    
+//    juce::Array<double> cents;
+//    for (auto freq : frequencyTable)
+//    {
+//        auto c = ratioToCents(freq / lowestFrequency);
+//        cents.add(c);
+//    }
+//
+//    return cents;
+//}
+//
+//juce::Array<double> TuningTable::getIntervalRatioList() const
+//{
+//    auto lowestFrequency = MTS_HIGHEST_FREQ;
+//    for (auto freq : frequencyTable)
+//    {
+//        if (freq < lowestFrequency)
+//            lowestFrequency = freq;
+//    }
+//
+//    juce::Array<double> ratios;
+//    for (auto freq : frequencyTable)
+//    {
+//        ratios.add(freq / lowestFrequency);
+//    }
+//
+//    return ratios;
+//}
 
 juce::Array<double> TuningTable::getFrequencyTable() const
 {

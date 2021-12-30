@@ -58,6 +58,8 @@ protected:
 
 	void setTableWithMts(juce::Array<double> mts, int newRootIndex = -1);
 
+	void transposeTableByNewRootFrequency(double newRootFrequency);
+
 public:
 
 	TuningTable(Definition definition);
@@ -74,8 +76,8 @@ public:
 
 	virtual double getRootMts() const;
 
-	virtual juce::Array<double> getIntervalCentsList() const override;
-	virtual juce::Array<double> getIntervalRatioList() const;
+	//virtual juce::Array<double> getIntervalCentsList() const override;
+	//virtual juce::Array<double> getIntervalRatioList() const;
 
 	virtual juce::Array<double> getFrequencyTable() const;
 	virtual juce::Array<double> getMtsTable() const;
@@ -91,11 +93,9 @@ public:
 	virtual double mtsAt(int index) const override;
 
 	virtual int closestIndexToFrequency(double frequency) const override;
-	virtual int closestIndexToFrequency(double frequency, bool useLookup) const;
-
 	virtual int closestIndexToCents(double centsFromRoot) const override;
 
-private:
+protected:
 
 	static juce::Array<double> frequencyToMtsTable(juce::Array<double> frequenciesIn);
 

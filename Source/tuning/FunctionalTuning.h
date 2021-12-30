@@ -23,19 +23,18 @@ class FunctionalTuning : public TuningTable
 
     int tuningSize;
 
-    juce::Array<double> ratioTable;
-
     double periodCents;
     double periodRatio;
-
 
 private:
 
     void setupCentsMap(const juce::Array<double>& cents);
 
-    void setupRootAndTableSize();
+    int setupRootIndexAndGetTableSize();
 
-    void rebuildTables();
+    TuningTable::Definition setupEmptyTableDefinition(const CentsDefinition& definition);
+
+    TuningTable::Definition setupFrequencyTableDefinition(const CentsDefinition& definition);
 
 public:
 
@@ -43,11 +42,16 @@ public:
         Expects a full interval table in cents, ending with period. May or may not include unison.
     */
     FunctionalTuning(CentsDefinition definition = CentsDefinition());
+
+    FunctionalTuning(CentsDefinition definition, bool buildTables);
     
     virtual bool operator==(const FunctionalTuning&);
     virtual bool operator!=(const FunctionalTuning&);
 
     virtual CentsDefinition getDefinition() const;
+
+    virtual juce::Array<double> getIntervalCentsList() const;
+    virtual juce::Array<double> getIntervalRatioList() const;
 
     virtual double getPeriodCents() const;
     virtual double getPeriodSemitones() const;
@@ -66,22 +70,24 @@ public:
 
     // TuningTable re-implementation
 
+    virtual int getTableSize() const override;
+    virtual int getTableSize(bool calculate) const;
+
+    virtual juce::Array<double> getFrequencyTable() const override;
+    virtual juce::Array<double> getMtsTable() const override;
+
     virtual double centsAt(int index) const override;
     virtual double frequencyAt(int index) const override;
     virtual double mtsAt(int index) const override;
 
     virtual int closestIndexToFrequency(double frequency) const override;
-    virtual int closestIndexToFrequency(double frequency, bool useLookup) const;
-
     virtual int closestIndexToCents(double centsFromRoot) const override;
 
-    virtual int getTuningTableSize() const;
+private:
 
-    virtual juce::Array<double> getIntervalCentsList() const override;
-    virtual juce::Array<double> getIntervalRatioList() const override;
+    virtual juce::Array<double> buildFrequencyTable(int size = 0) const;
 
-    virtual juce::Array<double> getFrequencyTable() const override;
-    virtual juce::Array<double> getMtsTable() const override;
-    //virtual juce::Array<MTSTriplet> getMTSDataTable() const; // this should have some parameters, or maybe even be static
+protected:
 
+    static void calculateRootAndTableSizeFromMap(Map<double>* centsMap, double rootFrequency, int& rootIndex, int& tableSize);
 };

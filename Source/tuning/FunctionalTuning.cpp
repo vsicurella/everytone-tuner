@@ -11,16 +11,19 @@
 #include "FunctionalTuning.h"
 
 FunctionalTuning::FunctionalTuning(CentsDefinition definition)
-    : tuningSize(definition.intervalCents.size()),
-    TuningBase(definition.rootFrequency, definition.name, definition.description)
+    : TuningTable(setupEmptyTableDefinition(definition))
 {
-    setVirtualPeriod(definition.virtualPeriod, juce::String(definition.virtualPeriod) + " cents");
-    setupCentsMap(definition.intervalCents);
+}
+
+FunctionalTuning::FunctionalTuning(CentsDefinition definition, bool buildTables)
+    : TuningTable((buildTables) ? setupFrequencyTableDefinition(definition) : setupEmptyTableDefinition(definition))
+{
 }
 
 void FunctionalTuning::setupCentsMap(const juce::Array<double>& cents)
 {
     centsTable = cents;
+    tuningSize = centsTable.size();
 
     periodCents = cents.getLast();
     periodRatio = centsToRatio(periodCents);
@@ -34,68 +37,86 @@ void FunctionalTuning::setupCentsMap(const juce::Array<double>& cents)
         tuningSize,
         tuningShifted.data(),
         periodCents,
-        0,                     /* pattern rootIndex */
+        0, /* pattern rootIndex */
         0, /* tuning index rootIndex */
     };
 
     centsMap.reset(new Map<double>(definition));
 }
 
-
-void FunctionalTuning::setupRootAndTableSize()
+int FunctionalTuning::setupRootIndexAndGetTableSize()
 {
-    double lowestRatio = MTS_LOWEST_FREQ / rootFrequency;
-    double lowestCents = ratioToCents(lowestRatio);
-    int lowestFromRoot = centsMap->closestIndexTo(lowestCents);
-
-    double highestRatio = MTS_HIGHEST_FREQ / rootFrequency;
-    double highestCents = ratioToCents(highestRatio);
-    int highestFromRoot = centsMap->closestIndexTo(highestCents);
-
-    rootIndex = -lowestFromRoot;
-    lookupTableSize = highestFromRoot - lowestFromRoot + 1;
-
-    //juce::Logger::writeToLog("Best mapping, rootIndex: " + juce::String(lowestToNewRoot) + ", size: " + juce::String(tableSize));
+    int lookupTableSize;
+    calculateRootAndTableSizeFromMap(centsMap.get(), rootFrequency, rootIndex, lookupTableSize);
+    return lookupTableSize;
 }
 
-void TuningTable::rebuildTables()
+TuningTable::Definition FunctionalTuning::setupEmptyTableDefinition(const CentsDefinition& definition)
 {
-    setupRootAndTableSize();
+    setupCentsMap(definition.intervalCents);
 
-    // Build ratio table
-    double cents, ratio;
-    for (int i = 0; i < tuningSize; i++)
+    auto tableSize = setupRootIndexAndGetTableSize();
+
+    juce::Array<double> emptyTable;
+    emptyTable.resize(tableSize);
+    emptyTable.fill(0);
+    tablesAreBuilt = false;
+
+    TuningTable::Definition tableDefinition =
     {
-        cents = centsMap->at(i);
-        ratio = centsToRatio(cents);
-        ratioTable.set(i, ratio);
-    }
+        emptyTable,
+        definition.rootFrequency,
+        definition.name,
+        definition.description,
+        definition.getPeriodString(),
+        definition.virtualPeriod,
+        definition.virtualSize
+    };
 
-    double periodRatio = centsToRatio(periodCents);
-    rootMts = roundN(10, frequencyToMTS(rootFrequency));
-
-    // Build Frequency and MTS freq tables
-    int offset;
-    double intervalRatio, frequency, size = tuningSize;
-    for (int t = 0; t < lookupTableSize; t++)
-    {
-        offset = t - rootIndex;
-        frequency = calculateFrequencyFromRoot(offset);
-
-        frequencyTable.set(t, frequency);
-        double mts = roundN(10, frequencyToMTS(frequency));
-        mtsTable.set(t, mts);
-
-        dbgFreqTable[t] = frequency;
-        dbgMtsTable[t] = mts;
-    }
+    return tableDefinition;
 }
+
+TuningTable::Definition FunctionalTuning::setupFrequencyTableDefinition(const CentsDefinition& definition)
+{
+    setupCentsMap(definition.intervalCents);
+
+    auto tableSize = setupRootIndexAndGetTableSize();
+
+    auto table = buildFrequencyTable(tableSize);
+    tablesAreBuilt = true;
+    
+    TuningTable::Definition tableDefinition =
+    {
+        table,
+        definition.rootFrequency,
+        definition.name,
+        definition.description,
+        definition.getPeriodString(),
+        definition.virtualPeriod,
+        definition.virtualSize
+    };
+
+    return tableDefinition;
+}
+
+bool FunctionalTuning::operator==(const FunctionalTuning& tuning)
+{
+    // TODO stricter and looser versions
+    return centsTable == tuning.centsTable,
+        rootIndex == tuning.rootIndex,
+        rootFrequency == tuning.rootFrequency;
+}
+
+bool FunctionalTuning::operator!=(const FunctionalTuning& tuning)
+{
+    return !operator==(tuning);
+}
+
 
 CentsDefinition FunctionalTuning::getDefinition() const
 {
     return CentsDefinition{ centsTable, rootFrequency, name, description, getVirtualPeriod(), getVirtualSize() };
 }
-
 
 double FunctionalTuning::getPeriodCents() const
 {
@@ -111,33 +132,6 @@ double FunctionalTuning::getPeriodRatio() const
 {
     return periodRatio;
 }
-
-
-juce::Array<double> FunctionalTuning::getIntervalCentsList() const
-{
-    // Don't include unison
-    juce::Array<double> cents;
-    for (int i = 1; i <= tuningSize; i++)
-    {
-        cents.set(i, centsMap->at(i));
-    }
-
-    return cents;
-}
-
-juce::Array<double> FunctionalTuning::getIntervalRatioList() const
-{
-    // Don't include unison
-    juce::Array<double> ratios;
-    for (int i = 1; i < tuningSize; i++)
-    {
-        ratios.set(i - 1, ratioTable[i]);
-    }
-    ratios.set(tuningSize - 1, periodRatio);
-
-    return ratios;
-}
-
 
 double FunctionalTuning::calculateFrequencyFromRoot(int stepsFromRoot) const
 {
@@ -160,4 +154,139 @@ double FunctionalTuning::calculateCentsFromRoot(int stepsFromRoot) const
 double FunctionalTuning::calculateSemitonesFromRoot(int stepsFromRoot) const
 {
     return calculateCentsFromRoot(stepsFromRoot) * 0.01;
+}
+
+juce::Array<double> FunctionalTuning::getIntervalCentsList() const
+{
+    // Don't include unison
+    juce::Array<double> cents;
+    for (int i = 1; i <= tuningSize; i++)
+    {
+        cents.add(centsMap->at(i));
+    }
+
+    return cents;
+}
+
+juce::Array<double> FunctionalTuning::getIntervalRatioList() const
+{
+    // Don't include unison
+    juce::Array<double> ratios;
+    for (int i = 1; i < tuningSize; i++)
+    {
+        auto ratio = centsToRatio(centsTable[i]);
+        ratios.add(ratio);
+    }
+    ratios.add(periodRatio);
+
+    return ratios;
+}
+
+int FunctionalTuning::getTableSize() const
+{
+    return getTableSize(false);
+}
+
+int FunctionalTuning::getTableSize(bool calculate) const
+{
+    if (calculate)
+    {
+        int root, size;
+        calculateRootAndTableSizeFromMap(centsMap.get(), rootFrequency, root, size);
+        return size;
+    }
+    
+    return TuningTable::getTableSize();
+}
+
+juce::Array<double> FunctionalTuning::getFrequencyTable() const
+{
+    if (tablesAreBuilt)
+        return TuningTable::getFrequencyTable();
+
+    return buildFrequencyTable();
+}
+
+juce::Array<double> FunctionalTuning::getMtsTable() const
+{
+    if (tablesAreBuilt)
+        return TuningTable::getFrequencyTable();
+
+    auto frequencies = buildFrequencyTable();
+    return mtsToFrequencyTable(frequencies);
+}
+
+double FunctionalTuning::centsAt(int index) const
+{
+    if (tablesAreBuilt)
+        return TuningTable::centsAt(index);
+
+    return calculateCentsFromRoot(index - rootIndex);
+}
+
+double FunctionalTuning::frequencyAt(int index) const
+{
+    if (tablesAreBuilt)
+        return TuningTable::frequencyAt(index);
+
+    return calculateFrequencyFromRoot(index - rootIndex);
+}
+
+double FunctionalTuning::mtsAt(int index) const
+{
+    if (tablesAreBuilt)
+        return TuningTable::mtsAt(index);
+
+    return calculateMtsFromRoot(index - rootIndex);
+}
+
+int FunctionalTuning::closestIndexToFrequency(double frequency) const
+{
+    if (tablesAreBuilt)
+        return TuningTable::closestIndexToFrequency(frequency);
+
+    auto cents = ratioToCents(frequency / rootFrequency);
+    return closestIndexToCents(cents);
+}
+
+int FunctionalTuning::closestIndexToCents(double centsFromRoot) const
+{
+    if (tablesAreBuilt)
+        return TuningTable::closestIndexToCents(centsFromRoot);
+
+    return centsMap->closestIndexTo(centsFromRoot);
+}
+
+juce::Array<double> FunctionalTuning::buildFrequencyTable(int tableSize) const
+{
+    auto frequencies = juce::Array<double>();
+
+    if (tableSize == 0)
+        tableSize = getTableSize();
+
+    if (tableSize == 0)
+        return frequencies;
+
+    for (int i = 0; i < getTableSize(); i++)
+    {
+        auto index = i - rootIndex;
+        auto f = calculateFrequencyFromRoot(index);
+        frequencies.add(f);
+    }
+
+    return frequencies;
+}
+
+void FunctionalTuning::calculateRootAndTableSizeFromMap(Map<double>* centsMap, double rootFrequency, int& rootIndex, int& tableSize)
+{
+    double lowestRatio = MTS_LOWEST_FREQ / rootFrequency;
+    double lowestCents = ratioToCents(lowestRatio);
+    int lowestFromRoot = centsMap->closestIndexTo(lowestCents);
+
+    double highestRatio = MTS_HIGHEST_FREQ / rootFrequency;
+    double highestCents = ratioToCents(highestRatio);
+    int highestFromRoot = centsMap->closestIndexTo(highestCents);
+
+    rootIndex = -lowestFromRoot;
+    tableSize = highestFromRoot - lowestFromRoot + 1;
 }
