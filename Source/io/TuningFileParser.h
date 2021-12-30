@@ -64,6 +64,8 @@ private:
 
     void parseTuning(juce::File file);
 
+    static juce::String tunInfoToString(const TUN::CSingleScale& tunScale);
+
 private:
 
     //juce::String filePath;

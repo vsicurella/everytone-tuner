@@ -110,39 +110,38 @@ CentsDefinition TuningFileParser::parseScalaFileDefinition(juce::File scalaFile)
 CentsDefinition TuningFileParser::parseTunFileDefinition(juce::File tunFile)
 {
     TUN::CSingleScale tunSingleScale;
+
     std::string path = tunFile.getFullPathName().toStdString();
 
-    if (tunSingleScale.Read(path.c_str()))
+    if (tunSingleScale.Read(path.c_str()) < 1)
+        return CentsDefinition();
+
+    juce::Array<double> centsTable;
+    int baseNote = tunSingleScale.GetBaseNote();
+    double baseFreq = tunSingleScale.GetBaseFreqHz();
+
+    for (auto freq : tunSingleScale.GetNoteFrequenciesHz())
     {
-        juce::Array<double> centsTable;
-        int baseNote = tunSingleScale.GetBaseNote();
-        double baseFreq = tunSingleScale.GetBaseFreqHz();
-
-        for (auto freq : tunSingleScale.GetNoteFrequenciesHz())
-        {
-            centsTable.add(ratioToCents(freq / baseFreq));
-        }
-
-        auto name = juce::String(tunSingleScale.GetKeys()[TUN::CSingleScale::KEY_Name]);
-        if (juce::File::isAbsolutePath(name))
-        {
-            auto temp = juce::File(name);
-            name = temp.getFileNameWithoutExtension();
-        }
-        auto description = juce::String(tunSingleScale.GetKeys()[TUN::CSingleScale::KEY_Description]);
-
-        CentsDefinition definition =
-        {
-            centsTable,
-            baseFreq,
-            name,
-            description
-        };
-
-        return definition;
+        centsTable.add(ratioToCents(freq / baseFreq));
     }
 
-    return CentsDefinition();
+    auto name = juce::String(tunSingleScale.m_strName);
+    if (juce::File::isAbsolutePath(name))
+    {
+        auto temp = juce::File(name);
+        name = temp.getFileNameWithoutExtension();
+    }
+    auto description = tunInfoToString(tunSingleScale);
+
+    CentsDefinition definition =
+    {
+        centsTable,
+        baseFreq,
+        name,
+        description
+    };
+
+    return definition;
 }
 
 void TuningFileParser::parseTuning(juce::File fileLoaded)
@@ -157,4 +156,69 @@ void TuningFileParser::parseTuning(juce::File fileLoaded)
         tuningDefinition = std::make_unique<CentsDefinition>(parseTunFileDefinition(fileLoaded));
         break;
     }
+}
+
+juce::String TuningFileParser::tunInfoToString(const TUN::CSingleScale& tunScale)
+{
+    juce::String info;
+
+    juce::StringArray keys =
+    {
+        "Name",
+        "ID",
+        "Filename",
+        "Author",
+        "Date",
+        "Location",
+        "Contact",
+        "Editor",
+        "EditorSpecs",
+        "Description",
+        "Keywords",
+        "History",
+        "Geography",
+        "Instrument",
+        "Compositions",
+        "Comments"
+    };
+
+    juce::StringArray values;
+    values.add(tunScale.m_strName);
+    values.add(tunScale.m_strID);
+    values.add(tunScale.m_strFilename);
+    values.add(tunScale.m_strAuthor);
+    values.add(tunScale.GetDate());
+    values.add(tunScale.m_strLocation);
+    values.add(tunScale.m_strContact);
+    values.add(tunScale.m_strEditor);
+    values.add(tunScale.m_strEditorSpecs);
+    values.add(tunScale.m_strDescription);
+
+    auto keywords = juce::StringArray();
+    for (auto word : tunScale.m_lstrKeywords)
+        keywords.add(word);
+    values.add(keywords.joinIntoString(", "));
+    
+    values.add(tunScale.m_strHistory);
+    values.add(tunScale.m_strGeography);
+    values.add(tunScale.m_strInstrument);
+    
+    auto compositions = juce::StringArray();
+    for (auto composition : tunScale.m_lstrCompositions)
+        compositions.add(composition);
+    values.add(compositions.joinIntoString(", "));
+    
+    values.add(tunScale.m_strComments);
+
+    for (int i = 0; i < keys.size(); i++)
+    {
+        auto value = values[i];
+        if (value.isEmpty())
+            continue;
+
+        auto str = keys[i] + ": " + value + juce::newLine;
+        info += str + juce::newLine;
+    }
+
+    return info;
 }
