@@ -23,26 +23,23 @@ IntervalListHeader::IntervalListHeader(bool inEditMode)
     }
 }
 
-IntervalListModel::IntervalListModel(bool editMode, const TuningBase* tuningIn)
+IntervalListModel::IntervalListModel(bool editMode, const FunctionalTuning* tuningIn)
     : inEditMode(editMode)
 {
     setTuning(tuningIn);
 }
 
-void IntervalListModel::setTuning(const TuningBase* tuningIn)
+void IntervalListModel::setTuning(const FunctionalTuning* tuningIn)
 {
-    //tuning = tuningIn;
+    tuning = tuningIn;
+    if (tuning == nullptr)
+    {
+        definition = CentsDefinition();
+        definition.intervalCents = {};
+        return;
+    }
 
-    //auto functional
-
-    //if (tuning == nullptr)
-    //{
-    //    definition = CentsDefinition();
-    //    definition.intervalCents = {};
-    //    return;
-    //}
-
-    //definition = tuning->getDefinition();
+    definition = tuning->getDefinition();
 }
 
 void IntervalListModel::sendCentsDefinitionUpdateChange()

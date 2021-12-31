@@ -24,11 +24,11 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     menuPanel = std::make_unique<MenuPanel>(this);
     addChildComponent(*menuPanel);
 
-    intervalListModel = std::make_unique<IntervalListModel>(false, currentTarget);
-    intervalListModel->addTuningWatcher(this);
+    //intervalListModel = std::make_unique<IntervalListModel>(false, currentTarget);
+    //intervalListModel->addTuningWatcher(this);
 
     overviewPanel = std::make_unique<OverviewPanel>(audioProcessor.options());
-    overviewPanel->setListEditorModel(intervalListModel.get());
+    //overviewPanel->setListEditorModel(intervalListModel.get());
     overviewPanel->setTuningDisplayed(currentTarget);
     overviewPanel->addTuningWatcher(this);
     overviewPanel->addOptionsWatcher(this);
@@ -114,7 +114,7 @@ void MultimapperAudioProcessorEditor::sourceTuningChanged(const std::shared_ptr<
 void MultimapperAudioProcessorEditor::targetTuningChanged(const std::shared_ptr<MappedTuningTable>& target)
 {
     infoBar->setDisplayedTuning(target.get());
-    intervalListModel->setTuning(target.get());
+    //intervalListModel->setTuning(target.get());
     overviewPanel->setTuningDisplayed(target.get());
     tuningBackup = std::make_unique<MappedTuningTable>(*audioProcessor.currentTarget());
 }
@@ -347,6 +347,7 @@ bool MultimapperAudioProcessorEditor::performOpenTuning(const juce::ApplicationC
             {
                 TuningFileParser parser(result);
                 audioProcessor.setTuningTarget(parser.getTuning());
+                setContentComponent(overviewPanel.get());
             }
         });
 

@@ -110,7 +110,7 @@ private:
     std::unique_ptr<InfoBar> infoBar;
     std::unique_ptr<MenuPanel> menuPanel;
 
-    std::unique_ptr<IntervalListModel> intervalListModel;
+    //std::unique_ptr<IntervalListModel> intervalListModel;
 
     std::unique_ptr<OverviewPanel> overviewPanel;
     std::unique_ptr<NewTuningPanel> newTuningPanel;

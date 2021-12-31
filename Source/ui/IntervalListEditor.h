@@ -31,15 +31,15 @@ class IntervalListModel : public juce::TableListBoxModel, public TuningChanger
 {
     bool inEditMode = false;
 
-    const TuningBase* tuning;
+    const FunctionalTuning* tuning;
 
     CentsDefinition definition;
 
 public:
 
-    IntervalListModel(bool inEditMode = false, const TuningBase* tuning = nullptr);
+    IntervalListModel(bool inEditMode = false, const FunctionalTuning* tuning = nullptr);
 
-    void setTuning(const TuningBase* tuning);
+    void setTuning(const FunctionalTuning* tuning);
 
     void sendCentsDefinitionUpdateChange();
 

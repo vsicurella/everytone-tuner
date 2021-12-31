@@ -28,6 +28,15 @@ class TuningTableViewer : public juce::TabbedComponent
     std::unique_ptr<MappingTableModel> mappingModel;
     std::unique_ptr<juce::TableListBox> mappingTable;
 
+private:
+
+    enum class TuningTableViewerTabs
+    {
+        Intervals = 0,
+        TuningTable,
+        Mapping
+    };
+
 public:
 
     // If passed in IntervalListModel is nullptr, it will be created and managed by this component
@@ -38,4 +47,9 @@ public:
     void set(const MappedTuningTable* tuningIn);
     void set(const TuningTable* tuningIn);
     void set(const TuningTableMap* tuningIn);
+
+private:
+
+    bool addIntervalTab();
+    void addTuningTableTabs();
 };

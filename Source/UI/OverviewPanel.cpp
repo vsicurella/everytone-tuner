@@ -168,11 +168,11 @@ void OverviewPanel::setTuningDisplayed(const MappedTuningTable* mappedTuningIn)
 void OverviewPanel::setListEditorModel(IntervalListModel* listEditor)
 {
 	//listEditorComponent->setModel(listEditor);
-	tuningTableViewer = nullptr;
-	tuningTableViewer = std::make_unique<TuningTableViewer>(listEditor);
-	tuningTableViewer->set(mappedTuning);
-	addAndMakeVisible(*tuningTableViewer);
-	resized();
+	//tuningTableViewer = nullptr;
+	//tuningTableViewer = std::make_unique<TuningTableViewer>(listEditor);
+	//tuningTableViewer->set(mappedTuning);
+	//addAndMakeVisible(*tuningTableViewer);
+	//resized();
 }
 
 //
