@@ -11,7 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "./tuning/Tuning.h"
+#include "./tuning/MappedTuning.h"
 #include "Common.h"
 
 template <typename ARR>
@@ -28,48 +28,153 @@ static juce::ValueTree arrayToValueTree(ARR array, juce::Identifier id, juce::Id
     return tree;
 }
 
-static juce::ValueTree tuningToValueTree(const TuningTable* tuning, juce::Identifier name = Everytone::ID::Tuning)
+static juce::ValueTree tuningBaseToValueTree(const TuningBase* tuning, juce::ValueTree parent = juce::ValueTree())
 {
-    auto tree = juce::ValueTree(name);
+    auto tree = parent;
+    if (!parent.isValid())
+        tree = juce::ValueTree(Everytone::ID::Tuning);
     
-    auto intervals = tuning->getIntervalCentsList();
-    auto intervalTree = arrayToValueTree(intervals, Everytone::ID::IntervalTable, Everytone::ID::Cents);
-    tree.addChild(intervalTree, 0, nullptr);
-
-    tree.setProperty(Everytone::ID::RootFrequency,  tuning->getRootFrequency(), nullptr);
-    tree.setProperty(Everytone::ID::Name,           tuning->getName(), nullptr);
-    tree.setProperty(Everytone::ID::Description,    tuning->getDescription(), nullptr);
-    tree.setProperty(Everytone::ID::VirtualPeriod,  tuning->getVirtualPeriod(), nullptr);
-    tree.setProperty(Everytone::ID::VirtualSize,    tuning->getVirtualSize(), nullptr);
+    tree.setProperty(Everytone::ID::RootFrequency,      tuning->getRootFrequency(), nullptr);
+    tree.setProperty(Everytone::ID::RootTuningIndex,    tuning->getRootIndex(), nullptr);
+    tree.setProperty(Everytone::ID::Name,               tuning->getName(), nullptr);
+    tree.setProperty(Everytone::ID::Description,        tuning->getDescription(), nullptr);
     
     return tree;
 }
 
-static CentsDefinition parseTuningValueTree(juce::ValueTree tree)
+static juce::ValueTree tuningTableToValueTree(const TuningTable* tuning, juce::ValueTree parent = juce::ValueTree())
 {
-    juce::Array<double> cents;
+    auto tree = parent;
+    if (!parent.isValid())
+        tree = juce::ValueTree(Everytone::ID::Tuning);
 
-    for (auto node : tree.getChild(0))
+    tuningBaseToValueTree(tuning, tree);
+
+    tree.setProperty(Everytone::ID::PeriodString, tuning->getPeriodString(), nullptr);
+    tree.setProperty(Everytone::ID::VirtualPeriod, tuning->getVirtualPeriod(), nullptr);
+    tree.setProperty(Everytone::ID::VirtualSize, tuning->getVirtualSize(), nullptr);
+
+    return tree;
+}
+
+static juce::ValueTree functionalTuningToValueTree(const FunctionalTuning* tuning, juce::ValueTree parent = juce::ValueTree())
+{
+    auto tree = parent;
+    if (!parent.isValid())
+        tree = juce::ValueTree(Everytone::ID::Tuning);
+
+    tuningTableToValueTree(tuning, tree);
+
+    auto intervals = tuning->getIntervalCentsList();
+    auto intervalTree = arrayToValueTree(intervals, Everytone::ID::CentsTable, Everytone::ID::Cents);
+    tree.addChild(intervalTree, 0, nullptr);
+
+    return tree;
+}
+
+static juce::ValueTree tuningToValueTree(const TuningBase* tuning, juce::Identifier name = Everytone::ID::Tuning)
+{
+    auto tree = juce::ValueTree(name);
+
+    auto functional = dynamic_cast<const FunctionalTuning*>(tuning);
+    if (functional != nullptr)
+        return functionalTuningToValueTree(functional, tree);
+
+    auto table = dynamic_cast<const TuningTable*>(tuning);
+    if (table != nullptr)
+        return tuningTableToValueTree(table, tree);
+
+    return tuningBaseToValueTree(tuning, tree);
+}
+
+static void applyTuningBasePropertiesFromValueTree(juce::ValueTree tree, int& rootIndex, double& rootFrequency, juce::String& name, juce::String& description)
+{
+    rootIndex       = (int)tree[Everytone::ID::RootTuningIndex];
+    rootFrequency   = (double)tree[Everytone::ID::RootFrequency];
+    name            = tree[Everytone::ID::Name].toString();
+    description     = tree[Everytone::ID::Description].toString();
+}
+
+static void applyTuningTablePropertiesFromValueTree(
+    juce::ValueTree tree,
+    int& rootIndex, 
+    juce::String& name, 
+    juce::String& description,
+    juce::String& periodString, 
+    double& virtualPeriod,
+    double& virtualSize)
+{
+    periodString = tree[Everytone::ID::PeriodString].toString();
+    virtualPeriod = (double)tree[Everytone::ID::VirtualPeriod];
+    virtualSize = (double)tree[Everytone::ID::VirtualSize];
+
+    double dummyFreq;
+    applyTuningBasePropertiesFromValueTree(tree, rootIndex, dummyFreq, name, description);
+}
+
+
+static std::shared_ptr<FunctionalTuning> constructFunctionalTuningFromValueTree(juce::ValueTree tree)
+{
+    auto centsNode = tree.getChildWithName(Everytone::ID::Cents);
+    if (!centsNode.isValid())
+        return nullptr;
+
+    juce::Array<double> cents;
+    for (auto child : centsNode)
     {
-        cents.add(node[Everytone::ID::Value]);
+        auto value = (double)child[Everytone::ID::Value];
+        cents.add(value);
     }
 
     if (cents.size() == 0)
+        return nullptr;
+
+    CentsDefinition definition { cents };
+    
+    definition.rootFrequency = (double)tree[Everytone::ID::RootFrequency];
+    definition.name = tree[Everytone::ID::Name].toString();
+    definition.description= tree[Everytone::ID::Description].toString();
+    definition.virtualPeriod = (double)tree[Everytone::ID::VirtualPeriod];
+    definition.virtualSize = (double)tree[Everytone::ID::VirtualSize];
+
+    return std::make_shared<FunctionalTuning>(definition);
+}
+
+static std::shared_ptr<TuningTable> constructTuningTableFromValueTree(juce::ValueTree tree)
+{
+    auto frequencyNode = tree.getChildWithName(Everytone::ID::FrequencyTable);
+    if (!frequencyNode.isValid())
+        return nullptr;
+
+    juce::Array<double> frequencyTable;
+    for (auto child : frequencyNode)
     {
-        return CentsDefinition();
+        auto frequency = (double)child[Everytone::ID::Value];
+        frequencyTable.add(frequency);
     }
 
-    CentsDefinition definition =
-    {
-        cents,
-        (double)tree.getProperty(Everytone::ID::RootFrequency, 440.0),
-        tree.getProperty(Everytone::ID::Name, "").toString(),
-        tree.getProperty(Everytone::ID::Description, "").toString(),
-        (double)tree.getProperty(Everytone::ID::VirtualPeriod, 2.0),
-        (double)tree.getProperty(Everytone::ID::VirtualSize, 12.0)
-    };
-    
-    return definition;
+    TuningTable::Definition definition { frequencyTable };
+
+    applyTuningTablePropertiesFromValueTree(tree, 
+                                            definition.rootIndex, 
+                                            definition.name, 
+                                            definition.description, 
+                                            definition.periodString, 
+                                            definition.virtualPeriod, 
+                                            definition.virtualSize);
+    return std::make_shared<TuningTable>(definition);
+}
+
+static std::shared_ptr<TuningTable> constructTuningFromValueTree(juce::ValueTree tree)
+{
+    if (!tree.isValid())
+        return nullptr;
+
+    auto functionalTuning = constructFunctionalTuningFromValueTree(tree);
+    if (functionalTuning != nullptr)
+        return functionalTuning;
+
+    return constructTuningTableFromValueTree(tree);
 }
 
 static juce::ValueTree tuningTableMapToValueTree(const TuningTableMap* midiMap, juce::Identifier name = Everytone::ID::TuningTableMidiMap)

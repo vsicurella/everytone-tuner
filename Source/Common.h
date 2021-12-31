@@ -23,9 +23,12 @@ namespace Everytone
         static juce::Identifier Tuning("Tuning");
         static juce::Identifier Name("Name");
         static juce::Identifier Description("Description");
+        static juce::Identifier PeriodString("PeriodString");
         static juce::Identifier VirtualPeriod("VirtualPeriod");
         static juce::Identifier VirtualSize("VirtualSize");
-        static juce::Identifier IntervalTable("IntervalTable");
+        static juce::Identifier FrequencyTable("FrequencyTable");
+        static juce::Identifier Frequency("Frequency");
+        static juce::Identifier CentsTable("CentsTable");
         static juce::Identifier Cents("Cents");
         static juce::Identifier RootMidiNote("rootMidiNote");
         static juce::Identifier RootMidiChannel("rootMidiChannel");
