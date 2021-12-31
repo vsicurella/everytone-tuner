@@ -44,6 +44,8 @@ public:
     FunctionalTuning(CentsDefinition definition = CentsDefinition());
 
     FunctionalTuning(CentsDefinition definition, bool buildTables);
+
+    FunctionalTuning(const FunctionalTuning&);
     
     virtual bool operator==(const FunctionalTuning&);
     virtual bool operator!=(const FunctionalTuning&);
@@ -62,13 +64,14 @@ public:
     virtual double calculateSemitonesFromRoot(int stepsFromRoot) const;
     virtual double calculateMtsFromRoot(int stepsFromRoot) const;
 
-
     // TuningBase implementation
     
     virtual int getTuningSize() const override { return tuningSize; }
 
 
     // TuningTable re-implementation
+
+    virtual void setRootFrequency(double frequency) override;
 
     virtual int getTableSize() const override;
     virtual int getTableSize(bool calculate) const;
@@ -90,4 +93,16 @@ private:
 protected:
 
     static void calculateRootAndTableSizeFromMap(Map<double>* centsMap, double rootFrequency, int& rootIndex, int& tableSize);
+
+public:
+
+    static CentsDefinition StandardTuningDefinition()
+    {
+    	return CentsDefinition::CentsDivisions(12);
+    }
+
+    static std::unique_ptr<FunctionalTuning> StandardTuning()
+    {
+    	return std::make_unique<FunctionalTuning>(StandardTuningDefinition());
+    }
 };

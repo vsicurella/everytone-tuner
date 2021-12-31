@@ -149,9 +149,28 @@ bool TuningTable::operator!=(const TuningTable& tuning)
     return !operator==(tuning);
 }
 
+TuningTable::Definition TuningTable::getDefinition() const
+{
+    return Definition
+    {
+        frequencyTable,
+        rootIndex,
+        name,
+        description,
+        periodString,
+        virtualPeriod,
+        virtualSize,
+    };
+}
+
 int TuningTable::getTableSize() const
 {
     return frequencyTable.size();
+}
+
+juce::String TuningTable::getPeriodString() const
+{
+    return periodString;
 }
 
 double TuningTable::getVirtualPeriod() const

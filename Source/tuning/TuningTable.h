@@ -24,8 +24,9 @@ public:
 
 	virtual int getTableSize() const = 0;
 
-	virtual double getVirtualPeriod() const = 0;
-	virtual double getVirtualSize() const = 0;
+	virtual juce::String getPeriodString() const { return juce::String(); }
+	virtual double getVirtualPeriod() const { return 0.0; }
+	virtual double getVirtualSize() const { return 0.0; }
 
 	virtual juce::Array<double> getFrequencyTable() const = 0;
 	virtual juce::Array<double> getMtsTable() const = 0;
@@ -44,6 +45,17 @@ public:
 		juce::String periodString;
 		double virtualPeriod = 0;
 		double virtualSize = 0;
+
+		bool operator==(const Definition& def)
+		{
+			return frequencies == def.frequencies
+				&& rootIndex == def.rootIndex
+				&& name == def.name
+				&& description == def.description
+				&& periodString == def.periodString
+				&& virtualPeriod == def.virtualPeriod
+				&& virtualSize == virtualSize;
+		}
 	};
 
 private:
@@ -85,10 +97,13 @@ public:
 	virtual bool operator==(const TuningTable&);
 	virtual bool operator!=(const TuningTable&);
 
+	TuningTable::Definition getDefinition() const;
+
 	// TuningTableBase implementation
 
 	virtual int getTableSize() const override;
-
+	
+	virtual juce::String getPeriodString() const override;
 	virtual double getVirtualPeriod() const override;
 	virtual double getVirtualSize() const override;
 
@@ -120,15 +135,4 @@ protected:
 
 	static juce::Array<double> mtsToFrequencyTable(juce::Array<double> mtsIn);
 
-public:
-
-	static CentsDefinition StandardTuningDefinition()
-	{
-		return CentsDefinition::CentsDivisions(12);
-	}
-
-	static std::unique_ptr<TuningTable> StandardTuning()
-	{
-		return std::make_unique<TuningTable>(StandardTuningDefinition());
-	}
 };

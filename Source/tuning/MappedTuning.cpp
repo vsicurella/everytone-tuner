@@ -34,8 +34,28 @@ int MappedTuningTable::getTuningSize() const
 
 void MappedTuningTable::setRootFrequency(double frequency)
 {
-    // TODO change mapping?
-    return tuning->setRootFrequency(frequency);
+    setRootFrequency(frequency, false);
+}
+
+std::shared_ptr<TuningTable> MappedTuningTable::setRootFrequency(double frequency, bool returnNewTuning)
+{
+    if (returnNewTuning)
+    {
+        auto functional = dynamic_cast<FunctionalTuning*>(tuning.get());
+        if (functional != nullptr)
+        {
+            auto newTuning = std::shared_ptr<FunctionalTuning>(functional);
+            newTuning->setRootFrequency(frequency);
+            return newTuning;
+        }
+
+        auto copy = std::shared_ptr<TuningTable>(tuning);
+        copy->setRootFrequency(frequency);
+        return copy;
+    }
+
+    tuning->setRootFrequency(frequency);
+    return tuning;
 }
 
 double MappedTuningTable::centsAt(int index) const

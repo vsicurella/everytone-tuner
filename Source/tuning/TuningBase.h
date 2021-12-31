@@ -11,7 +11,6 @@
 #pragma once
 #include <JuceHeader.h>
 #include "TuningMath.h"
-#include "CentsDefinition.h"
 
 class TuningBase
 {

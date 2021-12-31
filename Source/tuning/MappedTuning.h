@@ -11,7 +11,7 @@
 */
 
 #pragma once
-#include "TuningTable.h"
+#include "FunctionalTuning.h"
 #include "../mapping/TuningTableMap.h"
 
 class MappedTuningTable : public TuningTableBase
@@ -86,6 +86,7 @@ public:
     virtual int getTuningSize() const override;
 
     virtual void setRootFrequency(double frequency) override;
+    std::shared_ptr<TuningTable> setRootFrequency(double frequency, bool returnNewTuning);
 
     virtual double centsAt(int index) const override;
     virtual double frequencyAt(int index) const override;

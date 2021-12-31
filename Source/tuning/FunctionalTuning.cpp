@@ -20,6 +20,12 @@ FunctionalTuning::FunctionalTuning(CentsDefinition definition, bool buildTables)
 {
 }
 
+FunctionalTuning::FunctionalTuning(const FunctionalTuning& tuning)
+    : TuningTable((tuning.tablesAreBuilt) ? setupFrequencyTableDefinition(tuning.getDefinition()) : setupEmptyTableDefinition(tuning.getDefinition()))
+{
+
+}
+
 void FunctionalTuning::setupCentsMap(const juce::Array<double>& cents)
 {
     centsTable = cents;
@@ -112,7 +118,6 @@ bool FunctionalTuning::operator!=(const FunctionalTuning& tuning)
     return !operator==(tuning);
 }
 
-
 CentsDefinition FunctionalTuning::getDefinition() const
 {
     return CentsDefinition{ centsTable, rootFrequency, name, description, getVirtualPeriod(), getVirtualSize() };
@@ -180,6 +185,19 @@ juce::Array<double> FunctionalTuning::getIntervalRatioList() const
     ratios.add(periodRatio);
 
     return ratios;
+}
+
+void FunctionalTuning::setRootFrequency(double frequency)
+{
+    rootFrequency = frequency;
+    int tableSize = setupRootIndexAndGetTableSize();
+    
+    if (tablesAreBuilt)
+        return setTableWithFrequencies(buildFrequencyTable(tableSize));
+
+    juce::Array<double> emptyTable;
+    emptyTable.resize(tableSize);
+    setTableWithFrequencies(emptyTable);
 }
 
 int FunctionalTuning::getTableSize() const
