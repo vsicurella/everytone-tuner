@@ -9,7 +9,7 @@
 */
 
 #pragma once
-#include "../tuning/Tuning.h"
+#include "../tuning/TuningTable.h"
 
 class TuningTableHeader : public juce::TableHeaderComponent
 {

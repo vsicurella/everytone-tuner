@@ -31,16 +31,18 @@ IntervalListModel::IntervalListModel(bool editMode, const TuningBase* tuningIn)
 
 void IntervalListModel::setTuning(const TuningBase* tuningIn)
 {
-    tuning = tuningIn;
+    //tuning = tuningIn;
 
-    if (tuning == nullptr)
-    {
-        definition = CentsDefinition();
-        definition.intervalCents = {};
-        return;
-    }
+    //auto functional
 
-    definition = tuning->getDefinition();
+    //if (tuning == nullptr)
+    //{
+    //    definition = CentsDefinition();
+    //    definition.intervalCents = {};
+    //    return;
+    //}
+
+    //definition = tuning->getDefinition();
 }
 
 void IntervalListModel::sendCentsDefinitionUpdateChange()

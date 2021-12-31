@@ -94,6 +94,9 @@ public:
     void loadTuningSource(const CentsDefinition& tuningDefinition);
     void loadTuningTarget(const CentsDefinition& tuningDefinition);
 
+    void setTuningSource(std::shared_ptr<TuningTable> sourceTuning);
+    void setTuningTarget(std::shared_ptr<TuningTable> targetTuning);
+
     void setTargetTuningRootFrequency(double frequency);
     void setTargetMappingRoot(TuningTableMap::Root root);
     void setTargetMappedTuningRoot(MappedTuningTable::Root root);

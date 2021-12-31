@@ -95,20 +95,23 @@ public:
     {
         nameValueLabel->setText(tuning->getName(), juce::NotificationType::dontSendNotification);
 
+        juce::String periodString = tuning->getPeriodString();
+        juce::String sizeString = tuning->getSizeString();
+
         // Probably should be abstracted
-        auto sizeString = juce::String(tuning->getTuningSize());
-        auto sizeDetail = tuning->getTuning()->getVirtualSize();
-        if (sizeDetail != 0.0)
-            sizeString += " (" + juce::String(sizeDetail) + ")";
-        
+        //auto sizeString = juce::String(tuning->getTuningSize());
+        //auto sizeDetail = tuning->getTuning()->getVirtualSize();
+        //if (sizeDetail != 0.0)
+        //    sizeString += " (" + juce::String(sizeDetail) + ")";
+        //
         sizeString += " steps to ";
         sizeValueLabel->setText(sizeString, juce::NotificationType::dontSendNotification);
 
-        auto periodString = juce::String(tuning->getTuning()->getPeriodCents());
-        auto periodDetail = tuning->getTuning()->getVirtualPeriod();
-        if (periodDetail != 0.0)
-            periodString += " (" + juce::String(periodDetail) + ")";
-        periodValueLabel->setText(periodString, juce::NotificationType::dontSendNotification);
+        //auto periodString = juce::String(tuning->getTuning()->getPeriodCents());
+        //auto periodDetail = tuning->getTuning()->getVirtualPeriod();
+        //if (periodDetail != 0.0)
+        //    periodString += " (" + juce::String(periodDetail) + ")";
+        periodValueLabel->setText(tuning->getPeriodString(), juce::NotificationType::dontSendNotification);
 
         resized();
     }

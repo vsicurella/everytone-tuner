@@ -13,7 +13,7 @@
 TunerController::TunerController(Everytone::MappingMode modeIn, Everytone::MappingType typeIn)
     : mappingType(typeIn)
 {   
-    auto standardTuning = std::make_shared<FunctionalTuning>(FunctionalTuning::StandardTuningDefinition());
+    auto standardTuning = FunctionalTuning::StandardTuning();
     auto mapping = mapForTuning(standardTuning.get(), false);
     setTunings(standardTuning, mapping, standardTuning, mapping);
 

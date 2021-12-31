@@ -25,7 +25,7 @@ int  TuningTableViewerModel::getNumRows()
     if (tuning == nullptr)
         return 0;
 
-    return tuning->getTuningTableSize();
+    return tuning->getTableSize();
 }
 
 void TuningTableViewerModel::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)

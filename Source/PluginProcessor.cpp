@@ -256,7 +256,7 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     //}
 
     // For now, always load standard source mapping
-    auto sourceTuning = std::make_shared<FunctionalTuning>(FunctionalTuning::StandardTuningDefinition());
+    auto sourceTuning = FunctionalTuning::StandardTuning();
     auto sourceMapping = std::make_shared<TuningTableMap>(TuningTableMap::StandardMappingDefinition());
 
     std::shared_ptr<TuningTable> targetTuning;
@@ -407,6 +407,16 @@ void MultimapperAudioProcessor::loadTuningTarget(const CentsDefinition& tuningDe
 {
     auto newTarget = std::make_shared<FunctionalTuning>(tuningDefinition, true);
     tunerController->setTargetTuning(newTarget);
+}
+
+void MultimapperAudioProcessor::setTuningSource(std::shared_ptr<TuningTable> sourceTuning)
+{
+    tunerController->setSourceTuning(sourceTuning);
+}
+
+void MultimapperAudioProcessor::setTuningTarget(std::shared_ptr<TuningTable> targetTuning)
+{
+    tunerController->setTargetTuning(targetTuning);
 }
 
 void MultimapperAudioProcessor::setTargetTuningRootFrequency(double frequency)
