@@ -10,7 +10,7 @@
 
 #pragma once
 #include "TestsCommon.h"
-#include "../tuning/Tuning.h"
+#include "../tuning/FunctionalTuning.h"
 
 class Tuning_Test : public EverytoneTunerUnitTest
 {
