@@ -218,7 +218,7 @@ static std::shared_ptr<TuningTableMap> constructTuningTableMapFromValueTree(juce
     auto mapDefinition = Map<int>::Definition
     {
         mapSize,
-        pattern.data(),
+        pattern,
         period,
         patternRoot,
         mapRoot,

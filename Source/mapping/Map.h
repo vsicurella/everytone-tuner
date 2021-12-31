@@ -34,7 +34,7 @@ public:
     struct Definition
     {
         int mapSize = 0;
-        const T* pattern = nullptr;
+        Pattern pattern;
         T patternBase = 0;
         int patternRootIndex = 0;
         int mapRootIndex = 0;
@@ -111,19 +111,19 @@ public:
 
 private:
 
-    static Pattern newPatternCopy(T size, const T* source)
-    {
-        Pattern pattern;
-        for (int i = 0; i < size; i++)
-            pattern.push_back(source[i]);
+    //static Pattern newPatternCopy(T size, const T* source)
+    //{
+    //    Pattern pattern;
+    //    for (int i = 0; i < size; i++)
+    //        pattern.push_back(source[i]);
 
-        return pattern;
-    }
+    //    return pattern;
+    //}
 
-    Pattern initializePattern(Definition definition)
-    {
-        return newPatternCopy(definition.mapSize, definition.pattern);
-    }
+    //Pattern initializePattern(Definition definition)
+    //{
+    //    return newPatternCopy(definition.mapSize, definition.pattern);
+    //}
 
     Pattern initializePattern(FunctionDefinition definition)
     {
@@ -150,7 +150,7 @@ public:
 
     Map(Definition definition)
         : mapSize(definition.mapSize), 
-          mapPattern(initializePattern(definition)),
+          mapPattern(definition.pattern),
           patternBase(definition.patternBase),
           patternRootIndex(mod(definition.patternRootIndex, definition.mapSize)),
           mapRootIndex(definition.mapRootIndex),
@@ -166,7 +166,7 @@ public:
 
     Map(const Map& map)
         : mapSize(map.mapSize),
-          mapPattern(initializePattern(map.definition())),
+          mapPattern(map.mapPattern),
           patternBase(map.patternBase),
           patternRootIndex(map.patternRootIndex),
           mapRootIndex(map.mapRootIndex),
@@ -177,11 +177,21 @@ public:
     void operator=(const Map& map)
     {
         mapSize = map.mapSize;
-        mapPattern = initializePattern(map.definition());
+        mapPattern = map.mapPattern;
         patternBase = map.patternBase;
         patternRootIndex  = map.patternRootIndex;
         mapRootIndex = map.mapRootIndex;
         transpose = map.transpose;
+    }
+
+    bool operator==(const Map& map)
+    {
+        return mapSize == map.mapSize
+            && mapPattern == map.mapPattern
+            && patternBase == map.patternBase
+            && patternRootIndex == map.patternRootIndex
+            && mapRootIndex == map.mapRootIndex
+            && transpose == map.transpose;
     }
 
     Definition definition() const
@@ -189,7 +199,7 @@ public:
         Definition d =
         {
             mapSize,
-            mapPattern.data(),
+            mapPattern,
             patternBase,
             patternRootIndex,
             mapRootIndex,
@@ -242,7 +252,7 @@ public:
 
     void setTranspose(int transposeIn) { transpose = transposeIn; }
 
-    int closestIndexTo(T value)
+    int closestIndexTo(T value) const
     {
         int valuePeriod = (patternBase == 0)
             ? 0

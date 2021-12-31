@@ -23,7 +23,7 @@ MultichannelMap::~MultichannelMap() {}
 Map<int> MultichannelMap::buildMultimap(MultichannelMap::Definition definition)
 {
     // Create multimap from maps
-    int multipattern[2048];
+    std::vector<int> multipattern;
     for (int m = 0; m < definition.maps.size(); m++)
     {
         auto channelOffset = m * 128;
@@ -31,7 +31,7 @@ Map<int> MultichannelMap::buildMultimap(MultichannelMap::Definition definition)
         for (int i = 0; i < 128; i++)
         {
             auto index = channelOffset + i;
-            multipattern[index] = map->at(i);
+            multipattern.push_back(map->at(i));
         }
     }
 
