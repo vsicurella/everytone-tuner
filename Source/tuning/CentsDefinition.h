@@ -75,6 +75,60 @@ struct CentsDefinition
 
 	juce::String getPeriodString() const { return juce::String(virtualPeriod) + " cents"; }
 
+	juce::String getSizeString() const { return juce::String(virtualSize); }
+
+	static void calculateMtsRootAndTableSize(const juce::Array<double>& intervalCents, double rootFrequency, int& rootIndex, int& tableSize)
+	{
+		double minCents = 10e10, maxCents = -10e10;
+		double minIndex = -1, maxIndex = -1;
+
+		for (int i = 0; i < intervalCents.size(); i++)
+		{
+			auto cents = intervalCents[i];
+			if (cents < minCents)
+			{
+				minCents = cents;
+				minIndex = i;
+			}
+			else if (cents > maxCents)
+			{
+				maxCents = cents;
+				maxIndex = i;
+			}
+		}
+
+		double lowestRatio = MTS_LOWEST_FREQ / rootFrequency;
+		double lowestCents = ratioToCents(lowestRatio);
+
+		double highestRatio = MTS_HIGHEST_FREQ / rootFrequency;
+		double highestCents = ratioToCents(highestRatio);
+
+		if (intervalCents.size() == 1)
+		{
+			int lowest = ceil(lowestCents / intervalCents[0]);
+			int highest = floor(highestCents / intervalCents[0]);
+
+			rootIndex = -lowest;
+			tableSize = highest - lowest + 1;
+			return;
+		}
+
+		auto periodCents = intervalCents.getLast();
+		auto minPeriod = (minCents < 0) ? periodCents - minCents : periodCents;
+		double maxPeriod = (maxCents > periodCents) ? maxCents : periodCents;
+
+		int lowestFromRoot = ceil(lowestCents / minPeriod * intervalCents.size());
+		int highestFromRoot = floor(highestCents / maxPeriod * intervalCents.size());
+
+		rootIndex = -lowestFromRoot;
+		tableSize = highestFromRoot - lowestFromRoot + 1;
+	}
+
+	void calculateMtsRootAndTableSize(int& rootIndex, int& tableSize) const
+	{
+		calculateMtsRootAndTableSize(intervalCents, rootFrequency, rootIndex, tableSize);
+	}
+
 	static CentsDefinition CentsDivisions(double divisions, double periodCents = 1200.0, double frequency = 440.0)
 	{
 		double step = periodCents / divisions;

@@ -34,12 +34,14 @@ TuningTable::TuningTable(const TuningTable& tuning)
 
 void TuningTable::refreshTableMetadata()
 {
+    tableSize = frequencyTable.size();
+
     // Rebuild MTS table
     mtsTable = frequencyToMtsTable(frequencyTable);
     rootMts = frequencyToMTS(rootFrequency);
 }
 
-void TuningTable::setVirtualPeriod(double period, juce::String periodStr = "")
+void TuningTable::setVirtualPeriod(double period, juce::String periodStr)
 {
     virtualPeriod = period;
     periodString = periodStr;
@@ -71,31 +73,39 @@ void TuningTable::setTableWithMts(juce::Array<double> mts, int newRootIndex)
     rootMts = frequencyToMTS(rootFrequency);
 }
 
-void TuningTable::transposeTableByNewRootFrequency(double newRootFrequency)
+void TuningTable::transposeTableByRatio(double ratio)
 {
-    double transposeRatio = newRootFrequency / rootFrequency;
     auto previousTable = frequencyTable;
-
     for (int i = 0; i < previousTable.size(); i++)
     {
-        auto newFrequency = roundN(8, previousTable[i] * transposeRatio);
+        auto newFrequency = roundN(8, previousTable[i] * ratio);
         frequencyTable.set(i, newFrequency);
     }
 
-    rootFrequency = newRootFrequency;
+    rootFrequency = frequencyTable[rootIndex];
     refreshTableMetadata();
 }
 
-void TuningTable::setRootIndex(int newRootIndex)
-{
-    rootIndex = newRootIndex;
-    rootFrequency = frequencyTable[rootIndex]; // probably should do some checking
-}
+//void TuningTable::setRootIndex(int newRootIndex)
+//{
+//    rootIndex = newRootIndex;
+//    rootFrequency = frequencyTable[rootIndex]; // probably should do some checking
+//}
 
 void TuningTable::setRootFrequency(double frequency)
 {
+    if (frequencyTable.size() == 0)
+    {
+        rootFrequency = frequency;
+        return;
+    }
+
     // TODO check mts limits?
-    transposeTableByNewRootFrequency(frequency);
+    auto newRoot = closestIndexToFrequency(frequency);
+    rootIndex = newRoot;
+
+    auto ratio = frequency / frequencyTable[newRoot];
+    transposeTableByRatio(ratio);
 }
 
 double TuningTable::centsAt(int index) const
@@ -165,13 +175,28 @@ TuningTable::Definition TuningTable::getDefinition() const
 
 int TuningTable::getTableSize() const
 {
-    return frequencyTable.size();
+    return tableSize;
 }
 
 juce::String TuningTable::getPeriodString() const
 {
-    return periodString;
+    if (periodString.isNotEmpty())
+        return periodString;
+
+    if (virtualPeriod != 0)
+        return juce::String(virtualPeriod);
+
+    return juce::String();
 }
+
+juce::String TuningTable::getSizeString() const
+{
+    if (virtualSize != 0)
+        return juce::String(virtualSize);
+
+    return juce::String();
+}
+
 
 double TuningTable::getVirtualPeriod() const
 {

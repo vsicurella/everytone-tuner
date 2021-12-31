@@ -38,12 +38,11 @@ public:
 	virtual int getRootIndex() const { return rootIndex; }
 	virtual double getRootFrequency() const { return rootFrequency; }
 	virtual double getRootMts() const { return frequencyToMTS(rootFrequency); }
-	virtual int getTuningSize() const = 0;
+	//virtual int getTuningSize() const = 0;
 
 	virtual void setName(juce::String nameIn) { name = nameIn; };
 	virtual void setDescription(juce::String descIn) { description = descIn; }
 
-	virtual void setRootIndex(int newRootIndex) = 0;
 	virtual void setRootFrequency(double frequency) = 0;
 
 	virtual double centsAt(int index) const = 0;
@@ -55,10 +54,7 @@ public:
 	virtual double frequencyAt(int index) const = 0;
 	virtual double frequencyFromRoot(int steps) const { return frequencyAt(steps - rootIndex); }
 
-	virtual double mtsAt(int index) const 
-	{ 
-		return frequencyToMTS(frequencyAt(index));
-	}
+	virtual double mtsAt(int index) const { return frequencyToMTS(frequencyAt(index)); }
 	virtual double mtsFromRoot(int steps) { return mtsAt(steps - rootIndex); }
 
 	virtual int closestIndexToFrequency(double frequency) const = 0;
@@ -96,4 +92,5 @@ public:
 		auto index = closestIndexToMts(mts);
 		return mtsAt(index);
 	}
+
 };

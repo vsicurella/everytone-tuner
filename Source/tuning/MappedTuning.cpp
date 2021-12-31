@@ -29,7 +29,15 @@ MappedTuningTable::~MappedTuningTable()
 
 int MappedTuningTable::getTuningSize() const
 {
-    return tuning->getTuningSize();
+    auto functional = dynamic_cast<FunctionalTuning*>(tuning.get());
+    if (functional != nullptr)
+        return functional->getTuningSize();
+
+    auto virtualSize = tuning->getVirtualSize();
+    if (virtualSize != 0)
+        return round(virtualSize); // ??
+
+    return tuning.get()->getTableSize();
 }
 
 void MappedTuningTable::setRootFrequency(double frequency)
@@ -86,6 +94,16 @@ double MappedTuningTable::mtsAt(int index) const
 int MappedTuningTable::getTableSize() const
 {
     return tuning->getTableSize();
+}
+
+juce::String MappedTuningTable::getPeriodString() const
+{
+    return tuning->getPeriodString();
+}
+
+juce::String MappedTuningTable::getSizeString() const
+{
+    return tuning->getSizeString();
 }
 
 double MappedTuningTable::getVirtualPeriod() const

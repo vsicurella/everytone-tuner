@@ -40,7 +40,7 @@ public:
 
     // MappedTuning declarations
 
-    TuningTableBase* getTuning() const { return tuning.get(); }
+    TuningTable* getTuning() const { return tuning.get(); }
 
     TuningTableMap* getMapping() const { return mapping.get(); }
 
@@ -59,6 +59,7 @@ public:
         return root;
     }
 
+    virtual int getTuningSize() const;
 
     virtual int tuningIndexAt(int midiNote, int midiChannel) const;
 
@@ -68,39 +69,41 @@ public:
 
     virtual double mtsAt(int midiNote, int midiChannel) const;
 
-
     // TuningTableBase implementation
 
     virtual int getTableSize() const override;
+
+    virtual juce::String getPeriodString() const override;
+    virtual juce::String getSizeString() const override;
 
     virtual double getVirtualPeriod() const override;
     virtual double getVirtualSize() const override;
 
     virtual double getRootMts() const override;
 
+    virtual double mtsAt(int index) const override;
+
     virtual juce::Array<double> getFrequencyTable() const override;
     virtual juce::Array<double> getMtsTable() const override;
 
     // TuningBase implementation
 
-    virtual int getTuningSize() const override;
+    //virtual int getTuningSize() const override;
 
     virtual void setRootFrequency(double frequency) override;
     std::shared_ptr<TuningTable> setRootFrequency(double frequency, bool returnNewTuning);
 
     virtual double centsAt(int index) const override;
     virtual double frequencyAt(int index) const override;
-    virtual double mtsAt(int index) const override;
 
     virtual int closestIndexToFrequency(double frequency) const override;
     virtual int closestIndexToMts(double mts) const override;
-
 
 public:
 
     static std::unique_ptr<MappedTuningTable> StandardTuning()
     {
-        auto standardTuning = std::make_shared<TuningTable>(TuningTable::StandardTuningDefinition());
+        auto standardTuning = FunctionalTuning::StandardTuning();
         auto standardMapping = std::make_shared<TuningTableMap>(TuningTableMap::StandardMappingDefinition());
         return std::make_unique<MappedTuningTable>(standardTuning, standardMapping);
     }

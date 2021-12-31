@@ -25,6 +25,8 @@ public:
 	virtual int getTableSize() const = 0;
 
 	virtual juce::String getPeriodString() const { return juce::String(); }
+	virtual juce::String getSizeString() const { return juce::String(); }
+
 	virtual double getVirtualPeriod() const { return 0.0; }
 	virtual double getVirtualSize() const { return 0.0; }
 
@@ -62,6 +64,7 @@ private:
 
 	// Parameters	
 	juce::Array<double> frequencyTable;
+	int tableSize; // Derived classes can set this separately
 
 	// In case the file can provide some context for the tuning table
 	juce::String periodString;
@@ -86,7 +89,7 @@ protected:
 
 	void setTableWithMts(juce::Array<double> mts, int newRootIndex = -1);
 
-	void transposeTableByNewRootFrequency(double newRootFrequency);
+	void transposeTableByRatio(double ratio);
 
 public:
 
@@ -104,6 +107,8 @@ public:
 	virtual int getTableSize() const override;
 	
 	virtual juce::String getPeriodString() const override;
+	virtual juce::String getSizeString() const override;
+
 	virtual double getVirtualPeriod() const override;
 	virtual double getVirtualSize() const override;
 
@@ -119,7 +124,6 @@ public:
 
 	// TuningBase implementation
 
-	virtual void setRootIndex(int newRootIndex) override;
 	virtual void setRootFrequency(double frequency) override;
 
 	virtual double centsAt(int index) const override;
@@ -130,6 +134,8 @@ public:
 	virtual int closestIndexToCents(double centsFromRoot) const override;
 
 protected:
+
+	void setTableSize(int tableSizeIn) { tableSize = tableSizeIn; }
 
 	static juce::Array<double> frequencyToMtsTable(juce::Array<double> frequenciesIn);
 

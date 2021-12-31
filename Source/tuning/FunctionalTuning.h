@@ -14,12 +14,8 @@
 
 class FunctionalTuning : public TuningTable
 {
-    juce::Array<double> centsTable;
-
+    Map<double> centsMap;
     bool tablesAreBuilt = false;
-
-    // Metadata
-    std::unique_ptr<Map<double>> centsMap;
 
     int tuningSize;
 
@@ -30,20 +26,14 @@ private:
 
     void setupCentsMap(const juce::Array<double>& cents);
 
-    int setupRootIndexAndGetTableSize();
-
-    TuningTable::Definition setupEmptyTableDefinition(const CentsDefinition& definition);
-
-    TuningTable::Definition setupFrequencyTableDefinition(const CentsDefinition& definition);
+    static TuningTable::Definition setupEmptyTableDefinition(const CentsDefinition& definition);
 
 public:
 
     /*
         Expects a full interval table in cents, ending with period. May or may not include unison.
     */
-    FunctionalTuning(CentsDefinition definition = CentsDefinition());
-
-    FunctionalTuning(CentsDefinition definition, bool buildTables);
+    FunctionalTuning(CentsDefinition definition = CentsDefinition(), bool buildTables = false);
 
     FunctionalTuning(const FunctionalTuning&);
     
@@ -66,7 +56,7 @@ public:
 
     // TuningBase implementation
     
-    virtual int getTuningSize() const override { return tuningSize; }
+    virtual int getTuningSize() const { return tuningSize; }
 
 
     // TuningTable re-implementation
@@ -92,7 +82,7 @@ private:
 
 protected:
 
-    static void calculateRootAndTableSizeFromMap(Map<double>* centsMap, double rootFrequency, int& rootIndex, int& tableSize);
+    //static void calculateRootAndTableSizeFromMap(const Map<double>& centsMap, double rootFrequency, int& rootIndex, int& tableSize);
 
 public:
 
@@ -101,8 +91,9 @@ public:
     	return CentsDefinition::CentsDivisions(12);
     }
 
-    static std::unique_ptr<FunctionalTuning> StandardTuning()
+    static std::shared_ptr<FunctionalTuning> StandardTuning()
     {
-    	return std::make_unique<FunctionalTuning>(StandardTuningDefinition());
+        auto definition = StandardTuningDefinition();
+    	return std::make_shared<FunctionalTuning>(definition);
     }
 };
