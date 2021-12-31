@@ -14,7 +14,7 @@
 
 #include <JuceHeader.h>
 
-#include "../tuning/Tuning.h"
+#include "../tuning/FunctionalTuning.h"
 
 #include "TUN_V2/SCL_Import.h"
 #include "TUN_V2/TUN_Scale.h"
@@ -39,16 +39,12 @@ public:
 
 public:
 
-    TuningFileParser() {};
-    TuningFileParser(juce::String filepath);
     TuningFileParser(juce::File file);
     ~TuningFileParser();
 
-    void loadFile(juce::String absoluteFilePath);
-
     void readFile(juce::File file);
 
-    CentsDefinition getTuningDefinition() const;
+    std::shared_ptr<TuningTable> getTuning() const;
 
     TuningType getTuningType() const;
 
@@ -56,9 +52,9 @@ public:
     
     static int determineTuningType(juce::File tuningFileIn);
 
-    static CentsDefinition parseScalaFileDefinition(juce::File scalaFile);
+    static std::shared_ptr<FunctionalTuning> parseScalaFileDefinition(juce::File scalaFile);
 
-    static CentsDefinition parseTunFileDefinition(juce::File tunFile);
+    static std::shared_ptr<TuningTable> parseTunFileDefinition(juce::File tunFile);
 
 private:
 
@@ -70,5 +66,5 @@ private:
 
     //juce::String filePath;
     TuningType type = TuningType::INV;
-    std::unique_ptr<CentsDefinition> tuningDefinition;
+    std::shared_ptr<TuningTable> parsedTuning;
 };
