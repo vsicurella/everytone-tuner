@@ -143,17 +143,17 @@ void OverviewPanel::setTuningDisplayed(const MappedTuningTable* mappedTuningIn)
 	tuningNameBox->setText(tuning->getName(), juce::NotificationType::dontSendNotification);
 	descriptionEditor->setText(tuning->getDescription(), juce::NotificationType::dontSendNotification);
 
-	auto periodLabel = juce::String(tuning->getPeriodCents());
-	auto virtualPeriod = tuning->getVirtualPeriod();
-	if (virtualPeriod != 0)
-		periodLabel += " (" + juce::String(virtualPeriod) + ")";
-	tuningPeriodBox->setText(periodLabel, juce::NotificationType::dontSendNotification);
+	//auto periodLabel = juce::String(tuning->getPeriodCents());
+	//auto virtualPeriod = tuning->getVirtualPeriod();
+	//if (virtualPeriod != 0)
+	//	periodLabel += " (" + juce::String(virtualPeriod) + ")";
+	//tuningPeriodBox->setText(periodLabel, juce::NotificationType::dontSendNotification);
 
-	auto sizeLabel = juce::String(tuning->getTuningSize());
-	auto virtualSize = tuning->getVirtualSize();
-	if (virtualSize != 0)
-		sizeLabel += " (" + juce::String(virtualSize) + ")";
-	tuningSizeBox->setText(sizeLabel, juce::NotificationType::dontSendNotification);
+	//auto sizeLabel = juce::String(tuning->getTuningSize());
+	//auto virtualSize = tuning->getVirtualSize();
+	//if (virtualSize != 0)
+	//	sizeLabel += " (" + juce::String(virtualSize) + ")";
+	//tuningSizeBox->setText(sizeLabel, juce::NotificationType::dontSendNotification);
 
 	//auto mapping = mappedTuning->getMapping();
 	//setRootMidiChannelLabel(juce::String(mapping->getRootMidiChannel()));

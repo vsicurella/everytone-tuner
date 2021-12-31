@@ -256,20 +256,22 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     //}
 
     // For now, always load standard source mapping
-    auto sourceTuningDefinition = TuningTable::StandardTuningDefinition();
-    auto sourceMapDefinition = TuningTableMap::StandardMappingDefinition();
+    auto sourceTuning = std::make_shared<FunctionalTuning>(FunctionalTuning::StandardTuningDefinition());
+    auto sourceMapping = std::make_shared<TuningTableMap>(TuningTableMap::StandardMappingDefinition());
 
-    CentsDefinition targetTuningDefinition;
-    TuningTableMap::Definition targetMapDefinition;
+    std::shared_ptr<TuningTable> targetTuning;
+    std::shared_ptr<TuningTableMap> targetMapping;
 
     auto targetTree = state.getChildWithName(Everytone::ID::TuningTarget);
     if (targetTree.isValid())
     {
         auto tuningTree = targetTree.getChildWithName(Everytone::ID::Tuning);
-        targetTuningDefinition = parseTuningValueTree(tuningTree);
+        auto parsedTuning = constructTuningFromValueTree(tuningTree);
+        targetTuning = (parsedTuning != nullptr) ? parsedTuning
+                                                 : sourceTuning;
 
         auto mapTree = targetTree.getChildWithName(Everytone::ID::TuningTableMidiMap);
-        targetMapDefinition = parseTuningTableMapTree(mapTree);
+        targetMapping = constructTuningTableMapFromValueTree(mapTree);
     }
 
     auto optionsTree = state.getChildWithName(Everytone::ID::Options);
@@ -279,7 +281,11 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
         options = Everytone::Options::fromValueTree(optionsTree);
     }
 
-    tunerController->loadTunings(sourceTuningDefinition, sourceMapDefinition, targetTuningDefinition, targetMapDefinition);
+    if (targetMapping == nullptr)
+        tunerController->setTunings(sourceTuning, targetTuning);
+    else
+        tunerController->setTunings(sourceTuning, sourceMapping, targetTuning, targetMapping);
+
     setOptions(options);
 }
 
@@ -393,12 +399,14 @@ Everytone::Options MultimapperAudioProcessor::options() const
 
 void MultimapperAudioProcessor::loadTuningSource(const CentsDefinition& tuningDefinition)
 {
-    tunerController->loadSourceTuning(tuningDefinition);
+    auto newSource = std::make_shared<FunctionalTuning>(tuningDefinition);
+    tunerController->setSourceTuning(newSource);
 }
 
 void MultimapperAudioProcessor::loadTuningTarget(const CentsDefinition& tuningDefinition)
 {
-    tunerController->loadTargetTuning(tuningDefinition);
+    auto newTarget = std::make_shared<FunctionalTuning>(tuningDefinition, true);
+    tunerController->setTargetTuning(newTarget);
 }
 
 void MultimapperAudioProcessor::setTargetTuningRootFrequency(double frequency)

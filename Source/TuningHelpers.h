@@ -196,13 +196,13 @@ static juce::ValueTree tuningTableMapToValueTree(const TuningTableMap* midiMap, 
     return tree;
 }
 
-static TuningTableMap::Definition parseTuningTableMapTree(juce::ValueTree tree)
+static std::shared_ptr<TuningTableMap> constructTuningTableMapFromValueTree(juce::ValueTree tree)
 {
     auto patternNode = tree.getChildWithName(Everytone::ID::Pattern);
     const int mapSize = patternNode.getNumChildren();
 
     if (mapSize == 0)
-        return TuningTableMap::StandardMappingDefinition();
+        return nullptr;
 
     Map<int>::Pattern pattern;
     for (int i = 0; i < mapSize; i++)
@@ -236,7 +236,7 @@ static TuningTableMap::Definition parseTuningTableMapTree(juce::ValueTree tree)
         Map<int>(mapDefinition)
     };
 
-    return definition;
+    return std::make_shared<TuningTableMap>(definition);
 }
 
 static juce::ValueTree mappedTuningToValueTree(const MappedTuningTable* mappedTuning, juce::Identifier name)

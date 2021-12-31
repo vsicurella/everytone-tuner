@@ -48,12 +48,12 @@ public:
 
     TunerController(Everytone::MappingMode mappingMode=Everytone::MappingMode::Auto, Everytone::MappingType mappingType=Everytone::MappingType::Linear);
 
-    TunerController(CentsDefinition sourceTuning, TuningTableMap::Root sourceMapRootIn, 
-                    CentsDefinition targetTuning, TuningTableMap::Root targetMapRootIn,
+    TunerController(std::shared_ptr<TuningTable> sourceTuning, TuningTableMap::Root sourceMapRootIn, 
+                    std::shared_ptr<TuningTable> targetTuning, TuningTableMap::Root targetMapRootIn,
                     Everytone::MappingMode mappingMode, Everytone::MappingType mappingType = Everytone::MappingType::Linear);
 
-    TunerController(CentsDefinition sourceTuning, TuningTableMap::Definition sourceMapping,
-                    CentsDefinition targetTuning, TuningTableMap::Definition targetMapping,
+    TunerController(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
+                    std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping,
                     Everytone::MappingMode mappingMode, Everytone::MappingType mappingType = Everytone::MappingType::Linear);
     
     ~TunerController();
@@ -76,12 +76,20 @@ public:
     void removeWatcher(Watcher* watcher) { watchers.remove(watcher); }
     void clearWatchers() { watchers.clear(); }
 
+    // Tuning Setters
 
-    void loadSourceTuning(const CentsDefinition& tuningDefinition);
-    void loadSourceTuning(const CentsDefinition& tuningDefinition, const TuningTableMap::Definition& mapDefinition);
+    void setSourceTuning(std::shared_ptr<TuningTable> tuning);
+    void setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping);
 
-    void loadTargetTuning(const CentsDefinition& tuningDefinition);
-    void loadTargetTuning(const CentsDefinition& tuningDefinition, const TuningTableMap::Definition& mapDefinition);
+    void setTargetTuning(std::shared_ptr<TuningTable> tuning);
+    void setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping);
+
+    void setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTable> targetTuning);
+    void setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
+        std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping);
+
+    
+    // Mutators
 
     void remapSource(const TuningTableMap::Definition& mapDefinition);
     void remapTarget(const TuningTableMap::Definition& mapDefinition);
@@ -95,9 +103,8 @@ public:
     void setSourceMappedTuningRoot(MappedTuningTable::Root root);
     void setTargetMappedTuningRoot(MappedTuningTable::Root root);
 
-    void loadTunings(const CentsDefinition& sourceTuningDefinition, const CentsDefinition& targetTuningDefinition);
-    void loadTunings(const CentsDefinition& sourceTuningDefinition, const TuningTableMap::Definition& sourceMapDefinition,
-                     const CentsDefinition& targetTuningDefinition, const TuningTableMap::Definition& targetMapDefinition);
+
+    // Options
 
     void setMappingMode(Everytone::MappingMode mode);
     void setMappingType(Everytone::MappingType type);
@@ -108,14 +115,14 @@ private:
 
     std::shared_ptr<TuningTableMap> mapForTuning(const TuningTable* tuning, bool isTarget);
 
-    void loadSourceTuning(const CentsDefinition& definition, bool updateTuner);
-    void loadTargetTuning(const CentsDefinition& definition, bool updateTuner);
+    void loadSourceTuning(const TuningTable::Definition& definition, bool updateTuner);
+    void loadTargetTuning(const TuningTable::Definition& definition, bool updateTuner);
 
-    void setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner = true);
-    void setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner = true);
+    void setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner);
+    void setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner);
 
     void setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
-                    std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping);
+                    std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping, bool sendChangeMessages);
 
     void updateCurrentTuner();
 

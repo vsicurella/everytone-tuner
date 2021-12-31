@@ -13,39 +13,32 @@
 TunerController::TunerController(Everytone::MappingMode modeIn, Everytone::MappingType typeIn)
     : mappingType(typeIn)
 {   
-    auto standardTuning = std::make_shared<TuningTable>(TuningTable::StandardTuningDefinition());
+    auto standardTuning = std::make_shared<FunctionalTuning>(FunctionalTuning::StandardTuningDefinition());
     auto mapping = mapForTuning(standardTuning.get(), false);
     setTunings(standardTuning, mapping, standardTuning, mapping);
 
     mappingMode = modeIn;
 }
 
-TunerController::TunerController(CentsDefinition sourceTuning, TuningTableMap::Root sourceMapRootIn,
-                                 CentsDefinition targetTuning, TuningTableMap::Root targetMapRootIn, 
+TunerController::TunerController(std::shared_ptr<TuningTable> sourceTuning, TuningTableMap::Root sourceMapRootIn,
+                                 std::shared_ptr<TuningTable> targetTuning, TuningTableMap::Root targetMapRootIn,
                                  Everytone::MappingMode modeIn, Everytone::MappingType typeIn)
     : sourceMapRoot(sourceMapRootIn), 
       targetMapRoot(targetMapRootIn), 
       mappingType(typeIn)
 {
-    loadSourceTuning(sourceTuning, false);
-    loadTargetTuning(targetTuning, true);
-
+    // Keep default MappingMode::Auto here
+    setTunings(sourceTuning, targetTuning);
     mappingMode = modeIn;
 }
 
-TunerController::TunerController(CentsDefinition sourceTuningDefinition, TuningTableMap::Definition sourceMappingDefinition,
-                                 CentsDefinition targetTuningDefinition, TuningTableMap::Definition targetMappingDefinition,
+TunerController::TunerController(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
+                                 std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping,
                                  Everytone::MappingMode modeIn, Everytone::MappingType typeIn)
     : mappingMode(modeIn), 
       mappingType(typeIn)
 {
-    auto sourceTuning = std::make_shared<TuningTable>(sourceTuningDefinition);
-    auto sourceMap = std::make_shared<TuningTableMap>(sourceMappingDefinition);
-    
-    auto targetTuning = std::make_shared<TuningTable>(targetTuningDefinition);
-    auto targetMap = std::make_shared<TuningTableMap>(targetMappingDefinition);
-
-    setTunings(sourceTuning, sourceMap, targetTuning, targetMap);
+    setTunings(sourceTuning, sourceMapping, targetTuning, targetMapping);
 }
 
 TunerController::~TunerController()
@@ -53,30 +46,36 @@ TunerController::~TunerController()
 
 }
 
-void TunerController::loadSourceTuning(const CentsDefinition& tuningDefinition)
+void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning)
 {
-    auto newTuning = std::make_shared<TuningTable>(tuningDefinition);
-    setSourceTuning(newTuning, mapForTuning(newTuning.get(), false));
+    setSourceTuning(tuning, mapForTuning(tuning.get(), false), true);
 }
 
-void TunerController::loadSourceTuning(const CentsDefinition& tuningDefinition, const TuningTableMap::Definition& mapDefinition)
+void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping)
 {
-    auto newTuning = std::make_shared<TuningTable>(tuningDefinition);
-    auto newMapping = std::make_shared<TuningTableMap>(mapDefinition);
-    setSourceTuning(newTuning, newMapping);
+    setSourceTuning(tuning, mapping, true);
 }
 
-void TunerController::loadTargetTuning(const CentsDefinition& tuningDefinition)
+void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning)
 {
-    auto newTuning = std::make_shared<TuningTable>(tuningDefinition);
-    setTargetTuning(newTuning, mapForTuning(newTuning.get(), true));
+    setTargetTuning(tuning, mapForTuning(tuning.get(), true), true);
 }
 
-void TunerController::loadTargetTuning(const CentsDefinition& tuningDefinition, const TuningTableMap::Definition& mapDefinition)
+void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping)
 {
-    auto newTuning = std::make_shared<TuningTable>(tuningDefinition);
-    auto newMapping = std::make_shared<TuningTableMap>(mapDefinition);
-    setTargetTuning(newTuning, newMapping);
+    setTargetTuning(tuning, mapping, true);
+}
+
+void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTable> targetTuning)
+{
+    setTunings(sourceTuning, mapForTuning(sourceTuning.get(), false),
+               targetTuning, mapForTuning(targetTuning.get(), true), true);
+}
+
+void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
+    std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping)
+{
+    setTunings(sourceTuning, sourceMapping, targetTuning, targetMapping, true);
 }
 
 void TunerController::remapSource(const TuningTableMap::Definition& mapDefinition)
@@ -120,10 +119,7 @@ void TunerController::setSourceMappedTuningRoot(MappedTuningTable::Root root)
     if (tuningChanged)
     {
         auto currentRootIndex = tuning->getRootIndex();
-        auto currentDefinition = tuning->getDefinition();
-        currentDefinition.rootFrequency = root.frequency;
-        tuning = std::make_shared<TuningTable>(currentDefinition);
-
+        tuning = currentTuningSource->setRootFrequency(root.frequency, true);
         mappingChanged = currentRootIndex != tuning->getRootIndex();
     }
 
@@ -147,10 +143,7 @@ void TunerController::setTargetMappedTuningRoot(MappedTuningTable::Root root)
     if (tuningChanged)
     {
         auto currentTuningIndex = tuning->getRootIndex();
-        auto currentDefinition = tuning->getDefinition();
-        currentDefinition.rootFrequency = root.frequency;
-        tuning = std::make_shared<TuningTable>(currentDefinition);
-
+        tuning = currentTuningSource->setRootFrequency(root.frequency, true);
         mappingChanged = currentTuningIndex != tuning->getRootIndex();
     }
 
@@ -163,27 +156,6 @@ void TunerController::setTargetMappedTuningRoot(MappedTuningTable::Root root)
 
     if (mappingChanged || tuningChanged)
         setTargetTuning(tuning, mapping);
-}
-
-void TunerController::loadTunings(const CentsDefinition& sourceTuningDefinition, const CentsDefinition& targetTuningDefinition)
-{
-    auto newSourceTuning = std::make_shared<TuningTable>(sourceTuningDefinition);
-    auto newTargetTuning = std::make_shared<TuningTable>(targetTuningDefinition);
-
-    setTunings(newSourceTuning, mapForTuning(newSourceTuning.get(), false), 
-               newTargetTuning, mapForTuning(newTargetTuning.get(), true));
-}
-
-void TunerController::loadTunings(const CentsDefinition& sourceTuningDefinition, const TuningTableMap::Definition& sourceMapDefinition,
-                                  const CentsDefinition& targetTuningDefinition, const TuningTableMap::Definition& targetMapDefinition)
-{
-    auto newSourceTuning = std::make_shared<TuningTable>(sourceTuningDefinition);
-    auto newSourceMapping = std::make_shared<TuningTableMap>(sourceMapDefinition);
-
-    auto newTargetTuning = std::make_shared<TuningTable>(targetTuningDefinition);
-    auto newTargetMapping = std::make_shared<TuningTableMap>(targetMapDefinition);
-
-    setTunings(newSourceTuning, newSourceMapping, newTargetTuning, newTargetMapping);
 }
 
 void TunerController::updateCurrentTuner()
@@ -219,13 +191,13 @@ void TunerController::setPitchbendRange(int pitchbendRangeIn)
     juce::Logger::writeToLog("Pitchbend range of " + juce::String(pitchbendRangeIn) + " was ignored.");
 }
 
-void TunerController::loadSourceTuning(const CentsDefinition& definition, bool updateTuner)
+void TunerController::loadSourceTuning(const TuningTable::Definition& definition, bool updateTuner)
 {
     auto newTuning = std::make_shared<TuningTable>(definition);
     setSourceTuning(newTuning, mapForTuning(newTuning.get(), false), updateTuner);
 }
 
-void TunerController::loadTargetTuning(const CentsDefinition& definition, bool updateTuner)
+void TunerController::loadTargetTuning(const TuningTable::Definition& definition, bool updateTuner)
 {
     auto newTuning = std::make_shared<TuningTable>(definition);
     setTargetTuning(newTuning, mapForTuning(newTuning.get(), true), updateTuner);
@@ -258,15 +230,19 @@ void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, std::
 }
 
 void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
-                                 std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping)
+                                 std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping, bool sendChangeMessages)
 {
     setSourceTuning(sourceTuning, sourceMapping, false);
     setTargetTuning(targetTuning, targetMapping, false);
+
     updateCurrentTuner();
 
     // combine into one call?
-    watchers.call(&Watcher::sourceTuningChanged, currentTuningSource);
-    watchers.call(&Watcher::targetTuningChanged, currentTuningTarget);
+    if (sendChangeMessages)
+    {
+        watchers.call(&Watcher::sourceTuningChanged, currentTuningSource);
+        watchers.call(&Watcher::targetTuningChanged, currentTuningTarget);
+    }
 }
 
 void TunerController::mappingTypeChanged()
@@ -307,13 +283,13 @@ std::shared_ptr<TuningTableMap> TunerController::mapForTuning(const TuningTable*
 
 std::shared_ptr<TuningTableMap> TunerController::NewLinearMappingFromTuning(const TuningTable* tuning, TuningTableMap::Root root)
 {
-    auto definition = TuningTableMap::LinearMappingDefinition(root.midiChannel, root.midiNote, tuning->getRootIndex(), tuning->getTuningTableSize());
+    auto definition = TuningTableMap::LinearMappingDefinition(root.midiChannel, root.midiNote, tuning->getRootIndex(), tuning->getTableSize());
     return std::make_shared<TuningTableMap>(definition);
 }
 
 std::shared_ptr<TuningTableMap> TunerController::NewPeriodicMappingFromTuning(const TuningTable* tuning, TuningTableMap::Root root)
 {
-    auto definition = MultichannelMap::PeriodicMappingDefinition((int)tuning->getVirtualSize(), root.midiChannel, root.midiNote, tuning->getRootIndex(), tuning->getTuningTableSize());
+    auto definition = MultichannelMap::PeriodicMappingDefinition((int)tuning->getVirtualSize(), root.midiChannel, root.midiNote, tuning->getRootIndex(), tuning->getTableSize());
     return std::make_shared<TuningTableMap>(definition);
 }
 
