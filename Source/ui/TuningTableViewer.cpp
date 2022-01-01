@@ -97,27 +97,24 @@ void TuningTableViewer::addTuningTableTabs()
 
 bool TuningTableViewer::addIntervalTab()
 {
-    auto functional = dynamic_cast<const FunctionalTuning*>(tuning);
-
-    if (functional == nullptr)
+    if (getTabNames()[(int)TuningTableViewerTabs::Intervals] == "Intervals")
     {
         removeTab((int)TuningTableViewerTabs::Intervals);
         intervalModel = nullptr;
         setCurrentTabIndex(0);
-        return false;
     }
 
-    if (intervalModel == nullptr)
+    auto functional = dynamic_cast<const FunctionalTuning*>(tuning);
+    if (functional != nullptr)
     {
-        intervalModel = std::make_unique<IntervalListModel>(false);
+        intervalModel = std::make_unique<IntervalListModel>(false, functional);
         intervalTable = std::make_unique<juce::TableListBox>("IntervalTable", intervalModel.get());
         intervalTable->setHeader(std::make_unique<IntervalListHeader>(false));
-        addTab("Intervals", juce::Colour(), intervalTable.get(), false, (int)TuningTableViewerTabs::Intervals);
 
-        setCurrentTabIndex(0);
+        addTab("Intervals", juce::Colour(), intervalTable.get(), false, -1);
+        moveTab(getNumTabs() - 1, (int)TuningTableViewerTabs::Intervals, false);       
+        return true;
     }
 
-    intervalModel->setTuning(functional);
-
-    return true;
+    return false;
 }
