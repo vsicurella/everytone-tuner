@@ -93,16 +93,16 @@ static bool testTable(const MultichannelMap& multimap, int* expectedIndices)
     {
         beginTest("31-edo mapping starting on Midi Channel 5, Note 0");
 
-        auto tuning = std::make_unique<TuningTable>(CentsDefinition::CentsDivisions(31.0));
+        //auto tuning = std::make_unique<FunctionalTuning>(CentsDefinition::CentsDivisions(31.0));
 
-        int mapPeriod = (int)tuning->getVirtualSize();
-        int rootTuningIndex = tuning->getRootIndex();
-        int tuningTableSize = tuning->getTuningTableSize();
+        //int mapPeriod = (int)tuning->getVirtualSize();
+        //int rootTuningIndex = tuning->getRootIndex();
+        //int tuningTableSize = tuning->getTableSize();
 
         int rootMidiChannel = 5;
         int rootMidiNote = 0;
 
-        auto mapDefinition = MultichannelMap::PeriodicMappingDefinition(mapPeriod, rootMidiChannel, rootMidiNote, rootTuningIndex, tuningTableSize);
+        auto mapDefinition = MultichannelMap::PeriodicMappingDefinition(31, rootMidiChannel, rootMidiNote, 178, 329);
         auto periodMapping = TuningTableMap(mapDefinition);
 
         auto definition = periodMapping.getDefinition();

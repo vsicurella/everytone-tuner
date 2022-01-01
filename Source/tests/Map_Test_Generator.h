@@ -34,7 +34,7 @@ private:
 
     Map_Test<int>* NewMeantone12_31Test()
     {
-        auto pattern = new int[] { 0, 3, 5, 8, 10, 13, 16, 18, 21, 23, 26, 29 };
+        Map<int>::Pattern pattern = { 0, 3, 5, 8, 10, 13, 16, 18, 21, 23, 26, 29 };
 
         Map<int>::Definition definition = { 12, pattern, 31, 0, 0, 0 };
 
@@ -110,7 +110,7 @@ private:
     {
         auto defaultLinearMap = new Map<int>(LinearMap<int>());
 
-        int* expectedPattern = new int[] { 0 };
+        Map<int>::Pattern expectedPattern = { 0 };
 
         Map<int>::Definition expectedDefinition = { 1, expectedPattern, 1, 0, 0, 0 };
 

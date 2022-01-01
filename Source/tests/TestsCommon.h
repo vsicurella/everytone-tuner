@@ -26,12 +26,28 @@ static int precision(double number)
 }
 
 template <typename T>
-static String arrayToString(T const* array, int size, bool newLines = true)
+static String arrayToString(const T* array, int size, bool newLines = true)
 {
     String str = "";
     for (int i = 0; i < size; i++)
     {
         str += String(i) + ": " + String(array[i]);
+        if (newLines)
+            str += newLine;
+        else
+            str += ", ";
+    }
+
+    return str;
+}
+
+template <typename T>
+static String vecToString(std::vector<T> vec, int size, bool newLines = true)
+{
+    String str = "";
+    for (int i = 0; i < size; i++)
+    {
+        str += String(i) + ": " + String(vec[i]);
         if (newLines)
             str += newLine;
         else
@@ -125,6 +141,17 @@ protected:
 
     template <typename T, typename TARR>
     void test_table(int expectedSize, const T* expected, const TARR& table, String tableName)
+    {
+        for (int i = 0; i < expectedSize; i++)
+        {
+            int e = expected[i];
+            int t = table[i];
+            expect_exact(e, t, tableName + " at " + String(i));
+        }
+    }
+
+    template <typename T, typename TARR>
+    void test_table(int expectedSize, const std::vector<T>& expected, const TARR& table, String tableName)
     {
         for (int i = 0; i < expectedSize; i++)
         {

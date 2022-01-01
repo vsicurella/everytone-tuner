@@ -93,7 +93,7 @@ private:
         beginTest(testName + " Tuning");
 
         tuner->setPitchbendRange(params.pitchbendRange);
-        test_tuner(tuner.get(), params.startChannel, params.endChannel, params.expectedPitchMapped, params.expectedCoarseNotes, params.expectedPitchbends);
+        test_tuner(tuner.get(), params.startChannel, params.endChannel, params.expectedPitchMapped, params.expectedCoarseNotes, params.expectedPitchbends, testName + "range=4");
 
         tuner->setPitchbendRange(params.altPitchbendRange);
         test_tuner(tuner.get(), params.startChannel, params.endChannel, params.expectedPitchMapped, params.expectedCoarseNotes, params.expectedAltPitchbends, "range= " + juce::String(params.altPitchbendRange) + " ");
@@ -136,12 +136,12 @@ public:
         auto stdTuning = MappedTuningTable::StandardTuning();
 
         auto ode22def = CentsDefinition::CentsDivisions(22.0, 1200.0, 261.6255653);        
-        auto ode22atC262 = std::make_shared<TuningTable>(ode22def);
+        auto ode22atC262 = std::make_shared<FunctionalTuning>(ode22def);
 
         int ch = 4;
         int note = 0;
-        auto mapDef = TuningTableMap::LinearMappingDefinition(ch, note, ode22atC262->getRootIndex(), ode22atC262->getTuningTableSize());
-        auto mapping = std::make_shared<TuningTableMap>(mapDef);
+        auto root = TuningTableMap::Root{ ch, note };
+        auto mapping = MappedTuningTable::LinearMappingFromTuning(ode22atC262.get(), root);
         auto ode22MappedTuning = std::make_unique<MappedTuningTable>(ode22atC262, mapping);
 
         const bool expectedPitchMapped[] = { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true };
@@ -171,14 +171,13 @@ public:
         auto stdTuning = MappedTuningTable::StandardTuning();
 
         auto ode31def = CentsDefinition::CentsDivisions(31.0, 1200.0, 440);
-        auto ode31at440 = std::make_shared<TuningTable>(ode31def);
+        auto ode31at440 = std::make_shared<FunctionalTuning>(ode31def);
 
         int ch = 5;
         int note = 0;
 
-        auto mapDef = MultichannelMap::PeriodicMappingDefinition(ode31at440->getVirtualSize(), ch, note, ode31at440->getRootIndex(), ode31at440->getTuningTableSize());
-        auto mapping = std::make_shared<TuningTableMap>(mapDef);
-
+        auto root = TuningTableMap::Root{ ch, note };
+        auto mapping = MappedTuningTable::PeriodicMappingFromTuning(ode31at440.get(), root);
         auto ode31MappedTuning = std::make_unique<MappedTuningTable>(ode31at440, mapping);
 
         const bool expectedPitchMapped[] = { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true };

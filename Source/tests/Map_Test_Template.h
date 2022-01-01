@@ -30,7 +30,7 @@ private:
     String MapDefToString(typename Map<T>::Definition def)
     {
         String str = "Size: " + String(def.mapSize);
-        str += "\nPattern   : " + arrayToString<T>(def.pattern, def.mapSize, false);
+        str += "\nPattern   : " + vecToString<T>(def.pattern, def.mapSize, false);
         str += "\nBase      : " + String(def.patternBase);
         str += "\nPat. Root : " + String(def.patternRootIndex);
         str += "\nMap Root  : " + String(def.mapRootIndex);
@@ -75,11 +75,11 @@ public:
     {
         delete params.map;
 
-        if (params.definition.pattern != nullptr)
-        {
-            delete[] params.definition.pattern;
-            params.definition.pattern = nullptr;
-        }
+        //if (params.definition.pattern != nullptr)
+        //{
+        //    delete[] params.definition.pattern;
+        //    params.definition.pattern = nullptr;
+        //}
 
         if (params.expectedTable != nullptr)
         {
