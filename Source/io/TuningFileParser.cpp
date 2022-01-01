@@ -22,7 +22,6 @@ TuningFileParser::~TuningFileParser()
 
 void TuningFileParser::readFile(juce::File file)
 {
-    DBG("File Size: " + juce::String(file.getSize()));
     type = TuningType(determineTuningType(file));
     parseTuning(file);
 }
@@ -83,12 +82,14 @@ std::shared_ptr<FunctionalTuning> TuningFileParser::parseScalaFileDefinition(juc
     }
     auto description = juce::String(sclImport.GetScaleDescription());
 
-    CentsDefinition definition = 
+    CentsDefinition definition =
     {
         centsTable,
         baseFreq,
         name,
-        description
+        description,
+        centsTable.getLast(),
+        centsTable.size(),
     };
 
     return std::make_shared<FunctionalTuning>(definition);
