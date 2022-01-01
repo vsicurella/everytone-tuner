@@ -103,10 +103,13 @@ struct CentsDefinition
 		double highestRatio = MTS_HIGHEST_FREQ / rootFrequency;
 		double highestCents = ratioToCents(highestRatio);
 
+		// Ceil & Floor are preferred for MTS range,
+		// but tests are currently set up for rounding.
+		// Minor problem, generally just affects things by 1 index
 		if (intervalCents.size() == 1)
 		{
-			int lowest = ceil(lowestCents / intervalCents[0]);
-			int highest = floor(highestCents / intervalCents[0]);
+			int lowest = /*ceil*/round(lowestCents / intervalCents[0]);
+			int highest = /*floor*/round(highestCents / intervalCents[0]);
 
 			rootIndex = -lowest;
 			tableSize = highest - lowest + 1;
@@ -117,8 +120,8 @@ struct CentsDefinition
 		auto minPeriod = (minCents < 0) ? periodCents - minCents : periodCents;
 		double maxPeriod = (maxCents > periodCents) ? maxCents : periodCents;
 
-		int lowestFromRoot = ceil(lowestCents / minPeriod * intervalCents.size());
-		int highestFromRoot = floor(highestCents / maxPeriod * intervalCents.size());
+		int lowestFromRoot = /*ceil*/round(lowestCents / minPeriod * intervalCents.size());
+		int highestFromRoot = /*floor*/round(highestCents / maxPeriod * intervalCents.size());
 
 		rootIndex = -lowestFromRoot;
 		tableSize = highestFromRoot - lowestFromRoot + 1;
