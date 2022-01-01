@@ -147,7 +147,7 @@ struct CentsDefinition
 		juce::String name, description;
 		getEqualDivisionsNameAndDescription(name, description, divisions, periodRatio);
 
-		CentsDefinition definition = { { step }, frequency, name, description, periodRatio, divisions };
+		CentsDefinition definition = { { step }, frequency, name, description, ratioToCents(periodRatio), divisions };
 		return definition;
 	}
 };
