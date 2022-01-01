@@ -127,7 +127,7 @@ public:
     */
     static TuningTableMap::Definition LinearMappingDefinition(int rootMidiChannel, int rootMidiNote, int tuningRootIndex, int tuningTableSize)
     {
-        int midiIndex = mod((rootMidiChannel - 1) * 128 + rootMidiNote, tuningTableSize);
+        int midiIndex = mod((rootMidiChannel - 1) * 128 + rootMidiNote, 2048);
 
         auto mapFunction = Map<int>::FunctionDefinition
         {
