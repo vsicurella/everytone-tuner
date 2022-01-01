@@ -115,7 +115,7 @@ static void applyTuningTablePropertiesFromValueTree(
 
 static std::shared_ptr<FunctionalTuning> constructFunctionalTuningFromValueTree(juce::ValueTree tree)
 {
-    auto centsNode = tree.getChildWithName(Everytone::ID::Cents);
+    auto centsNode = tree.getChildWithName(Everytone::ID::CentsTable);
     if (!centsNode.isValid())
         return nullptr;
 

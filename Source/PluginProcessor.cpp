@@ -234,6 +234,8 @@ void MultimapperAudioProcessor::getStateInformation (juce::MemoryBlock& destData
         auto optionsNode = options().toValueTree();
         state.addChild(optionsNode, -1, nullptr);
 
+        juce::Logger::writeToLog("Saved:\n" + state.toXmlString());
+
         juce::MemoryOutputStream stream(destData, false);
         state.writeToStream(stream);
     }
@@ -247,6 +249,8 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     juce::MemoryInputStream stream(buffer, false);
     
     auto state = juce::ValueTree::readFromStream(juce::MemoryInputStream(data, (size_t)sizeInBytes, false));
+
+    juce::Logger::writeToLog("Loading:\n" + state.toXmlString());
 
     //auto sourceTree = state.getChildWithName(Everytone::ID::TuningSource);
     //if (sourceTree.isValid())
