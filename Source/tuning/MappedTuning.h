@@ -12,7 +12,7 @@
 
 #pragma once
 #include "FunctionalTuning.h"
-#include "../mapping/TuningTableMap.h"
+#include "../mapping/MultichannelMap.h"
 
 class MappedTuningTable : public TuningTableBase
 {
@@ -107,4 +107,7 @@ public:
         auto standardMapping = std::make_shared<TuningTableMap>(TuningTableMap::StandardMappingDefinition());
         return std::make_unique<MappedTuningTable>(standardTuning, standardMapping);
     }
+
+    static std::shared_ptr<TuningTableMap> LinearMappingFromTuning(const TuningTable* tuningDefinition, TuningTableMap::Root root);
+    static std::shared_ptr<TuningTableMap> PeriodicMappingFromTuning(const TuningTable* tuningDefinition, TuningTableMap::Root root);
 };

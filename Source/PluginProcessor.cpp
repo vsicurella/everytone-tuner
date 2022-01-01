@@ -46,7 +46,7 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
 
     Map_Test_Generator mapTests;
     MultichannelMap_Test multichannelMapTest;
-    Tuning_Test tuningTest;
+    FunctionalTuning_Test tuningTest;
     MidiNoteTuner_Test midiNoteTunerTest;
 
     auto tests = juce::Array<juce::UnitTest*>();

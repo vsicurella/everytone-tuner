@@ -262,24 +262,24 @@ juce::Array<double> TuningTable::getMtsTable() const
 
 juce::Array<double> TuningTable::frequencyToMtsTable(juce::Array<double> frequenciesIn)
 {
-    auto mtsTable = juce::Array<double>(frequenciesIn.size());
+    juce::Array<double> mtsTable;
     for (int n = 0; n < frequenciesIn.size(); n++)
     {
         auto freq = frequenciesIn[n];
         double mts = roundN(10, frequencyToMTS(freq));
-        mtsTable.set(n, mts);
+        mtsTable.add(mts);
     }
     return mtsTable;
 }
 
 juce::Array<double> TuningTable::mtsToFrequencyTable(juce::Array<double> mtsIn)
 {
-    auto frequencyTable = juce::Array<double>(mtsIn.size());
+    juce::Array<double> frequencyTable;
     for (int n = 0; n < mtsIn.size(); n++)
     {
         auto mts = mtsIn[n];
         double frequency = roundN(10, mtsToFrequency(mts));
-        frequencyTable.set(n, mts);
+        frequencyTable.add(mts);
     }
     return frequencyTable;
 }

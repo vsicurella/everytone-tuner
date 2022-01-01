@@ -281,27 +281,15 @@ std::shared_ptr<TuningTableMap> TunerController::mapForTuning(const TuningTable*
     return nullptr;
 }
 
-std::shared_ptr<TuningTableMap> TunerController::NewLinearMappingFromTuning(const TuningTable* tuning, TuningTableMap::Root root)
-{
-    auto definition = TuningTableMap::LinearMappingDefinition(root.midiChannel, root.midiNote, tuning->getRootIndex(), tuning->getTableSize());
-    return std::make_shared<TuningTableMap>(definition);
-}
-
-std::shared_ptr<TuningTableMap> TunerController::NewPeriodicMappingFromTuning(const TuningTable* tuning, TuningTableMap::Root root)
-{
-    auto definition = MultichannelMap::PeriodicMappingDefinition((int)tuning->getVirtualSize(), root.midiChannel, root.midiNote, tuning->getRootIndex(), tuning->getTableSize());
-    return std::make_shared<TuningTableMap>(definition);
-}
-
 std::shared_ptr<TuningTableMap> TunerController::NewMappingFromTuning(const TuningTable* tuning, TuningTableMap::Root root, Everytone::MappingType mappingType)
 {
     switch (mappingType)
     {
     case Everytone::MappingType::Linear:
-        return NewLinearMappingFromTuning(tuning, root);
+        return MappedTuningTable::LinearMappingFromTuning(tuning, root);
 
     case Everytone::MappingType::Periodic:
-        return NewPeriodicMappingFromTuning(tuning, root);
+        return MappedTuningTable::PeriodicMappingFromTuning(tuning, root);
 
     default:
         jassertfalse;

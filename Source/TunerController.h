@@ -131,9 +131,6 @@ private:
 public:
 
     // For use in "Auto Mapping" mode with tunings created in the app
-    static std::shared_ptr<TuningTableMap> NewLinearMappingFromTuning(const TuningTable* tuningDefinition, TuningTableMap::Root root);
-    static std::shared_ptr<TuningTableMap> NewPeriodicMappingFromTuning(const TuningTable* tuningDefinition, TuningTableMap::Root root);
-
     static std::shared_ptr<TuningTableMap> NewMappingFromTuning(const TuningTable* tuningDefinition, TuningTableMap::Root root, Everytone::MappingType mappingType);
 };
 

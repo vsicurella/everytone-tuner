@@ -155,3 +155,14 @@ double MappedTuningTable::mtsAt(int midiNote, int midiChannel) const
     return tuning->mtsAt(index);
 }
 
+std::shared_ptr<TuningTableMap> MappedTuningTable::LinearMappingFromTuning(const TuningTable* tuning, TuningTableMap::Root root)
+{
+    auto definition = TuningTableMap::LinearMappingDefinition(root.midiChannel, root.midiNote, tuning->getRootIndex(), tuning->getTableSize());
+    return std::make_shared<TuningTableMap>(definition);
+}
+
+std::shared_ptr<TuningTableMap> MappedTuningTable::PeriodicMappingFromTuning(const TuningTable* tuning, TuningTableMap::Root root)
+{
+    auto definition = MultichannelMap::PeriodicMappingDefinition((int)tuning->getVirtualSize(), root.midiChannel, root.midiNote, tuning->getRootIndex(), tuning->getTableSize());
+    return std::make_shared<TuningTableMap>(definition);
+}

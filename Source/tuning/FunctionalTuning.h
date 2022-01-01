@@ -40,6 +40,8 @@ public:
     virtual bool operator==(const FunctionalTuning&);
     virtual bool operator!=(const FunctionalTuning&);
 
+    void cacheTables();
+
     virtual CentsDefinition getDefinition() const;
 
     virtual juce::Array<double> getIntervalCentsList() const;
@@ -88,12 +90,17 @@ public:
 
     static CentsDefinition StandardTuningDefinition()
     {
-    	return CentsDefinition::CentsDivisions(12);
+        CentsDefinition definition;
+        definition.name = "12-edo";
+        definition.description = "The octave divided into 12 equal steps.";
+        definition.virtualPeriod = 1200.0;
+        definition.virtualSize = 12;
+        return definition;
     }
 
     static std::shared_ptr<FunctionalTuning> StandardTuning()
     {
         auto definition = StandardTuningDefinition();
-    	return std::make_shared<FunctionalTuning>(definition);
+    	return std::make_shared<FunctionalTuning>(definition, true);
     }
 };
