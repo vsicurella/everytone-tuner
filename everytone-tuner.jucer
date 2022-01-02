@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="dQHHPS" name="Everytone Tuner" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" defines="RUN_MULTIMAPPER_TESTS=1"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" defines="RUN_MULTIMAPPER_TESTS=0"
               pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn">
   <MAINGROUP id="H8zE4n" name="Everytone Tuner">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
@@ -41,6 +41,8 @@
               file="Source/UI/NewTuningPanel.cpp"/>
         <FILE id="c1KNVt" name="NewTuningPanel.h" compile="0" resource="0"
               file="Source/UI/NewTuningPanel.h"/>
+        <FILE id="VziKHW" name="ToneCircle.h" compile="0" resource="0" file="Source/ui/ToneCircle.h"/>
+        <FILE id="garUZT" name="ToneCircle.cpp" compile="1" resource="0" file="Source/ui/ToneCircle.cpp"/>
       </GROUP>
       <GROUP id="{79A5D062-8ED3-30D7-15DF-F01D07F22E53}" name="tests">
         <FILE id="OeS2f9" name="MidiNoteTuner_tests.h" compile="0" resource="0"

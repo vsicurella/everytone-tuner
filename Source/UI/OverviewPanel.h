@@ -13,6 +13,7 @@
 #include "../tuning/MappedTuning.h"
 #include "../TuningChanger.h"
 #include "TuningTableViewer.h"
+#include "ToneCircle.h"
 
 class OverviewPanel  : public juce::Component, public TuningChanger, public OptionsChanger
 {
@@ -46,6 +47,7 @@ private:
 	//std::unique_ptr<IntervalListHeader> listEditorHeader;
 	//std::unique_ptr<juce::TableListBox> listEditorComponent;
 	std::unique_ptr<TuningTableViewer> tuningTableViewer;
+	std::unique_ptr<ToneCircle> toneCircle;
 
 	juce::OwnedArray<juce::Label> labels;
 

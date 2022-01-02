@@ -58,6 +58,9 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 
 	tuningTableViewer = std::make_unique<TuningTableViewer>();
 	addAndMakeVisible(*tuningTableViewer);
+
+	toneCircle = std::make_unique<ToneCircle>("OverviewToneCircle");
+	addAndMakeVisible(*toneCircle);
 }
 
 OverviewPanel::~OverviewPanel()
@@ -109,7 +112,8 @@ void OverviewPanel::resized()
 	//tuningInfo.items.add(juce::FlexItem(halfWidth, h, *descriptionEditor));
 	
 	tuningInfo.items.add(juce::FlexItem(halfWidth, h, *tuningTableViewer));
-	
+	tuningInfo.items.add(juce::FlexItem(halfWidth, h, *toneCircle));
+
 	//juce::FlexBox main;
 	//main.justifyContent = juce::FlexBox::JustifyContent::flexStart;
 
@@ -163,6 +167,7 @@ void OverviewPanel::setTuningDisplayed(const MappedTuningTable* mappedTuningIn)
 
 	//listEditorComponent->updateContent();
 	tuningTableViewer->set(mappedTuning);
+	toneCircle->setTuning(mappedTuning);
 }
 
 void OverviewPanel::setListEditorModel(IntervalListModel* listEditor)
