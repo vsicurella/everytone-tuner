@@ -37,6 +37,8 @@ public:
 
 	void setTuning(const MappedTuningTable* tuningIn);
 
+	void mouseMove(const juce::MouseEvent&) override;
+
 //==============================================================================
 private:
 
@@ -51,6 +53,11 @@ private:
 	juce::Array<float> degreeAngles;
 	juce::Array<juce::Point<float>> degreePoints;
 	juce::ColourGradient intervalTextGradient;
+
+	std::unique_ptr<juce::Label> intervalLabel;
+
+	double nearDistanceThreshold = 15;
+	int mouseNearDegree = -1;
 
 	// Drawing helpers
 	juce::Point<float> center;

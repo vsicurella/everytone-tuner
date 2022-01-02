@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="dQHHPS" name="Everytone Tuner" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" defines="RUN_MULTIMAPPER_TESTS=0"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" defines="RUN_MULTIMAPPER_TESTS=1"
               pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn">
   <MAINGROUP id="H8zE4n" name="Everytone Tuner">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">

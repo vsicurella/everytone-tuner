@@ -19,6 +19,12 @@ ToneCircle::ToneCircle(juce::String componentName)
 	setColour(intervalStartColourId,  juce::Colours::red);
 	setColour(intervalMiddleColourId, juce::Colours::red);
 	setColour(intervalEndColourId,    juce::Colours::red);
+
+	auto font = juce::Font(juce::Font::getDefaultMonospacedFontName(), 12, juce::Font::FontStyleFlags::plain);
+	intervalLabel = std::make_unique<juce::Label>("IntervalLabel");
+	intervalLabel->setJustificationType(juce::Justification::centred);
+	intervalLabel->setFont(font);
+	addChildComponent(*intervalLabel);
 }
 
 ToneCircle::~ToneCircle()
@@ -47,7 +53,8 @@ void ToneCircle::paint(juce::Graphics& g)
 		true
 	);
 
-	//juce::Font font = juce::Font(juce::Font::getDefaultMonospacedFontName(), getHeight() * 0.02, juce::Font::FontStyleFlags::plain);
+	//double fontHeight = getHeight() * 0.02f;
+	//juce::Font font = juce::Font(juce::Font::getDefaultMonospacedFontName(), fontHeight, juce::Font::FontStyleFlags::plain);
 	//g.setColour(circleColour);
 	//auto periodText = "Period: " + tuning->getPeriodString();
 	//auto periodWidth = font.getStringWidth(periodText) * 1.5f;
@@ -79,10 +86,16 @@ void ToneCircle::resized()
 	circleRadius = juce::jmin(getWidth(), getHeight()) * (1 - margin) / 2.0f;
 	circleBounds = { center.getX() - circleRadius, center.getY() - circleRadius, circleRadius * 2, circleRadius * 2};
 
+	int fontHeight = round(getHeight() * 0.05);
+	intervalLabel->setBounds(getLocalBounds().withSizeKeepingCentre(getWidth(), fontHeight));
+
 	degreePoints.clear();
-	for (auto ang : degreeAngles)
+	for (int i = 0; i < degreeAngles.size(); i++)
 	{
-		degreePoints.add(center.getPointOnCircumference(circleRadius, ang));
+		auto ang = degreeAngles[i];
+		auto point = center.getPointOnCircumference(circleRadius, ang);
+		degreePoints.add(point);
+		//DBG(juce::String(i) + ": " + juce::String(ang) + ", " + point.toString());
 	}
 }
 
@@ -101,7 +114,8 @@ void ToneCircle::setTuning(const MappedTuningTable* tuningIn)
 	degreeAngles.clear();
 	for (int i = 0; i < size; i++)
 	{
-		degreeAngles.add(scaleDegreeToAngle(i, period));
+		auto angle = scaleDegreeToAngle(i, period);
+		degreeAngles.add(angle);
 	}
 
 	resized();
@@ -110,4 +124,32 @@ void ToneCircle::setTuning(const MappedTuningTable* tuningIn)
 float ToneCircle::scaleDegreeToAngle(int scaleDegreeIn, double period) const
 {
 	return 2.0f * juce::float_Pi * tuning->centsFromRoot(scaleDegreeIn) / 1200;
+}
+
+void ToneCircle::mouseMove(const juce::MouseEvent& e)
+{
+	int nearDegree = -1;
+	double shortestDistance = 10e10;
+	for (int i = 0; i < degreePoints.size(); i++)
+	{
+		auto point = degreePoints[i];
+		auto distance = e.position.getDistanceFrom(point);
+		if (distance <= nearDistanceThreshold && distance < shortestDistance)
+		{
+			shortestDistance = distance;
+			nearDegree = i;
+		}
+	}
+
+	mouseNearDegree = nearDegree;
+
+	if (nearDegree >= 0)
+	{
+		auto text = juce::String(tuning->centsFromRoot(nearDegree)) + " cents";
+		intervalLabel->setText(text, juce::NotificationType::dontSendNotification);
+		intervalLabel->setVisible(true);
+		return;
+	}
+	
+	intervalLabel->setVisible(false);
 }
