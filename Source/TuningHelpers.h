@@ -54,6 +54,10 @@ static juce::ValueTree tuningTableToValueTree(const TuningTable* tuning, juce::V
     tree.setProperty(Everytone::ID::VirtualPeriod, tuning->getVirtualPeriod(), nullptr);
     tree.setProperty(Everytone::ID::VirtualSize, tuning->getVirtualSize(), nullptr);
 
+    auto frequencies = tuning->getFrequencyTable();
+    auto frequencyNode = arrayToValueTree(frequencies, Everytone::ID::FrequencyTable, Everytone::ID::Frequency);
+    tree.addChild(frequencyNode, 0, nullptr);
+
     return tree;
 }
 
