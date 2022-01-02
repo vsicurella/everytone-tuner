@@ -110,7 +110,7 @@ void TuningTable::setRootFrequency(double frequency)
 
 double TuningTable::centsAt(int index) const
 {
-    auto ratio = frequencyTable[index] / rootFrequency;
+    auto ratio = frequencyAt(index) / rootFrequency;
 	return ratioToCents(ratio);
 }
 

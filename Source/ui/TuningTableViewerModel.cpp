@@ -97,7 +97,7 @@ juce::Component* TuningTableViewerModel::refreshComponentForCell(int rowNumber, 
         case TuningTableHeader::Columns::Cents:
         {
             label->setName("Cents" + indexString + "Label");
-            auto cents = roundN(3, tuning->centsFromRoot(rowNumber));
+            auto cents = roundN(3, tuning->centsAt(rowNumber));
             label->setText(juce::String(cents), juce::NotificationType::dontSendNotification);
             break;
         }

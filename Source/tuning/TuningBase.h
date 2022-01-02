@@ -46,16 +46,16 @@ public:
 	virtual void setRootFrequency(double frequency) = 0;
 
 	virtual double centsAt(int index) const = 0;
-	virtual double centsFromRoot(int steps) const { return centsAt(steps); }
+	virtual double centsFromRoot(int steps) const { return centsAt(steps + rootIndex); }
 
 	virtual double semitonesAt(int index) const { return centsAt(index) * 0.01; }
 	virtual double semitonesFromRoot(int steps) const { return centsFromRoot(steps) * 0.01; }
 
 	virtual double frequencyAt(int index) const = 0;
-	virtual double frequencyFromRoot(int steps) const { return frequencyAt(steps - rootIndex); }
+	virtual double frequencyFromRoot(int steps) const { return frequencyAt(steps + rootIndex); }
 
 	virtual double mtsAt(int index) const { return frequencyToMTS(frequencyAt(index)); }
-	virtual double mtsFromRoot(int steps) { return mtsAt(steps - rootIndex); }
+	virtual double mtsFromRoot(int steps) { return mtsAt(steps + rootIndex); }
 
 	virtual int closestIndexToFrequency(double frequency) const = 0;
 	virtual int closestFrequency(double frequency)
