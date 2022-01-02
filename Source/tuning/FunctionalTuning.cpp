@@ -140,7 +140,7 @@ double FunctionalTuning::calculateMtsFromRoot(int stepsFromRoot) const
 
 double FunctionalTuning::calculateCentsFromRoot(int stepsFromRoot) const
 {
-    return centsFromRoot(stepsFromRoot);
+    return centsMap.at(stepsFromRoot);
 }
 
 double FunctionalTuning::calculateSemitonesFromRoot(int stepsFromRoot) const

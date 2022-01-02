@@ -46,7 +46,7 @@ public:
 	virtual void setRootFrequency(double frequency) = 0;
 
 	virtual double centsAt(int index) const = 0;
-	virtual double centsFromRoot(int steps) const { return centsAt(steps - rootIndex); }
+	virtual double centsFromRoot(int steps) const { return centsAt(steps); }
 
 	virtual double semitonesAt(int index) const { return centsAt(index) * 0.01; }
 	virtual double semitonesFromRoot(int steps) const { return centsFromRoot(steps) * 0.01; }
