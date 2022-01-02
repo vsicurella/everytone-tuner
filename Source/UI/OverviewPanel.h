@@ -40,8 +40,8 @@ private:
 	std::unique_ptr<juce::Label> tuningSizeBox;
 	std::unique_ptr<juce::Label> tuningPeriodBox;
 
-	std::unique_ptr<juce::Label> descriptionTextLabel;
-	std::unique_ptr<juce::TextEditor> descriptionEditor;
+	//std::unique_ptr<juce::Label> descriptionTextLabel;
+	//std::unique_ptr<juce::TextEditor> descriptionEditor;
 
 	//std::unique_ptr<IntervalListHeader> listEditorHeader;
 	//std::unique_ptr<juce::TableListBox> listEditorComponent;

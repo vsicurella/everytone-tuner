@@ -28,11 +28,14 @@ class TuningTableViewer : public juce::TabbedComponent
     std::unique_ptr<MappingTableModel> mappingModel;
     std::unique_ptr<juce::TableListBox> mappingTable;
 
+    std::unique_ptr<juce::TextEditor> descriptionBox;
+
 private:
 
-    enum class TuningTableViewerTabs
+    enum class Tabs
     {
-        Intervals = 0,
+        Description = 0,
+        Intervals,
         TuningTable,
         Mapping
     };

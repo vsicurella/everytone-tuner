@@ -40,12 +40,12 @@ OverviewPanel::OverviewPanel (Everytone::Options options)
 	tuningPeriodLabel->attachToComponent(tuningPeriodBox.get(), true);
 	addAndMakeVisible(tuningPeriodLabel);
 
-    descriptionEditor.reset (new juce::TextEditor ("descriptionEditor"));
-    addAndMakeVisible (descriptionEditor.get());
-    descriptionEditor->setMultiLine (true);
-    descriptionEditor->setReadOnly (true);
-    descriptionEditor->setScrollbarsShown (true);
-    descriptionEditor->setPopupMenuEnabled (true);
+    //descriptionEditor.reset (new juce::TextEditor ("descriptionEditor"));
+    //addAndMakeVisible (descriptionEditor.get());
+    //descriptionEditor->setMultiLine (true);
+    //descriptionEditor->setReadOnly (true);
+    //descriptionEditor->setScrollbarsShown (true);
+    //descriptionEditor->setPopupMenuEnabled (true);
 	//descriptionTextBox->setTextToShowWhenEmpty(TRANS("No description"), juce::Colours::darkgrey);
 
 	//auto descriptionlabel = labels.add(new juce::Label("descriptionLabel", juce::translate("Description") + ": "));
@@ -68,7 +68,7 @@ OverviewPanel::~OverviewPanel()
 	tuningNameBox = nullptr;
 	tuningSizeBox = nullptr;
 	tuningPeriodBox = nullptr;
-    descriptionEditor = nullptr;
+    //descriptionEditor = nullptr;
 }
 
 //==============================================================================
@@ -106,7 +106,7 @@ void OverviewPanel::resized()
 	//tuningInfo.items.add(juce::FlexItem(halfWidth, controlHeight, *tuningNameBox).withMargin(tuningMargin));
 	//tuningInfo.items.add(juce::FlexItem(halfWidth, controlHeight, *tuningSizeBox).withMargin(tuningMargin));
 	//tuningInfo.items.add(juce::FlexItem(halfWidth, controlHeight, *tuningPeriodBox).withMargin(tuningMargin));
-	tuningInfo.items.add(juce::FlexItem(halfWidth, h, *descriptionEditor));
+	//tuningInfo.items.add(juce::FlexItem(halfWidth, h, *descriptionEditor));
 	
 	tuningInfo.items.add(juce::FlexItem(halfWidth, h, *tuningTableViewer));
 	
@@ -141,7 +141,7 @@ void OverviewPanel::setTuningDisplayed(const MappedTuningTable* mappedTuningIn)
 	auto tuning = mappedTuning->getTuning();
 
 	tuningNameBox->setText(tuning->getName(), juce::NotificationType::dontSendNotification);
-	descriptionEditor->setText(tuning->getDescription(), juce::NotificationType::dontSendNotification);
+	//descriptionEditor->setText(tuning->getDescription(), juce::NotificationType::dontSendNotification);
 
 	//auto periodLabel = juce::String(tuning->getPeriodCents());
 	//auto virtualPeriod = tuning->getVirtualPeriod();

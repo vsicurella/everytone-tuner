@@ -13,26 +13,12 @@
 TuningTableViewer::TuningTableViewer(IntervalListModel* intervalListModel, const MappedTuningTable* tuningIn)
     : juce::TabbedComponent(juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
-    //if (intervalListModel == nullptr)
-    //{
-    //    intervalModel = std::make_unique<IntervalListModel>(false);
-    //    intervalListModel = intervalModel.get();
-    //}
-
-    //intervalTable = std::make_unique<juce::TableListBox>("IntervalTable", intervalListModel);
-    //intervalTable->setHeader(std::make_unique<IntervalListHeader>(false));
-    //
-    //tuningModel = std::make_unique<TuningTableViewerModel>();
-    //tuningTable = std::make_unique<juce::TableListBox>("TuningTable", tuningModel.get());
-    //tuningTable->setHeader(std::make_unique<TuningTableHeader>());
-
-    //mappingModel = std::make_unique<MappingTableModel>();
-    //mappingTable = std::make_unique<juce::TableListBox>("MappingTable", mappingModel.get());
-    //mappingTable->setHeader(std::make_unique<MappingTableHeader>());
-
-    //addTab("Intervals", juce::Colour(), intervalTable.get(), false);
-    //addTab("Tuning Table", juce::Colour(), tuningTable.get(), false);
-    //addTab("Mapping", juce::Colour(), mappingTable.get(), false);
+    descriptionBox = std::make_unique<juce::TextEditor>("descriptionBox");
+    descriptionBox->setMultiLine(true);
+    descriptionBox->setReadOnly(true);
+    descriptionBox->setScrollbarsShown(true);
+    descriptionBox->setPopupMenuEnabled(true);
+    addTab("Description", juce::Colour(), descriptionBox.get(), false, (int)Tabs::Description);
 
     set(tuningIn);
 }
@@ -67,6 +53,7 @@ void TuningTableViewer::set(const TuningTable* tuningIn)
     addTuningTableTabs();
     tuningModel->setTuning(tuningIn);
     tuningTable->updateContent();
+    descriptionBox->setText(tuning->getDescription());
 }
 
 void TuningTableViewer::set(const TuningTableMap* mappingIn)
@@ -83,7 +70,7 @@ void TuningTableViewer::addTuningTableTabs()
         tuningModel = std::make_unique<TuningTableViewerModel>();
         tuningTable = std::make_unique<juce::TableListBox>("TuningTable", tuningModel.get());
         tuningTable->setHeader(std::make_unique<TuningTableHeader>());
-        addTab("Tuning Table", juce::Colour(), tuningTable.get(), false, (int)TuningTableViewerTabs::TuningTable);
+        addTab("Tuning Table", juce::Colour(), tuningTable.get(), false, (int)Tabs::TuningTable);
     }
 
     if (mappingModel == nullptr)
@@ -91,17 +78,17 @@ void TuningTableViewer::addTuningTableTabs()
         mappingModel = std::make_unique<MappingTableModel>();
         mappingTable = std::make_unique<juce::TableListBox>("MappingTable", mappingModel.get());
         mappingTable->setHeader(std::make_unique<MappingTableHeader>());
-        addTab("Mapping", juce::Colour(), mappingTable.get(), false, (int)TuningTableViewerTabs::Mapping);
+        addTab("Mapping", juce::Colour(), mappingTable.get(), false, (int)Tabs::Mapping);
     }
 }
 
 bool TuningTableViewer::addIntervalTab()
 {
-    if (getTabNames()[(int)TuningTableViewerTabs::Intervals] == "Intervals")
+    if (getTabNames()[(int)Tabs::Intervals] == "Intervals")
     {
-        removeTab((int)TuningTableViewerTabs::Intervals);
+        removeTab((int)Tabs::Intervals);
         intervalModel = nullptr;
-        setCurrentTabIndex(0);
+        //setCurrentTabIndex(0);
     }
 
     auto functional = dynamic_cast<const FunctionalTuning*>(tuning);
@@ -112,7 +99,7 @@ bool TuningTableViewer::addIntervalTab()
         intervalTable->setHeader(std::make_unique<IntervalListHeader>(false));
 
         addTab("Intervals", juce::Colour(), intervalTable.get(), false, -1);
-        moveTab(getNumTabs() - 1, (int)TuningTableViewerTabs::Intervals, false);       
+        moveTab(getNumTabs() - 1, (int)Tabs::Intervals, false);       
         return true;
     }
 
