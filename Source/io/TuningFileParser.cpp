@@ -120,6 +120,16 @@ std::shared_ptr<TuningTable> TuningFileParser::parseTunFileDefinition(juce::File
     }
     auto description = tunInfoToString(tunSingleScale);
 
+    // Try to find interval pattern to return FunctionalTuning if possible
+    //auto extractedDefinition = CentsDefinition::ExtractFromFrequencyTable(frequencies, baseNote);
+    //if (extractedDefinition.intervalCents.size() > 0)
+    //{
+    //    extractedDefinition.name = name;
+    //    extractedDefinition.description = description;
+    //    return std::make_shared<FunctionalTuning>(extractedDefinition);
+    //}
+
+    // Fallback to a frequency table tuning
     TuningTable::Definition definition =
     {
         frequencies,
