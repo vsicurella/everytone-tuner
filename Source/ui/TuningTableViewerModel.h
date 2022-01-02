@@ -19,7 +19,8 @@ public:
     {
         Index = 1,
         MTS,
-        Frequency
+        Frequency,
+        Cents
     };
 
     TuningTableHeader()
@@ -27,12 +28,15 @@ public:
         addColumn("#",   (int)Columns::Index, 48);
         addColumn("MTS", (int)Columns::MTS, 72);
         addColumn("Hz",  (int)Columns::Frequency, 96);
+        addColumn("Cents", (int)Columns::Cents, 84);
     }
 };
 
 class TuningTableViewerModel : public juce::TableListBoxModel
 {
     const TuningTable* tuning = nullptr;
+
+    juce::Array<bool> rowOutOfBounds;
 
 public:
 

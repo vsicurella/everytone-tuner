@@ -25,7 +25,9 @@ int  TuningTableViewerModel::getNumRows()
     if (tuning == nullptr)
         return 0;
 
-    return tuning->getTableSize();
+    auto size = tuning->getTableSize();
+    rowOutOfBounds.resize(size);
+    return size;
 }
 
 void TuningTableViewerModel::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
@@ -35,6 +37,9 @@ void TuningTableViewerModel::paintRowBackground(juce::Graphics& g, int rowNumber
 
     if (rowNumber == tuning->getRootIndex())
         g.fillAll(juce::Colours::steelblue);
+
+    if (rowOutOfBounds[rowNumber])
+        g.fillAll(juce::Colours::dimgrey);
 }
 
 void TuningTableViewerModel::paintCell(juce::Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
@@ -66,6 +71,10 @@ juce::Component* TuningTableViewerModel::refreshComponentForCell(int rowNumber, 
     auto label = dynamic_cast<juce::Label*>(existingComponentToUpdate);
     if (label != nullptr)
     {
+        auto mts = roundN(4, tuning->mtsAt(rowNumber));
+        bool outOfBounds = mts < -0.0f  || mts >= 128;
+        rowOutOfBounds.set(rowNumber, outOfBounds);
+
         switch (column)
         {
         case TuningTableHeader::Columns::Index:
@@ -75,18 +84,27 @@ juce::Component* TuningTableViewerModel::refreshComponentForCell(int rowNumber, 
         case TuningTableHeader::Columns::MTS:
         {
             label->setName("Mts" + indexString + "Label");
-            auto mts = tuning->mtsAt(rowNumber);
             label->setText(juce::String(mts), juce::NotificationType::dontSendNotification);
             break;
         }
         case TuningTableHeader::Columns::Frequency:
         {
             label->setName("Frequency" + indexString + "Label");
-            auto frequency = tuning->frequencyAt(rowNumber);
+            auto frequency = roundN(4, tuning->frequencyAt(rowNumber));
             label->setText(juce::String(frequency), juce::NotificationType::dontSendNotification);
             break;
         }
+        case TuningTableHeader::Columns::Cents:
+        {
+            label->setName("Cents" + indexString + "Label");
+            auto cents = roundN(3, tuning->centsFromRoot(rowNumber));
+            label->setText(juce::String(cents), juce::NotificationType::dontSendNotification);
+            break;
         }
+        }
+
+        label->setEnabled(!outOfBounds);
+
     }
 
     return existingComponentToUpdate;
