@@ -82,6 +82,7 @@ std::shared_ptr<FunctionalTuning> TuningFileParser::parseScalaFileDefinition(juc
     }
     auto description = juce::String(sclImport.GetScaleDescription());
 
+    auto vSize = (double)centsTable.size();
     CentsDefinition definition =
     {
         centsTable,
@@ -89,7 +90,7 @@ std::shared_ptr<FunctionalTuning> TuningFileParser::parseScalaFileDefinition(juc
         name,
         description,
         centsTable.getLast(),
-        centsTable.size(),
+        vSize
     };
 
     return std::make_shared<FunctionalTuning>(definition);

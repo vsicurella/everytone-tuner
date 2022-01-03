@@ -289,7 +289,7 @@ public:
 template <typename T>
 static Map<T> LinearMap(int mapRootIndex = 0, T base = 1, T transpose = 0)
 {
-    Map<T>::FunctionDefinition d = 
+    typename Map<T>::FunctionDefinition d =
     { 
         1,             /* size */
         0,             /* start */

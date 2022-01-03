@@ -248,7 +248,7 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     juce::MemoryBlock       buffer(data, (size_t)sizeInBytes);
     juce::MemoryInputStream stream(buffer, false);
     
-    auto state = juce::ValueTree::readFromStream(juce::MemoryInputStream(data, (size_t)sizeInBytes, false));
+    auto state = juce::ValueTree::readFromStream(stream);
 
     juce::Logger::writeToLog("Loading:\n" + state.toXmlString());
 

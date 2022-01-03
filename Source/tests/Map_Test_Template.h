@@ -44,7 +44,7 @@ public:
     {
         String testName;
         typename Map<T>::Definition definition;
-        typename Map<T>* map;
+        Map<T>* map;
 
         const int testTableSize;
         const int testTableStart;
