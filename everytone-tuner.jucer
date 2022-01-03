@@ -2,7 +2,8 @@
 
 <JUCERPROJECT id="dQHHPS" name="Everytone Tuner" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" defines="RUN_MULTIMAPPER_TESTS=1"
-              pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn">
+              pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
+              companyName="Everytone">
   <MAINGROUP id="H8zE4n" name="Everytone Tuner">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
       <FILE id="oMI0GT" name="Common.h" compile="0" resource="0" file="Source/Common.h"/>
