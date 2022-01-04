@@ -82,11 +82,38 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     voiceLimitLabel->setJustificationType(juce::Justification::centredRight);
     voiceLimitLabel->attachToComponent(voiceLimitValueLabel.get(), true);
     addAndMakeVisible(*voiceLimitLabel);
+
+
+    pitchbendRangeValue = std::make_unique<juce::Label>("pitchbendRangeValue");
+    pitchbendRangeValue->setEditable(false, true);
+    addAndMakeVisible(*pitchbendRangeValue);
+    pitchbendRangeValue->onEditorShow = [&]()
+    {
+        auto editor = pitchbendRangeValue->getCurrentTextEditor();
+        if (editor)
+        {
+            auto pitchbendText = pitchbendRangeValue->getText();
+            auto rangeString = juce::StringArray::fromTokens(pitchbendText, false)[1];
+            auto range = rangeString.getDoubleValue() * 2;
+            editor->setText(juce::String(range), juce::NotificationType::dontSendNotification);
+        }
+    };
+    pitchbendRangeValue->onTextChange = [&]()
+    {
+        auto newRange = pitchbendRangeValue->getText().getIntValue();
+        optionsWatchers.call(&OptionsWatcher::pitchbendRangeChanged, newRange);
+    };
+    setPitchbendRangeText(options.pitchbendRange);
+
+    pitchbendRangeLabel = labels.add(new juce::Label("pitchbendLabel", "Pitchbend Range:"));
+    pitchbendRangeLabel->attachToComponent(pitchbendRangeValue.get(), true);
+    addAndMakeVisible(pitchbendRangeLabel);
 }
 
 OptionsPanel::~OptionsPanel()
 {
     labels.clear();
+    pitchbendRangeValue = nullptr;
     voiceLimitValueLabel = nullptr;
     mpeZoneBox = nullptr;
     channelRulesBox = nullptr;
@@ -136,6 +163,14 @@ void OptionsPanel::resized()
     voiceLimitItemMargin.left = voiceLimitLabelWidth + margin;
     rightHalf.items.add(juce::FlexItem(voiceLimitWidth, controlHeight, *voiceLimitValueLabel).withMargin(voiceLimitItemMargin));
 
+
+    auto pitchbendWidth = pitchbendRangeValue->getFont().getStringWidth(pitchbendRangeValue->getText()) + margin;
+    auto pitchbendLabelWidth = pitchbendRangeLabel->getFont().getStringWidth(pitchbendRangeLabel->getText());
+    auto pitchbendItemMargin = controlMargin;
+    pitchbendItemMargin.left = pitchbendLabelWidth + margin;
+    rightHalf.items.add(juce::FlexItem(pitchbendWidth, controlHeight, *pitchbendRangeValue).withMargin(pitchbendItemMargin));
+
+
     auto layoutMargin = juce::FlexItem::Margin(0, margin, 0, margin);
 
     juce::FlexBox flexBox;
@@ -146,4 +181,10 @@ void OptionsPanel::resized()
     flexBox.items.add(juce::FlexItem(halfWidth, h, rightHalf).withMargin(layoutMargin));
 
     flexBox.performLayout(getLocalBounds());
+}
+
+void OptionsPanel::setPitchbendRangeText(int pitchbendRange)
+{
+    auto value = "+/- " + juce::String(pitchbendRange / 2) + " semitones";
+    pitchbendRangeValue->setText(value, juce::NotificationType::dontSendNotification);
 }

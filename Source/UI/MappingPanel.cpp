@@ -71,32 +71,6 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
 	mappingLabel->attachToComponent(linearMappingButton.get(), true);
 	addAndMakeVisible(mappingLabel);
 
-	pitchbendRangeValue = std::make_unique<juce::Label>("pitchbendRangeValue");
-	pitchbendRangeValue->setEditable(false, true);
-	addAndMakeVisible(*pitchbendRangeValue);
-	pitchbendRangeValue->onEditorShow = [&]()
-	{
-		auto editor = pitchbendRangeValue->getCurrentTextEditor();
-		if (editor)
-		{
-			auto pitchbendText = pitchbendRangeValue->getText();
-			auto range = juce::StringArray::fromTokens(pitchbendText, false)[1];
-			editor->setText(range, juce::NotificationType::dontSendNotification);
-		}
-	};
-	pitchbendRangeValue->onTextChange = [&]()
-	{
-		auto newRange = pitchbendRangeValue->getText().getIntValue();
-		optionsWatchers.call(&OptionsWatcher::pitchbendRangeChanged, newRange);
-		setPitchbendRangeText(newRange);
-	};
-	setPitchbendRangeText(options.pitchbendRange / 2);
-
-	auto pitchbendLabel = labels.add(new juce::Label("pitchbendLabel", "Pitchbend Range:"));
-	pitchbendLabel->attachToComponent(pitchbendRangeValue.get(), true);
-	addAndMakeVisible(pitchbendLabel);
-
-
     setMappedTuning(tuningIn);
 }
 
@@ -144,7 +118,6 @@ void MappingPanel::resized()
 	mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *periodicMappingButton));
 
 	mappingBox.items.add(juce::FlexItem(buttonWidth * 2, buttonHeight, mappingRow).withMargin(referenceMargin));
-	mappingBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *pitchbendRangeValue).withMargin(referenceMargin));
 
 	mappingBox.performLayout(getLocalBounds());
 }
@@ -152,12 +125,6 @@ void MappingPanel::resized()
 void MappingPanel::setMappedTuning(MappedTuningTable* tuningIn)
 {
 
-}
-
-void MappingPanel::setPitchbendRangeText(int pitchbendRange)
-{
-    auto value = "+/- " + juce::String(pitchbendRange) + " semitones";
-    pitchbendRangeValue->setText(value, juce::NotificationType::dontSendNotification);
 }
 
 void MappingPanel::mappingTypeButtonClicked()

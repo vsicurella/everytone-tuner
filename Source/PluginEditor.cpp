@@ -172,7 +172,7 @@ void MultimapperAudioProcessorEditor::voiceLimitChanged(int newVoiceLimit)
 void MultimapperAudioProcessorEditor::pitchbendRangeChanged(int pitchbendRange)
 {
     audioProcessor.pitchbendRange(pitchbendRange);
-    //mappingPanel->setPitchbendRangeText();
+    optionsPanel->setPitchbendRangeText(audioProcessor.pitchbendRange());
 }
 
 void MultimapperAudioProcessorEditor::bendModeChanged(Everytone::BendMode newBendMode)

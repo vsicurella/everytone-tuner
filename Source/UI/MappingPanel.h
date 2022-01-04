@@ -24,8 +24,6 @@ class MappingPanel  : public juce::Component, public TuningChanger, public Optio
     std::unique_ptr<juce::TextButton> linearMappingButton;
     std::unique_ptr<juce::TextButton> periodicMappingButton;
 
-    std::unique_ptr<juce::Label> pitchbendRangeValue;
-
     juce::String rootChannelBackup;
     juce::String rootNoteBackup;
     juce::String rootFrequencyBackup;
@@ -47,7 +45,6 @@ public:
 
     void tuningReferenceEdited();
     
-    void setPitchbendRangeText(int pitchbendRange);
     void setMappedTuning(MappedTuningTable* tuningIn);
     
 private:

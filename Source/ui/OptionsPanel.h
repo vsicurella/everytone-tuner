@@ -26,6 +26,8 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    void setPitchbendRangeText(int pitchbendRange);
+
 private:
 
     std::unique_ptr<juce::ComboBox> channelModeBox;
@@ -33,8 +35,10 @@ private:
     std::unique_ptr<juce::ComboBox> bendModeBox;
     std::unique_ptr<juce::ComboBox> mpeZoneBox;
     std::unique_ptr<juce::Label> voiceLimitValueLabel;
+    std::unique_ptr<juce::Label> pitchbendRangeValue;
 
     juce::Label* voiceLimitLabel;
+    juce::Label* pitchbendRangeLabel;
 
     juce::OwnedArray<juce::Label> labels;
 
