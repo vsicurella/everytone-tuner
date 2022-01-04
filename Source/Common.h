@@ -193,3 +193,47 @@ public:
 
     void removeOptionsWatcher(OptionsWatcher* watcher) { optionsWatchers.remove(watcher); }
 };
+
+class LabelMouseHighlight : public juce::Label
+{
+    bool mouseIn = false;
+
+public:
+
+    // Tried to do this with LookAndFeel::drawLabel() but couldn't get it working
+
+    LabelMouseHighlight(const juce::String& componentName = juce::String(), const juce::String& labelText = juce::String())
+        : juce::Label(componentName, labelText) {}
+
+    virtual ~LabelMouseHighlight() {}
+
+    void paint(juce::Graphics& g) override
+    {
+        juce::Label::paint(g);
+
+        if (isMouseOver())
+        {
+            g.setColour(juce::Colours::white.withAlpha(0.15f));
+            g.fillRoundedRectangle(getLocalBounds().toFloat(), getHeight() * 0.125f);
+        }
+        
+    }
+
+    void mouseEnter(const juce::MouseEvent& e) override
+    {
+        if (mouseIn)
+            return;
+
+        repaint();
+        mouseIn = true;
+    }
+
+    void mouseExit(const juce::MouseEvent& e) override
+    {
+        if (mouseIn)
+        {
+            repaint();
+            mouseIn = false;
+        }
+    }
+};

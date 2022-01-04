@@ -69,7 +69,7 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     addAndMakeVisible(*mpeZoneLabel);
 
 
-    voiceLimitValueLabel = std::make_unique<juce::Label>("VoiceLimitValue");
+    voiceLimitValueLabel = std::make_unique<LabelMouseHighlight>("VoiceLimitValue");
     voiceLimitValueLabel->setEditable(true);
     voiceLimitValueLabel->setText(juce::String(options.voiceLimit), juce::NotificationType::dontSendNotification);
     voiceLimitValueLabel->onTextChange = [&]()
@@ -84,7 +84,7 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     addAndMakeVisible(*voiceLimitLabel);
 
 
-    pitchbendRangeValue = std::make_unique<juce::Label>("pitchbendRangeValue");
+    pitchbendRangeValue = std::make_unique<LabelMouseHighlight>("pitchbendRangeValue");
     pitchbendRangeValue->setEditable(false, true);
     addAndMakeVisible(*pitchbendRangeValue);
     pitchbendRangeValue->onEditorShow = [&]()
@@ -113,6 +113,7 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
 OptionsPanel::~OptionsPanel()
 {
     labels.clear();
+
     pitchbendRangeValue = nullptr;
     voiceLimitValueLabel = nullptr;
     mpeZoneBox = nullptr;

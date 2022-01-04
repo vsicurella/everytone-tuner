@@ -14,7 +14,7 @@
 //==============================================================================
 MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuningIn)
 {
-	rootMidiChannelBox.reset(new juce::Label("rootMidiChannelBox", "1"));
+	rootMidiChannelBox.reset(new LabelMouseHighlight("rootMidiChannelBox", "1"));
 	addAndMakeVisible(rootMidiChannelBox.get());
 	rootMidiChannelBox->setEditable(false, true);
 	rootMidiChannelBox->onEditorShow = [&]() { rootChannelBackup = rootMidiChannelBox->getText(); };
@@ -25,7 +25,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
 	rootChannelLabel->attachToComponent(rootMidiChannelBox.get(), true);
 	addAndMakeVisible(rootChannelLabel);
 
-	rootMidiNoteBox.reset(new juce::Label("rootMidiNoteBox", "60"));
+	rootMidiNoteBox.reset(new LabelMouseHighlight("rootMidiNoteBox", "60"));
 	addAndMakeVisible(rootMidiNoteBox.get());
 	rootMidiNoteBox->setEditable(false, true);
 	rootMidiNoteBox->onEditorShow = [&]() { rootNoteBackup = rootMidiNoteBox->getText(); };
@@ -36,7 +36,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
 	rootNoteLabel->attachToComponent(rootMidiNoteBox.get(), true);
 	addAndMakeVisible(rootNoteLabel);
 
-	rootFrequencyBox.reset(new juce::Label("rootFrequencyBox", "263"));
+	rootFrequencyBox.reset(new LabelMouseHighlight("rootFrequencyBox", "263"));
 	addAndMakeVisible(rootFrequencyBox.get());
 	rootFrequencyBox->setEditable(false, true);
 	rootFrequencyBox->onEditorShow = [&]() { rootFrequencyBackup = rootFrequencyBox->getText(); };
@@ -116,7 +116,6 @@ void MappingPanel::resized()
 	mappingRow.justifyContent = juce::FlexBox::JustifyContent::flexStart;
 	mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *linearMappingButton));
 	mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *periodicMappingButton));
-
 	mappingBox.items.add(juce::FlexItem(buttonWidth * 2, buttonHeight, mappingRow).withMargin(referenceMargin));
 
 	mappingBox.performLayout(getLocalBounds());

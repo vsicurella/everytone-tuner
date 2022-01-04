@@ -17,9 +17,9 @@
 */
 class MappingPanel  : public juce::Component, public TuningChanger, public OptionsChanger
 {
-    std::unique_ptr<juce::Label> rootMidiChannelBox;
-    std::unique_ptr<juce::Label> rootMidiNoteBox;
-    std::unique_ptr<juce::Label> rootFrequencyBox;
+    std::unique_ptr<LabelMouseHighlight> rootMidiChannelBox;
+    std::unique_ptr<LabelMouseHighlight> rootMidiNoteBox;
+    std::unique_ptr<LabelMouseHighlight> rootFrequencyBox;
 
     std::unique_ptr<juce::TextButton> linearMappingButton;
     std::unique_ptr<juce::TextButton> periodicMappingButton;

@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h>
 #include "../Common.h"
+#include "../ControlLookAndFeel.h"
 
 //==============================================================================
 /*
@@ -29,13 +30,15 @@ public:
     void setPitchbendRangeText(int pitchbendRange);
 
 private:
+    
+    Everytone::ControlLookAndFeel controlLookAndFeel;
 
     std::unique_ptr<juce::ComboBox> channelModeBox;
     std::unique_ptr<juce::ComboBox> channelRulesBox;
     std::unique_ptr<juce::ComboBox> bendModeBox;
     std::unique_ptr<juce::ComboBox> mpeZoneBox;
-    std::unique_ptr<juce::Label> voiceLimitValueLabel;
-    std::unique_ptr<juce::Label> pitchbendRangeValue;
+    std::unique_ptr<LabelMouseHighlight> voiceLimitValueLabel;
+    std::unique_ptr<LabelMouseHighlight> pitchbendRangeValue;
 
     juce::Label* voiceLimitLabel;
     juce::Label* pitchbendRangeLabel;
