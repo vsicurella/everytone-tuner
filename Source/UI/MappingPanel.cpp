@@ -118,7 +118,7 @@ void MappingPanel::resized()
 	mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *periodicMappingButton));
 	mappingBox.items.add(juce::FlexItem(buttonWidth * 2, buttonHeight, mappingRow).withMargin(referenceMargin));
 
-	mappingBox.performLayout(getLocalBounds());
+	mappingBox.performLayout(getLocalBounds().withRight(w / 2));
 }
 
 void MappingPanel::setMappedTuning(MappedTuningTable* tuningIn)
