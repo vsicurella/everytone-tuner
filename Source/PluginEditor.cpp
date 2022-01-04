@@ -13,7 +13,7 @@
 MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    tuningBackup = std::make_unique<MappedTuningTable>(*audioProcessor.currentTarget());
+    //tuningBackup = std::make_unique<MappedTuningTable>(*audioProcessor.currentTarget());
 
     auto currentTarget = audioProcessor.currentTarget();
 
@@ -116,7 +116,7 @@ void MultimapperAudioProcessorEditor::targetTuningChanged(const std::shared_ptr<
     infoBar->setDisplayedTuning(target.get());
     //intervalListModel->setTuning(target.get());
     overviewPanel->setTuningDisplayed(target.get());
-    tuningBackup = std::make_unique<MappedTuningTable>(*audioProcessor.currentTarget());
+    //tuningBackup = std::make_unique<MappedTuningTable>(*audioProcessor.currentTarget());
 }
 
 void MultimapperAudioProcessorEditor::targetDefinitionLoaded(TuningChanger* changer, CentsDefinition definition)

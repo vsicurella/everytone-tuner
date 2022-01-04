@@ -103,7 +103,7 @@ private:
     // access the processor object that created it.
     MultimapperAudioProcessor& audioProcessor;
 
-    std::unique_ptr<MappedTuningTable> tuningBackup;
+    //std::unique_ptr<MappedTuningTable> tuningBackup;
 
     juce::Component* contentComponent = nullptr;
 
