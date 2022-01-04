@@ -52,12 +52,13 @@ std::shared_ptr<TuningTable> MappedTuningTable::setRootFrequency(double frequenc
         auto functional = dynamic_cast<FunctionalTuning*>(tuning.get());
         if (functional != nullptr)
         {
-            auto newTuning = std::shared_ptr<FunctionalTuning>(functional);
-            newTuning->setRootFrequency(frequency);
+            auto definition = functional->getDefinition();
+            definition.rootFrequency = frequency;
+            auto newTuning = std::make_shared<FunctionalTuning>(definition);
             return newTuning;
         }
 
-        auto copy = std::shared_ptr<TuningTable>(tuning);
+        auto copy = std::make_shared<TuningTable>(*tuning);
         copy->setRootFrequency(frequency);
         return copy;
     }
