@@ -279,10 +279,10 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     }
 
     auto optionsTree = state.getChildWithName(Everytone::ID::Options);
-    Everytone::Options options;
+    Everytone::Options loadedOptions;
     if (optionsTree.isValid())
     {
-        options = Everytone::Options::fromValueTree(optionsTree);
+        loadedOptions = Everytone::Options::fromValueTree(optionsTree);
     }
 
     if (targetMapping == nullptr)
@@ -290,7 +290,7 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     else
         tunerController->setTunings(sourceTuning, sourceMapping, targetTuning, targetMapping);
 
-    setOptions(options);
+    options(loadedOptions);
 }
 
 //==============================================================================
@@ -443,47 +443,47 @@ void MultimapperAudioProcessor::setTargetMappedTuningRoot(MappedTuningTable::Roo
 //    tunerController->setNoteMapping(&map);
 //}
 
-void MultimapperAudioProcessor::setAutoMappingType(Everytone::MappingType type)
+void MultimapperAudioProcessor::autoMappingType(Everytone::MappingType type)
 {
     tunerController->setMappingType(type);
 }
 
-void MultimapperAudioProcessor::setMappingMode(Everytone::MappingMode mode)
+void MultimapperAudioProcessor::mappingMode(Everytone::MappingMode mode)
 {
     tunerController->setMappingMode(mode);
 }
 
-void MultimapperAudioProcessor::setChannelMode(Everytone::ChannelMode mode)
+void MultimapperAudioProcessor::channelMode(Everytone::ChannelMode mode)
 {
     voiceController->setChannelMode(mode);
 }
 
-void MultimapperAudioProcessor::setMpeZone(Everytone::MpeZone zone)
+void MultimapperAudioProcessor::mpeZone(Everytone::MpeZone zone)
 {
     voiceController->setMpeZone(zone);
 }
 
-void MultimapperAudioProcessor::setVoiceLimit(int voiceLimit)
+void MultimapperAudioProcessor::voiceLimit(int voiceLimit)
 {
     voiceController->setVoiceLimit(voiceLimit);
 }
 
-void MultimapperAudioProcessor::setPitchbendRange(int pitchbendRange)
+void MultimapperAudioProcessor::pitchbendRange(int pitchbendRange)
 {
     tunerController->setPitchbendRange(pitchbendRange);
 }
 
-void MultimapperAudioProcessor::setBendMode(Everytone::BendMode bendMode)
+void MultimapperAudioProcessor::bendMode(Everytone::BendMode bendMode)
 {
     voiceInterpolator->setBendMode(bendMode);
 }
 
-void MultimapperAudioProcessor::setOptions(Everytone::Options optionsIn)
+void MultimapperAudioProcessor::options(Everytone::Options optionsIn)
 {
-    setAutoMappingType(optionsIn.mappingType);
-    setMappingMode(optionsIn.mappingMode);
-    setChannelMode(optionsIn.channelMode);
-    setBendMode(optionsIn.bendMode);
-    setVoiceLimit(optionsIn.voiceLimit);
-    setPitchbendRange(optionsIn.pitchbendRange);
+    autoMappingType(optionsIn.mappingType);
+    mappingMode(optionsIn.mappingMode);
+    channelMode(optionsIn.channelMode);
+    bendMode(optionsIn.bendMode);
+    voiceLimit(optionsIn.voiceLimit);
+    pitchbendRange(optionsIn.pitchbendRange);
 }

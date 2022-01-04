@@ -141,22 +141,22 @@ void MultimapperAudioProcessorEditor::targetMappedTuningRootChanged(TuningChange
 
 void MultimapperAudioProcessorEditor::mappingTypeChanged(Everytone::MappingType type)
 {
-    audioProcessor.setAutoMappingType(type);
+    audioProcessor.autoMappingType(type);
 }
 
 void MultimapperAudioProcessorEditor::mappingModeChanged(Everytone::MappingMode mode)
 {
-    audioProcessor.setMappingMode(mode);
+    audioProcessor.mappingMode(mode);
 }
 
 void MultimapperAudioProcessorEditor::channelModeChanged(Everytone::ChannelMode newChannelMode)
 {
-    audioProcessor.setChannelMode(newChannelMode);
+    audioProcessor.channelMode(newChannelMode);
 }
 
 void MultimapperAudioProcessorEditor::mpeZoneChanged(Everytone::MpeZone zone)
 {
-    audioProcessor.setMpeZone(zone);
+    audioProcessor.mpeZone(zone);
 }
 
 void MultimapperAudioProcessorEditor::midiModeChanged(Everytone::MidiMode newMidiMode)
@@ -166,18 +166,18 @@ void MultimapperAudioProcessorEditor::midiModeChanged(Everytone::MidiMode newMid
 
 void MultimapperAudioProcessorEditor::voiceLimitChanged(int newVoiceLimit)
 {
-    audioProcessor.setVoiceLimit(newVoiceLimit);
+    audioProcessor.voiceLimit(newVoiceLimit);
 }
 
 void MultimapperAudioProcessorEditor::pitchbendRangeChanged(int pitchbendRange)
 {
-    // User inputs bipolar form, so multiply for absolute range
-    audioProcessor.setPitchbendRange(pitchbendRange * 2);
+    audioProcessor.pitchbendRange(pitchbendRange);
+    //mappingPanel->setPitchbendRangeText();
 }
 
 void MultimapperAudioProcessorEditor::bendModeChanged(Everytone::BendMode newBendMode)
 {
-    audioProcessor.setBendMode(newBendMode);
+    audioProcessor.bendMode(newBendMode);
 }
 
 juce::ApplicationCommandTarget* MultimapperAudioProcessorEditor::getFirstCommandTarget(juce::CommandID commandID)

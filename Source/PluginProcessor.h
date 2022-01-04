@@ -84,8 +84,6 @@ public:
 
     const MappedTuningTable* currentTarget() const { return tunerController->readTuningTarget(); }
 
-    Everytone::Options options() const;
-
     //==============================================================================
 
     void addTunerControllerWatcher(TunerController::Watcher* watcher) { tunerController->addWatcher(watcher); }
@@ -105,21 +103,29 @@ public:
 
     //==============================================================================
 
-    void setAutoMappingType(Everytone::MappingType type);
+    Everytone::Options options() const;
+    void options(Everytone::Options optionsIn);
 
-    void setMappingMode(Everytone::MappingMode mode);
+    Everytone::MappingType autoMappingType() const { return tunerController->getMappingType(); }
+    void autoMappingType(Everytone::MappingType type);
 
-    void setChannelMode(Everytone::ChannelMode mode);
+    Everytone::MappingMode mappingMode() const { return tunerController->getMappingMode(); }
+    void mappingMode(Everytone::MappingMode mode);
 
-    void setMpeZone(Everytone::MpeZone zone);
+    Everytone::ChannelMode channelMode() const { return voiceController->getChannelMode(); }
+    void channelMode(Everytone::ChannelMode mode);
 
-    void setVoiceLimit(int voiceLimit);
+    Everytone::MpeZone mpeZone() const { return voiceController->getMpeZone(); }
+    void mpeZone(Everytone::MpeZone zone);
 
-    void setPitchbendRange(int pitchbendRange);
+    int voiceLimit() const { return voiceController->getVoiceLimit(); }
+    void voiceLimit(int voiceLimit);
 
-    void setBendMode(Everytone::BendMode bendMode);
+    int pitchbendRange() const { return tunerController->getPitchbendRange(); }
+    void pitchbendRange(int pitchbendRange);
 
-    void setOptions(Everytone::Options optionsIn);
+    Everytone::BendMode bendMode() const { return voiceInterpolator->getBendMode(); }
+    void bendMode(Everytone::BendMode bendMode);
 
     //==============================================================================
 
