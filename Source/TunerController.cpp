@@ -143,7 +143,7 @@ void TunerController::setTargetMappedTuningRoot(MappedTuningTable::Root root)
     if (tuningChanged)
     {
         auto currentTuningIndex = tuning->getRootIndex();
-        tuning = currentTuningSource->setRootFrequency(root.frequency, true);
+        tuning = currentTuningTarget->setRootFrequency(root.frequency, true);
         mappingChanged = currentTuningIndex != tuning->getRootIndex();
     }
 
