@@ -95,6 +95,7 @@ public:
     void setTuningSource(std::shared_ptr<TuningTable> sourceTuning);
     void setTuningTarget(std::shared_ptr<TuningTable> targetTuning);
 
+    void setTargetTuningReference(MappedTuningTable::FrequencyReference reference);
     void setTargetTuningRootFrequency(double frequency);
     void setTargetMappingRoot(TuningTableMap::Root root);
     void setTargetMappedTuningRoot(MappedTuningTable::Root root);

@@ -12,6 +12,11 @@
 
 #include "./Map.h"
 
+static int midiIndex(int midiChannel, int midiNote)
+{
+    return (midiChannel - 1) * 128 + midiNote;
+}
+
 struct MappedNote
 {
     int inputChannel = 0;  // MIDI input channel
@@ -33,6 +38,13 @@ public:
     {
         int midiChannel = 1;
         int midiNote = 60;
+
+        bool operator==(const TuningTableMap::Root& root) const
+        {
+            return midiChannel == root.midiChannel && midiNote == root.midiNote;
+        }
+
+        bool operator!=(const TuningTableMap::Root& root) const { return operator==(root); }
     };
 
     // Constructor parameters for TuningTableMap
@@ -41,26 +53,27 @@ public:
     {
         Root root;
         Map<int> map;
+        int transpose = 0;
     };
 
 protected:
 
     // MIDI Channel and Note combine to set the mapping root
+    // Metadata from the map construction
     int rootMidiChannel;
     int rootMidiNote;
 
-    // Tuning table index to align with map root
-    //int tuningRootIndex;
-
     // MIDI Note to Tuning Table index map
     std::unique_ptr<Map<int>> map;
+
+    // Number of steps to offset the output by, 
+    // best used when Tuning Reference and Mapping Root aren't the same
+    int transpose = 0;
 
     // Cached map for Multichannel MIDI range
     int table[2048];
 
 private:
-
-    int midiIndex(int midiChannel, int midiNote) const;
 
     void rebuildTable();
 
@@ -78,6 +91,8 @@ public:
     int getRootMidiNote() const { return rootMidiNote; }
     int getRootMidiIndex() const { return midiIndex(rootMidiChannel, rootMidiNote); }
 
+    Root getRoot() const;
+
     int period() const;
 
     const Map<int>* midiIndexMap() const;
@@ -86,15 +101,20 @@ public:
 
     MappedNote getMappedNote(int channel, int note) const;
 
+    //int periodsAt(int channel, int note);
+
+
+    int getTransposition() const;
+    void setTransposition(int transposeIn);
+    std::shared_ptr<TuningTableMap> withTransposition(int transposeIn);
+
+    Definition getDefinition() const;
+
     int getPatternIndex(int channel, int note);
 
     int tableAt(int midiNoteIndex) const;
 
-    //int periodsAt(int channel, int note);
 
-    Root getRoot() const;
-
-    Definition getDefinition() const;
 
 public:
 

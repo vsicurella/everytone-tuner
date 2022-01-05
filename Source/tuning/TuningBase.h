@@ -18,6 +18,7 @@ protected:
 	juce::String name;
 	juce::String description;
 
+	// Passing in the rootIndex should give you the rootFrequency
 	int rootIndex;
 	double rootFrequency;
 
@@ -38,7 +39,6 @@ public:
 	virtual int getRootIndex() const { return rootIndex; }
 	virtual double getRootFrequency() const { return rootFrequency; }
 	virtual double getRootMts() const { return frequencyToMTS(rootFrequency); }
-	//virtual int getTuningSize() const = 0;
 
 	virtual void setName(juce::String nameIn) { name = nameIn; };
 	virtual void setDescription(juce::String descIn) { description = descIn; }

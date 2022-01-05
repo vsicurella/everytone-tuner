@@ -90,6 +90,18 @@ void TunerController::remapTarget(const TuningTableMap::Definition& mapDefinitio
     setTargetTuning(currentTuningTarget->shareTuning(), newMapping);
 }
 
+void TunerController::setSourceReference(MappedTuningTable::FrequencyReference reference)
+{
+    auto root = MappedTuningTable::Root { reference, currentTuningSource->getRootFrequency(), sourceMapRoot };
+    setSourceMappedTuningRoot(root);
+}
+
+void TunerController::setTargetReference(MappedTuningTable::FrequencyReference reference)
+{
+    auto root = MappedTuningTable::Root { reference, currentTuningTarget->getRootFrequency(), targetMapRoot };
+    setTargetMappedTuningRoot(root);
+}
+
 void TunerController::setSourceRootFrequency(double frequency)
 {
     setSourceMappedTuningRoot({ sourceMapRoot.midiChannel, sourceMapRoot.midiNote, frequency });
@@ -112,32 +124,38 @@ void TunerController::setTargetMapRoot(TuningTableMap::Root root)
 
 void TunerController::setSourceMappedTuningRoot(MappedTuningTable::Root root)
 {
+    // These would be great elsewhere, but at the moment TuningTableMap can't recreate itself with a different root
+
     bool tuningChanged = currentTuningSource->getRootFrequency() != root.frequency;
-    bool mappingChanged = sourceMapRoot.midiChannel != root.midiChannel || sourceMapRoot.midiNote != root.midiNote;
-    
+    bool mappingChanged = sourceMapRoot != root.mapping;
+
+    sourceMapRoot = root.mapping;
+    sourceReference = root.tuningReference;
+
     auto tuning = currentTuningSource->shareTuning();
     if (tuningChanged)
     {
-        auto currentRootIndex = tuning->getRootIndex();
+        auto currentTuningIndex = tuning->getRootIndex();
         tuning = currentTuningSource->setRootFrequency(root.frequency, true);
-        mappingChanged = currentRootIndex != tuning->getRootIndex();
+        mappingChanged = currentTuningIndex != tuning->getRootIndex();
     }
 
     auto mapping = currentTuningSource->shareMapping();
     if (mappingChanged)
-    {
-        sourceMapRoot = { root.midiChannel, root.midiNote };
         mapping = mapForTuning(tuning.get(), false);
-    }
 
     if (mappingChanged || tuningChanged)
-        setTargetTuning(tuning, mapping);
+        setSourceTuning(tuning, mapping);
 }
 
 void TunerController::setTargetMappedTuningRoot(MappedTuningTable::Root root)
 {
     bool tuningChanged = currentTuningTarget->getRootFrequency() != root.frequency;
-    bool mappingChanged = targetMapRoot.midiChannel != root.midiChannel || targetMapRoot.midiNote != root.midiNote;
+    bool mappingChanged = targetMapRoot != root.mapping || 
+                          currentTuningTarget->getFrequencyReference() != root.tuningReference;
+
+    targetMapRoot = root.mapping;
+    targetReference = root.tuningReference;
 
     auto tuning = currentTuningTarget->shareTuning();
     if (tuningChanged)
@@ -149,10 +167,7 @@ void TunerController::setTargetMappedTuningRoot(MappedTuningTable::Root root)
 
     auto mapping = currentTuningTarget->shareMapping();
     if (mappingChanged)
-    {
-        targetMapRoot = { root.midiChannel, root.midiNote };
         mapping = mapForTuning(tuning.get(), true);
-    }
 
     if (mappingChanged || tuningChanged)
         setTargetTuning(tuning, mapping);
@@ -191,23 +206,18 @@ void TunerController::setPitchbendRange(int pitchbendRangeIn)
     juce::Logger::writeToLog("Pitchbend range of " + juce::String(pitchbendRangeIn) + " was ignored.");
 }
 
-void TunerController::loadSourceTuning(const TuningTable::Definition& definition, bool updateTuner)
-{
-    auto newTuning = std::make_shared<TuningTable>(definition);
-    setSourceTuning(newTuning, mapForTuning(newTuning.get(), false), updateTuner);
-}
-
-void TunerController::loadTargetTuning(const TuningTable::Definition& definition, bool updateTuner)
-{
-    auto newTuning = std::make_shared<TuningTable>(definition);
-    setTargetTuning(newTuning, mapForTuning(newTuning.get(), true), updateTuner);
-}
-
 void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner)
 {
-    sourceMapRoot = mapping->getRoot();
-    currentTuningSource = std::make_shared<MappedTuningTable>(tuning, mapping);
-    juce::Logger::writeToLog("Loaded new source tuning: " + tuning->getDescription());
+    auto mappedSource = std::make_shared<MappedTuningTable>(tuning, mapping);
+    setSource(mappedSource, updateTuner);
+}
+
+void TunerController::setSource(std::shared_ptr<MappedTuningTable>& mappedTuning, bool updateTuner)
+{
+    sourceReference = mappedTuning->getFrequencyReference();
+    sourceMapRoot = mappedTuning->getMappingRoot();
+    currentTuningSource = mappedTuning;
+    juce::Logger::writeToLog("Loaded new source tuning: " + currentTuningSource->getDescription());
 
     if (updateTuner)
     {
@@ -218,9 +228,16 @@ void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, std::
 
 void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner)
 {
-    targetMapRoot = mapping->getRoot();
-    currentTuningTarget = std::make_shared<MappedTuningTable>(tuning, mapping);
-    juce::Logger::writeToLog("Loaded new target tuning: " + tuning->getDescription());
+    auto mappedTarget = std::make_shared<MappedTuningTable>(tuning, mapping, targetReference);
+    setTarget(mappedTarget, updateTuner);
+}
+
+void TunerController::setTarget(std::shared_ptr<MappedTuningTable>& mappedTuning, bool updateTuner)
+{
+    targetReference = mappedTuning->getFrequencyReference();
+    targetMapRoot = mappedTuning->getMappingRoot();
+    currentTuningTarget = mappedTuning;
+    juce::Logger::writeToLog("Loaded new target tuning: " + currentTuningSource->getDescription());
 
     if (updateTuner)
     {

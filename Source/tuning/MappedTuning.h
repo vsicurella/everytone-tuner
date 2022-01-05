@@ -21,20 +21,43 @@ class MappedTuningTable : public TuningTableBase
 
 public:
 
+    struct FrequencyReference
+    {
+        int midiChannel = -1;
+        int midiNote = -1;
+
+        bool isInvalid() const
+        {
+            return midiChannel < 1 || midiChannel > 16 || midiNote < 0 || midiNote > 127;
+        }
+
+        bool operator==(const FrequencyReference& reference) const
+        {
+            return midiChannel == reference.midiChannel
+                && midiNote == reference.midiNote;
+        }
+
+        bool operator!=(const FrequencyReference& reference) const { return !operator==(reference); }
+    };
+
     struct Root
     {
-        int midiChannel = 1;
-        int midiNote = 69;
-        double frequency = 440.0;
+        FrequencyReference tuningReference;
+        double frequency = 261.6255653;
+        TuningTableMap::Root mapping;
     };
+
+    static int getTranspositionForReference(TuningTableMap::Root root, FrequencyReference reference, int tuningTableSize);
 
 private:
 
-    int midiIndex(int note, int channelIndex) { return 128 * channelIndex + note; }
+    FrequencyReference reference;
+
+    void alignMappingWithReference();
 
 public:
     
-    MappedTuningTable(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping);
+    MappedTuningTable(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, FrequencyReference reference = FrequencyReference());
     MappedTuningTable(const MappedTuningTable& mappedTuning);
     ~MappedTuningTable();
 
@@ -47,14 +70,18 @@ public:
     std::shared_ptr<TuningTable> shareTuning() const { return tuning; }
 
     std::shared_ptr<TuningTableMap> shareMapping() const { return mapping; }
+    
+    MappedTuningTable::FrequencyReference getFrequencyReference() const { return reference; }
+
+    TuningTableMap::Root getMappingRoot() const { return mapping->getRoot(); }
 
     MappedTuningTable::Root getRoot() const
     {
         MappedTuningTable::Root root =
         {
-            mapping->getRootMidiChannel(),
-            mapping->getRootMidiNote(),
-            tuning->getRootFrequency()
+            reference,
+            tuning->getRootFrequency(),
+            mapping->getRoot()
         };
         return root;
     }
@@ -68,6 +95,7 @@ public:
     virtual double frequencyAt(int midiNote, int midiChannel) const;
 
     virtual double mtsAt(int midiNote, int midiChannel) const;
+
 
     // TuningTableBase implementation
 
@@ -85,6 +113,7 @@ public:
 
     virtual juce::Array<double> getFrequencyTable() const override;
     virtual juce::Array<double> getMtsTable() const override;
+
 
     // TuningBase implementation
 

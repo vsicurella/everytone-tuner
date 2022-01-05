@@ -26,6 +26,10 @@ public:
     // Used with a new tuning in Manual-Mapping mode
     virtual void sourceMappedTuningLoaded(TuningChanger* changer, CentsDefinition tuningDefinition, TuningTableMap::Definition mapDefinition) {}
     virtual void targetMappedTuningLoaded(TuningChanger* changer, CentsDefinition tuningDefinition, TuningTableMap::Definition mapDefinition) {}
+    
+    // Used when a tuning note reference changed
+    virtual void sourceTuningReferenceChanged(TuningChanger* changer, MappedTuningTable::FrequencyReference reference) {}
+    virtual void targetTuningReferenceChanged(TuningChanger* changer, MappedTuningTable::FrequencyReference reference) {}
 
     // Used when only the tuning's root frequency changes - mapping stays the same in either Auto or Manual mode
     virtual void sourceRootFrequencyChanged(TuningChanger* changer, double frequency) {}

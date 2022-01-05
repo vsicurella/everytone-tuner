@@ -32,6 +32,9 @@ private:
     TuningTableMap::Root sourceMapRoot;
     TuningTableMap::Root targetMapRoot;
 
+    MappedTuningTable::FrequencyReference sourceReference;
+    MappedTuningTable::FrequencyReference targetReference;
+
     std::shared_ptr<MappedTuningTable> currentTuningSource;
     std::shared_ptr<MappedTuningTable> currentTuningTarget;
 
@@ -76,6 +79,7 @@ public:
     void removeWatcher(Watcher* watcher) { watchers.remove(watcher); }
     void clearWatchers() { watchers.clear(); }
 
+
     // Tuning Setters
 
     void setSourceTuning(std::shared_ptr<TuningTable> tuning);
@@ -88,11 +92,14 @@ public:
     void setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
         std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping);
 
-    
+
     // Mutators
 
     void remapSource(const TuningTableMap::Definition& mapDefinition);
     void remapTarget(const TuningTableMap::Definition& mapDefinition);
+
+    void setSourceReference(MappedTuningTable::FrequencyReference reference);
+    void setTargetReference(MappedTuningTable::FrequencyReference reference);
 
     void setSourceRootFrequency(double frequency);
     void setTargetRootFrequency(double frequency);
@@ -115,11 +122,11 @@ private:
 
     std::shared_ptr<TuningTableMap> mapForTuning(const TuningTable* tuning, bool isTarget);
 
-    void loadSourceTuning(const TuningTable::Definition& definition, bool updateTuner);
-    void loadTargetTuning(const TuningTable::Definition& definition, bool updateTuner);
-
     void setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner);
+    void setSource(std::shared_ptr<MappedTuningTable>& mappedTuning, bool updateTuner);
+
     void setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner);
+    void setTarget(std::shared_ptr<MappedTuningTable>& mappedTuning, bool updateTuner);
 
     void setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
                     std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping, bool sendChangeMessages);

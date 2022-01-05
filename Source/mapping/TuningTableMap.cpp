@@ -34,17 +34,13 @@ void TuningTableMap::operator=(const TuningTableMap& mapToCopy)
     rebuildTable();
 }
 
-int TuningTableMap::midiIndex(int midiChannel, int midiNote) const 
-{ 
-    return (midiChannel - 1) * 128 + midiNote; 
-}
-
 void TuningTableMap::rebuildTable()
 {
 
     for (int i = 0; i < 2048; i++)
     {
-        table[i] = map->at(i);
+        int index = mod(i + transpose, 2048);
+        table[i] = map->at(index);
     }
 }
 
@@ -107,12 +103,31 @@ TuningTableMap::Root TuningTableMap::getRoot() const
     return Root { rootMidiChannel, rootMidiNote };
 }
 
+int TuningTableMap::getTransposition() const
+{
+    return transpose;
+}
+
+void TuningTableMap::setTransposition(int transposeIn)
+{
+    transpose = transposeIn;
+    rebuildTable();
+}
+
+std::shared_ptr<TuningTableMap> TuningTableMap::withTransposition(int transposeIn)
+{
+    auto definition = getDefinition();
+    definition.transpose = transposeIn;
+    return std::make_shared<TuningTableMap>(definition);
+}
+
 TuningTableMap::Definition TuningTableMap::getDefinition() const
 {
     TuningTableMap::Definition definition =
     {
         TuningTableMap::Root { rootMidiChannel, rootMidiNote },
-        *map
+        *map,
+        transpose
     };
     return definition;
 }

@@ -124,9 +124,14 @@ void MultimapperAudioProcessorEditor::targetDefinitionLoaded(TuningChanger* chan
     commitTuning(definition);   
 }
 
-void MultimapperAudioProcessorEditor::targetMappedTuningLoaded(TuningChanger* changer, CentsDefinition tuningDefinition, TuningTableMap::Definition mapDefinition)
+//void MultimapperAudioProcessorEditor::targetMappedTuningLoaded(TuningChanger* changer, CentsDefinition tuningDefinition, TuningTableMap::Definition mapDefinition)
+//{
+//    
+//}
+
+void MultimapperAudioProcessorEditor::targetReferenceChanged(TuningChanger* changer, MappedTuningTable::FrequencyReference reference)
 {
-    
+    audioProcessor.setTargetTuningReference(reference);
 }
 
 void MultimapperAudioProcessorEditor::targetRootFrequencyChanged(TuningChanger* changer, double frequency)

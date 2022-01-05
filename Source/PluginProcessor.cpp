@@ -423,6 +423,11 @@ void MultimapperAudioProcessor::setTuningTarget(std::shared_ptr<TuningTable> tar
     tunerController->setTargetTuning(targetTuning);
 }
 
+void MultimapperAudioProcessor::setTargetTuningReference(MappedTuningTable::FrequencyReference reference)
+{
+    tunerController->setTargetReference(reference);
+}
+
 void MultimapperAudioProcessor::setTargetTuningRootFrequency(double frequency)
 {
     tunerController->setTargetRootFrequency(frequency);
