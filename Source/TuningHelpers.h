@@ -248,7 +248,11 @@ static juce::ValueTree mappedTuningToValueTree(const MappedTuningTable* mappedTu
     auto tuningTree = tuningToValueTree(mappedTuning->getTuning());
     auto mappingTree = tuningTableMapToValueTree(mappedTuning->getMapping());
 
+    auto mappedRoot = mappedTuning->getRoot();
+
     auto tree = juce::ValueTree(name);
+    tree.setProperty(Everytone::ID::ReferenceMidiChannel, mappedRoot.tuningReference.midiChannel, nullptr);
+    tree.setProperty(Everytone::ID::ReferenceMidiNote, mappedRoot.tuningReference.midiNote, nullptr);
     tree.addChild(tuningTree, 0, nullptr);
     tree.addChild(mappingTree, 1, nullptr);
     return tree;

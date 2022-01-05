@@ -46,8 +46,11 @@ TunerController::~TunerController()
 
 }
 
-void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning)
+void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, bool setReference, MappedTuningTable::FrequencyReference reference)
 {
+    if (setReference)
+        sourceReference = reference;
+
     setSourceTuning(tuning, mapForTuning(tuning.get(), false), true);
 }
 
@@ -56,13 +59,28 @@ void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, std::
     setSourceTuning(tuning, mapping, true);
 }
 
-void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning)
+void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, MappedTuningTable::FrequencyReference sourceReferenceIn)
 {
+    sourceReference = sourceReferenceIn;
+    setSourceTuning(tuning, mapping, true);
+}
+
+void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, bool setReference, MappedTuningTable::FrequencyReference reference)
+{
+    if (setReference)
+        targetReference = reference;
+
     setTargetTuning(tuning, mapForTuning(tuning.get(), true), true);
 }
 
 void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping)
 {
+    setTargetTuning(tuning, mapping, true);
+}
+
+void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, MappedTuningTable::FrequencyReference targetReferenceIn)
+{
+    targetReference = targetReferenceIn;
     setTargetTuning(tuning, mapping, true);
 }
 
@@ -72,9 +90,25 @@ void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, std:
                targetTuning, mapForTuning(targetTuning.get(), true), true);
 }
 
-void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
-    std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping)
+void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, MappedTuningTable::FrequencyReference sourceReferenceIn,
+                                 std::shared_ptr<TuningTable> targetTuning, MappedTuningTable::FrequencyReference targetReferenceIn)
 {
+    sourceReference = sourceReferenceIn;
+    targetReference = targetReferenceIn;
+    setTunings(sourceTuning, targetTuning);
+}
+
+void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
+                                 std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping)
+{
+    setTunings(sourceTuning, sourceMapping, targetTuning, targetMapping, true);
+}
+
+void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping, MappedTuningTable::FrequencyReference sourceReferenceIn,
+                                 std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping, MappedTuningTable::FrequencyReference targetReferenceIn)
+{
+    sourceReference = sourceReferenceIn;
+    targetReference = targetReferenceIn;
     setTunings(sourceTuning, sourceMapping, targetTuning, targetMapping, true);
 }
 

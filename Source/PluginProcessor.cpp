@@ -225,20 +225,16 @@ void MultimapperAudioProcessor::getStateInformation (juce::MemoryBlock& destData
     //auto sourceNode = tuningToValueTree(*midiBrain->getTuningSource(), Everytone::ID::TuningSource);
     //state.addChild(sourceNode, -1, nullptr);
     
-    // Some hosts call this on initialization
-    if (tunerController.get() != nullptr && voiceController.get() != nullptr)
-    {
-        auto targetNode = mappedTuningToValueTree(tunerController->readTuningTarget(), Everytone::ID::TuningTarget);
-        state.addChild(targetNode, 0, nullptr);
+    auto targetNode = mappedTuningToValueTree(tunerController->readTuningTarget(), Everytone::ID::TuningTarget);
+    state.addChild(targetNode, 0, nullptr);
 
-        auto optionsNode = options().toValueTree();
-        state.addChild(optionsNode, -1, nullptr);
+    auto optionsNode = options().toValueTree();
+    state.addChild(optionsNode, -1, nullptr);
 
-        juce::Logger::writeToLog("Saved:\n" + state.toXmlString());
+    juce::Logger::writeToLog("Saved:\n" + state.toXmlString());
 
-        juce::MemoryOutputStream stream(destData, false);
-        state.writeToStream(stream);
-    }
+    juce::MemoryOutputStream stream(destData, false);
+    state.writeToStream(stream);
 }
 
 void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -262,9 +258,11 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     // For now, always load standard source mapping
     auto sourceTuning = FunctionalTuning::StandardTuning();
     auto sourceMapping = std::make_shared<TuningTableMap>(TuningTableMap::StandardMappingDefinition());
+    MappedTuningTable::FrequencyReference sourceReference;
 
     std::shared_ptr<TuningTable> targetTuning;
     std::shared_ptr<TuningTableMap> targetMapping;
+    MappedTuningTable::FrequencyReference targetReference;
 
     auto targetTree = state.getChildWithName(Everytone::ID::TuningTarget);
     if (targetTree.isValid())
@@ -276,6 +274,12 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
 
         auto mapTree = targetTree.getChildWithName(Everytone::ID::TuningTableMidiMap);
         targetMapping = constructTuningTableMapFromValueTree(mapTree);
+
+        if (targetTree.hasProperty(Everytone::ID::ReferenceMidiChannel))
+            targetReference.midiChannel = (int)targetTree[Everytone::ID::ReferenceMidiChannel];
+
+        if (targetTree.hasProperty(Everytone::ID::ReferenceMidiNote))
+            targetReference.midiNote = (int)targetTree[Everytone::ID::ReferenceMidiNote];
     }
 
     auto optionsTree = state.getChildWithName(Everytone::ID::Options);
@@ -286,9 +290,9 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
     }
 
     if (targetMapping == nullptr)
-        tunerController->setTunings(sourceTuning, targetTuning);
+        tunerController->setTunings(sourceTuning, sourceReference, targetTuning, targetReference);
     else
-        tunerController->setTunings(sourceTuning, sourceMapping, targetTuning, targetMapping);
+        tunerController->setTunings(sourceTuning, sourceMapping, sourceReference, targetTuning, targetMapping, targetReference);
 
     options(loadedOptions);
 }

@@ -82,15 +82,24 @@ public:
 
     // Tuning Setters
 
-    void setSourceTuning(std::shared_ptr<TuningTable> tuning);
+    void setSourceTuning(std::shared_ptr<TuningTable> tuning, bool setReference = false, MappedTuningTable::FrequencyReference reference = MappedTuningTable::FrequencyReference());
     void setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping);
+    void setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, MappedTuningTable::FrequencyReference sourceReference);
 
-    void setTargetTuning(std::shared_ptr<TuningTable> tuning);
+    void setTargetTuning(std::shared_ptr<TuningTable> tuning, bool setReference = false, MappedTuningTable::FrequencyReference reference = MappedTuningTable::FrequencyReference());
     void setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping);
+    void setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, MappedTuningTable::FrequencyReference targetReference);
 
     void setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTable> targetTuning);
+    void setTunings(std::shared_ptr<TuningTable> sourceTuning, MappedTuningTable::FrequencyReference sourceReference,
+                    std::shared_ptr<TuningTable> targetTuning, MappedTuningTable::FrequencyReference targetReference);
+
+
     void setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
-        std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping);
+                    std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping);
+
+    void setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping, MappedTuningTable::FrequencyReference sourceReference,
+                    std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping, MappedTuningTable::FrequencyReference targetReference);
 
 
     // Mutators
