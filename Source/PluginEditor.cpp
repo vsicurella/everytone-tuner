@@ -129,7 +129,7 @@ void MultimapperAudioProcessorEditor::targetDefinitionLoaded(TuningChanger* chan
 //    
 //}
 
-void MultimapperAudioProcessorEditor::targetReferenceChanged(TuningChanger* changer, MappedTuningTable::FrequencyReference reference)
+void MultimapperAudioProcessorEditor::targetTuningReferenceChanged(TuningChanger* changer, MappedTuningTable::FrequencyReference reference)
 {
     audioProcessor.setTargetTuningReference(reference);
 }

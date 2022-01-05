@@ -17,16 +17,25 @@
 */
 class MappingPanel  : public juce::Component, public TuningChanger, public OptionsChanger
 {
+    std::unique_ptr<LabelMouseHighlight> referenceMidiChannelBox;
+    std::unique_ptr<LabelMouseHighlight> referenceMidiNoteBox;
+    std::unique_ptr<LabelMouseHighlight> rootFrequencyBox;
+    std::unique_ptr<GroupComponent> referenceGroup;
+
+    std::unique_ptr<TextButton> lockReferenceButton;
+
     std::unique_ptr<LabelMouseHighlight> rootMidiChannelBox;
     std::unique_ptr<LabelMouseHighlight> rootMidiNoteBox;
-    std::unique_ptr<LabelMouseHighlight> rootFrequencyBox;
+    std::unique_ptr<GroupComponent> rootGroup;
 
     std::unique_ptr<juce::TextButton> linearMappingButton;
     std::unique_ptr<juce::TextButton> periodicMappingButton;
 
-    juce::String rootChannelBackup;
-    juce::String rootNoteBackup;
-    juce::String rootFrequencyBackup;
+    int refChannelBackup;
+    int refNoteBackup;
+    double rootFrequencyBackup;
+    int rootChannelBackup;
+    int rootNoteBackup;
 
     juce::OwnedArray<juce::Label> labels;
 
@@ -41,12 +50,16 @@ public:
 
     void setTuningDisplayed(const MappedTuningTable* tuning);
 
+    void lockReferenceButtonClicked();
+
     void mappingTypeButtonClicked();
 
     void tuningReferenceEdited();
-    
-    void setMappedTuning(MappedTuningTable* tuningIn);
-    
+
+    void tuningRootFrequencyEdited();
+
+    void mappingRootEdited();
+        
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MappingPanel)
 };

@@ -51,7 +51,7 @@ public:
 
     //void targetMappedTuningLoaded(TuningChanger* changer, CentsDefinition tuningDefinition, TuningTableMap::Definition mapDefinition) override;
 
-    void targetReferenceChanged(TuningChanger* changer, MappedTuningTable::FrequencyReference reference);
+    void targetTuningReferenceChanged(TuningChanger* changer, MappedTuningTable::FrequencyReference reference) override;
 
     void targetRootFrequencyChanged(TuningChanger* changer, double frequency) override;
 
