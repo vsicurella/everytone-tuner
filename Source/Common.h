@@ -43,6 +43,10 @@ namespace Everytone
         static juce::Identifier MapRoot("MapRoot");
         static juce::Identifier Transpose("Transpose");
 
+        // MappedTuning
+        static juce::Identifier ReferenceMidiChannel("ReferenceMidiChannel");
+        static juce::Identifier ReferenceMidiNote("ReferenceMidiNote");
+
         // Options
         static juce::Identifier Options("Options");
         static juce::Identifier MappingMode("MappingMode");
@@ -165,7 +169,6 @@ namespace Everytone
     };
 
 }
-
 
 class OptionsChanger;
 class OptionsWatcher
