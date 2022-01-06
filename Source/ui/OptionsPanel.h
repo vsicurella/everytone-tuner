@@ -12,8 +12,6 @@
 
 #include <JuceHeader.h>
 #include "../Common.h"
-#include "../ControlLookAndFeel.h"
-
 //==============================================================================
 /*
 */
@@ -31,7 +29,7 @@ public:
 
 private:
     
-    Everytone::ControlLookAndFeel controlLookAndFeel;
+    //Everytone::ControlLookAndFeel controlLookAndFeel;
 
     std::unique_ptr<juce::ComboBox> channelModeBox;
     std::unique_ptr<juce::ComboBox> channelRulesBox;
