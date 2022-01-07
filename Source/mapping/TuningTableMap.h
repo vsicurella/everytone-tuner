@@ -17,6 +17,16 @@ static int midiIndex(int midiChannel, int midiNote)
     return (midiChannel - 1) * 128 + midiNote;
 }
 
+static bool ChannelInMidiRange(int midiChannel)
+{
+    return midiChannel > 0 && midiChannel <= 16;
+}
+
+static bool NoteInMidiRange(int midiNote)
+{
+    return midiNote >= 0 && midiNote < 128;
+}
+
 struct MappedNote
 {
     int inputChannel = 0;  // MIDI input channel
