@@ -22,14 +22,14 @@ The following features are currently available but are subject to change while i
 ### Planned
 
 - More plugin formats
-- Decoupling of *tuning reference* and *mapping root* (interally supported, needs UI)
+- Decoupling of *tuning reference* and *mapping root* (internally supported, needs UI)
 - MTS-ESP master & client modes
 - More scale-creation methods (inc. Rank-N, harmonic subsets)
 - Support more interval input types than cents, and display the exact lines from loaded SCL files
 - KBM & custom mapping methods
 - Saving scale and mappings to a file
 - Dynamic tuning through controller mappings or modulations
-- More voice/pitch allocation options (ex. increate polyphony limit by sharing a channel if pitchbend is the same)
+- More voice/pitch allocation options (ex. increase polyphony limit by sharing a channel if pitchbend is the same)
 - More tuning visualization options (inc. many more tone wheel improvements)
 - Edit source tuning for something else than 12-edo @ A 440hz = MIDI Note 69 (internally supported, needs UI)
 - CV Output
@@ -47,7 +47,7 @@ Certain DAWs introduce other MIDI routing difficulties, such as Ableton Live, th
 
 ## Credits
 
-Huge thanks to the all the developers, sharers, and maintainers of microtonal knowledge across various online resources such as members of the Xenharmonic Alliance ([Facebook](https://www.facebook.com/groups/476404232379884), [Discord](https://discord.com/invite/FSF5JFT)), the (Microtonal Music and Tuning Theory)[https://www.facebook.com/groups/497105067092502] group on Facebook, and the [XenWiki](https://xen.wiki/). I appreciate the time many of them spend in presenting information, working with individuals to help them understand concepts, reducing confusion, and keeping misinformation in check.
+Huge thanks to the all the developers, sharers, and maintainers of microtonal knowledge across various online resources such as members of the Xenharmonic Alliance ([Facebook](https://www.facebook.com/groups/476404232379884), [Discord](https://discord.com/invite/FSF5JFT)), the [Microtonal Music and Tuning Theory](https://www.facebook.com/groups/497105067092502) group on Facebook, and the [XenWiki](https://xen.wiki/). I appreciate the time many of them spend in presenting information, working with individuals to help them understand concepts, reducing confusion, and keeping misinformation in check.
 
 I also want to give a shoutout to Sevish and Lajos Mészáros, maintainers of [ScaleWorkshop](https://github.com/SeanArchibald/scale-workshop) not only for providing an excellent accessible online tool, but also being helpful in my collaboration with ScaleWorkshop, which helped inform some of the designs within this application.
 
