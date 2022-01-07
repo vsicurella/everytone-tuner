@@ -193,17 +193,17 @@ void MappingPanel::resized()
 void MappingPanel::lockReferenceButtonClicked()
 {
     bool locked = lockReferenceButton->getToggleState();
-    setReferenceLockState(locked, true);
+    refChannelBackup = rootChannelBackup;
+    refNoteBackup = rootNoteBackup;
+    setLockState(locked, true);
 }
 
-void MappingPanel::setReferenceLockState(bool isLocked, bool sendChangeMessage)
+void MappingPanel::setLockState(bool isLocked, bool sendChangeMessage)
 {
-    refChannelBackup = rootChannelBackup;
     referenceMidiChannelBox->setText(juce::String(refChannelBackup), juce::NotificationType::dontSendNotification);
     referenceMidiChannelBox->setEnabled(!isLocked);
 
-    refNoteBackup = rootNoteBackup;
-    referenceMidiNoteBox->setText(juce::String(rootNoteBackup), juce::NotificationType::dontSendNotification);
+    referenceMidiNoteBox->setText(juce::String(refNoteBackup), juce::NotificationType::dontSendNotification);
     referenceMidiNoteBox->setEnabled(!isLocked);
 
     if (sendChangeMessage)
@@ -238,7 +238,7 @@ void MappingPanel::setTuningDisplayed(const MappedTuningTable* mappedTuning)
     refChannelBackup = (referenceLocked) ? rootChannelBackup : mappingRoot.tuningReference.midiChannel;
     refNoteBackup = (referenceLocked) ? rootNoteBackup : mappingRoot.tuningReference.midiNote;
     
-    setReferenceLockState(referenceLocked, false);
+    setLockState(referenceLocked, false);
 }
 
 void MappingPanel::tuningReferenceEdited()
@@ -260,14 +260,14 @@ void MappingPanel::tuningReferenceEdited()
     auto channelInputTokens = juce::StringArray::fromTokens(referenceMidiChannelBox->getText().trim(), " ", "");
     auto channelInput = channelInputTokens[0].getDoubleValue();
 
-    refChannelBackup = (channelInput >= 1 && channelInput <= 16) ? channelInput
-                                                                 : refChannelBackup;
+    refChannelBackup = ChannelInMidiRange(channelInput) ? channelInput
+                                                        : refChannelBackup;
 
     auto noteInputTokens = juce::StringArray::fromTokens(referenceMidiNoteBox->getText().trim(), " ", "");
     auto noteInput = noteInputTokens[0].getIntValue();
 
-    refNoteBackup = (noteInput >= 0 && noteInput < 128) ? noteInput
-                                                        : refNoteBackup;
+    refNoteBackup = NoteInMidiRange(noteInput) ? noteInput
+                                               : refNoteBackup;
     
     referenceMidiChannelBox->setText(juce::String(refChannelBackup), juce::NotificationType::dontSendNotification);
     referenceMidiNoteBox->setText(juce::String(refNoteBackup), juce::NotificationType::dontSendNotification);
@@ -293,16 +293,16 @@ void MappingPanel::mappingRootEdited()
     auto channelInputTokens = juce::StringArray::fromTokens(rootMidiChannelBox->getText().trim(), " ", "");
     auto channelInput = channelInputTokens[0].getDoubleValue();
 
-    rootChannelBackup = (channelInput >= 1 && channelInput <= 16) ? channelInput
-                                                                  : rootChannelBackup;
+    rootChannelBackup = ChannelInMidiRange(channelInput) ? channelInput
+                                                         : rootChannelBackup;
     rootMidiChannelBox->setText(juce::String(rootChannelBackup), juce::NotificationType::dontSendNotification);
 
 
     auto noteInputTokens = juce::StringArray::fromTokens(rootMidiNoteBox->getText().trim(), " ", "");
     auto noteInput = noteInputTokens[0].getIntValue();
 
-    rootNoteBackup = (noteInput >= 0 && noteInput < 128) ? noteInput
-                                                         : rootNoteBackup;
+    rootNoteBackup = NoteInMidiRange(noteInput) ? noteInput
+                                                : rootNoteBackup;
     rootMidiNoteBox->setText(juce::String(rootNoteBackup), juce::NotificationType::dontSendNotification);
 
     TuningTableMap::Root newRoot = { rootChannelBackup, rootNoteBackup };

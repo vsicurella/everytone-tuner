@@ -62,7 +62,7 @@ public:
         
 private:
 
-    void setReferenceLockState(bool isLocked, bool sendChangeMessage);
+    void setLockState(bool isLocked, bool sendChangeMessage);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MappingPanel)
 };
