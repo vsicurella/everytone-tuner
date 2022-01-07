@@ -16,7 +16,7 @@ int MappedTuningTable::getTranspositionForReference(TuningTableMap::Root root, F
         return 0;
 
     auto transposition = midiIndex(root.midiChannel, root.midiNote) - midiIndex(reference.midiChannel, reference.midiNote);
-    return mod(transposition, tuningTableSize);
+    return transposition;
 }
 
 MappedTuningTable::MappedTuningTable(std::shared_ptr<TuningTable> tuningIn, std::shared_ptr<TuningTableMap> mappingIn, FrequencyReference referenceIn)
@@ -99,6 +99,12 @@ double MappedTuningTable::mtsAt(int midiNote, int midiChannel) const
 {
     auto index = tuningIndexAt(midiNote, midiChannel);
     return tuning->mtsAt(index);
+}
+
+void MappedTuningTable::setFrequencyReference(MappedTuningTable::FrequencyReference newReference)
+{
+    reference = newReference;
+    alignMappingWithReference();
 }
 
 //std::shared_ptr<MappedTuningTable> MappedTuningTable::setRoot(MappedTuningTable::Root root, bool returnCopies)

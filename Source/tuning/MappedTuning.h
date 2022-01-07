@@ -28,7 +28,7 @@ public:
 
         bool isInvalid() const
         {
-            return midiChannel < 1 || midiChannel > 16 || midiNote < 0 || midiNote > 127;
+            return !ChannelInMidiRange(midiChannel) || !NoteInMidiRange(midiNote);
         }
 
         bool operator==(const FrequencyReference& reference) const
@@ -45,6 +45,15 @@ public:
         FrequencyReference tuningReference;
         double frequency = 261.6255653;
         TuningTableMap::Root mapping;
+
+        bool operator==(const Root& root)
+        {
+            return tuningReference == root.tuningReference
+                && frequency == root.frequency
+                && mapping == root.mapping;
+        }
+
+        bool operator!=(const Root& root) { return !operator==(root); }
     };
 
     static int getTranspositionForReference(TuningTableMap::Root root, FrequencyReference reference, int tuningTableSize);
@@ -95,6 +104,9 @@ public:
     virtual double frequencyAt(int midiNote, int midiChannel) const;
 
     virtual double mtsAt(int midiNote, int midiChannel) const;
+
+
+    virtual void setFrequencyReference(MappedTuningTable::FrequencyReference newReference);
 
 
     // TuningTableBase implementation
