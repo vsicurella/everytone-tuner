@@ -138,22 +138,46 @@ void TunerController::setTargetReference(MappedTuningTable::FrequencyReference r
 
 void TunerController::setSourceRootFrequency(double frequency)
 {
-    setSourceMappedTuningRoot({ sourceMapRoot.midiChannel, sourceMapRoot.midiNote, frequency });
+    MappedTuningTable::Root mappedRoot =
+    {
+        sourceReference,
+        frequency,
+        sourceMapRoot
+    };
+    setSourceMappedTuningRoot(mappedRoot);
 }
 
 void TunerController::setTargetRootFrequency(double frequency)
 {
-    setTargetMappedTuningRoot({ targetMapRoot.midiChannel, targetMapRoot.midiNote, frequency });
+    MappedTuningTable::Root mappedRoot =
+    {
+        targetReference,
+        frequency,
+        targetMapRoot
+    };
+    setTargetMappedTuningRoot(mappedRoot);
 }
 
 void TunerController::setSourceMapRoot(TuningTableMap::Root root)
 {
-    setSourceMappedTuningRoot({ root.midiChannel, root.midiNote, currentTuningSource->getRootFrequency() });
+    MappedTuningTable::Root mappedRoot =
+    {
+        sourceReference,
+        currentTuningSource->getRootFrequency(),
+        { root.midiChannel, root.midiNote }
+    };
+    setSourceMappedTuningRoot(mappedRoot);
 }
 
 void TunerController::setTargetMapRoot(TuningTableMap::Root root)
 {
-    setTargetMappedTuningRoot({ root.midiChannel, root.midiNote, currentTuningTarget->getRootFrequency() });
+    MappedTuningTable::Root mappedRoot =
+    {
+        targetReference,
+        currentTuningTarget->getRootFrequency(),
+        { root.midiChannel, root.midiNote }
+    };
+    setTargetMappedTuningRoot(mappedRoot);
 }
 
 void TunerController::setSourceMappedTuningRoot(MappedTuningTable::Root root)
@@ -161,7 +185,9 @@ void TunerController::setSourceMappedTuningRoot(MappedTuningTable::Root root)
     // These would be great elsewhere, but at the moment TuningTableMap can't recreate itself with a different root
 
     bool tuningChanged = currentTuningSource->getRootFrequency() != root.frequency;
-    bool mappingChanged = sourceMapRoot != root.mapping;
+    bool mappingChanged = root.tuningReference.isInvalid()
+                       || sourceMapRoot != root.mapping
+                       || currentTuningSource->getFrequencyReference() != root.tuningReference;
 
     sourceMapRoot = root.mapping;
     sourceReference = root.tuningReference;
@@ -185,8 +211,9 @@ void TunerController::setSourceMappedTuningRoot(MappedTuningTable::Root root)
 void TunerController::setTargetMappedTuningRoot(MappedTuningTable::Root root)
 {
     bool tuningChanged = currentTuningTarget->getRootFrequency() != root.frequency;
-    bool mappingChanged = targetMapRoot != root.mapping || 
-                          currentTuningTarget->getFrequencyReference() != root.tuningReference;
+    bool mappingChanged = root.tuningReference.isInvalid() 
+                       || targetMapRoot != root.mapping 
+                       || currentTuningTarget->getFrequencyReference() != root.tuningReference;
 
     targetMapRoot = root.mapping;
     targetReference = root.tuningReference;
