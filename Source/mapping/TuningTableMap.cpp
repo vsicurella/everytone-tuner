@@ -13,7 +13,8 @@
 TuningTableMap::TuningTableMap(TuningTableMap::Definition definition)
     : rootMidiChannel(definition.root.midiChannel),
       rootMidiNote(definition.root.midiNote),
-      map(std::make_unique<Map<int>>(definition.map))
+      map(std::make_unique<Map<int>>(definition.map)),
+      transpose(definition.transpose)
 {
     rebuildTable();
 }
@@ -21,7 +22,8 @@ TuningTableMap::TuningTableMap(TuningTableMap::Definition definition)
 TuningTableMap::TuningTableMap(const TuningTableMap& mapToCopy)
     : rootMidiChannel(mapToCopy.rootMidiChannel),
       rootMidiNote(mapToCopy.rootMidiNote),
-      map(new Map<int>(*mapToCopy.map.get()))
+      map(new Map<int>(*mapToCopy.map.get())),
+      transpose(mapToCopy.transpose)
 {
     rebuildTable();
 }
@@ -31,6 +33,7 @@ void TuningTableMap::operator=(const TuningTableMap& mapToCopy)
     rootMidiChannel = mapToCopy.rootMidiChannel;
     rootMidiNote = mapToCopy.rootMidiNote;
     map.reset(new Map<int>(mapToCopy.getDefinition().map));
+    transpose = mapToCopy.transpose;
     rebuildTable();
 }
 
