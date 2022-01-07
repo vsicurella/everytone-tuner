@@ -140,6 +140,11 @@ void MultimapperAudioProcessorEditor::targetRootFrequencyChanged(TuningChanger* 
     audioProcessor.setTargetTuningRootFrequency(frequency);
 }
 
+void MultimapperAudioProcessorEditor::targetMappingRootChanged(TuningChanger* changer, TuningTableMap::Root root)
+{
+    audioProcessor.setTargetMappingRoot(root);
+}
+
 void MultimapperAudioProcessorEditor::targetMappedTuningRootChanged(TuningChanger* changer, MappedTuningTable::Root root)
 {
     audioProcessor.setTargetMappedTuningRoot(root);

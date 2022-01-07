@@ -55,6 +55,8 @@ public:
 
     void targetRootFrequencyChanged(TuningChanger* changer, double frequency) override;
 
+    void targetMappingRootChanged(TuningChanger* changer, TuningTableMap::Root root) override;
+
     void targetMappedTuningRootChanged(TuningChanger* changer, MappedTuningTable::Root root) override;
 
     //==============================================================================

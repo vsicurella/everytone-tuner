@@ -32,7 +32,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
     referenceMidiChannelBox->setEnabled(!referenceLocked);
     referenceMidiChannelBox->onTextChange = [this]() { tuningReferenceEdited(); };
 
-    auto refChannelLabel = labels.add(new juce::Label("referenceChannelLabel", "Midi Channel:"));
+    auto refChannelLabel = labels.add(new juce::Label("referenceChannelLabel", "MIDI Channel:"));
     addAndMakeVisible(*refChannelLabel);
     refChannelLabel->setJustificationType(juce::Justification::centredRight);
     refChannelLabel->attachToComponent(referenceMidiChannelBox.get(), true);
@@ -43,7 +43,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
     referenceMidiNoteBox->setEnabled(!referenceLocked);
     referenceMidiNoteBox->onTextChange = [this]() { tuningReferenceEdited(); };
 
-    auto refNoteLabel = labels.add(new juce::Label("referenceNoteLabel", "Midi Note:"));
+    auto refNoteLabel = labels.add(new juce::Label("referenceNoteLabel", "MIDI Note:"));
     addAndMakeVisible(*refNoteLabel);
     refNoteLabel->setJustificationType(juce::Justification::centredRight);
     refNoteLabel->attachToComponent(referenceMidiNoteBox.get(), true);
@@ -198,15 +198,15 @@ void MappingPanel::lockReferenceButtonClicked()
 
 void MappingPanel::setReferenceLockState(bool isLocked, bool sendChangeMessage)
 {
-    auto refChannel = (isLocked) ? rootChannelBackup : refChannelBackup;
-    referenceMidiChannelBox->setText(juce::String(refChannel), juce::NotificationType::dontSendNotification);
+    refChannelBackup = rootChannelBackup;
+    referenceMidiChannelBox->setText(juce::String(refChannelBackup), juce::NotificationType::dontSendNotification);
     referenceMidiChannelBox->setEnabled(!isLocked);
 
-    auto refNote = (isLocked) ? rootNoteBackup : refNoteBackup;
-    referenceMidiNoteBox->setText(juce::String(refNote), juce::NotificationType::dontSendNotification);
+    refNoteBackup = rootNoteBackup;
+    referenceMidiNoteBox->setText(juce::String(rootNoteBackup), juce::NotificationType::dontSendNotification);
     referenceMidiNoteBox->setEnabled(!isLocked);
 
-    if (isLocked && sendChangeMessage)
+    if (sendChangeMessage)
         tuningReferenceEdited();
 }
 
@@ -243,19 +243,33 @@ void MappingPanel::setTuningDisplayed(const MappedTuningTable* mappedTuning)
 
 void MappingPanel::tuningReferenceEdited()
 {
+    bool referenceLocked = lockReferenceButton->getToggleState();
+
+    if (referenceLocked)
+    {
+        refChannelBackup = rootChannelBackup;
+        refNoteBackup = rootNoteBackup;
+        
+        referenceMidiChannelBox->setText(juce::String(refChannelBackup), juce::NotificationType::dontSendNotification);
+        referenceMidiNoteBox->setText(juce::String(refNoteBackup), juce::NotificationType::dontSendNotification);
+
+        tuningWatchers.call(&TuningWatcher::targetTuningReferenceChanged, this, MappedTuningTable::FrequencyReference());
+        return;
+    }
+
     auto channelInputTokens = juce::StringArray::fromTokens(referenceMidiChannelBox->getText().trim(), " ", "");
     auto channelInput = channelInputTokens[0].getDoubleValue();
 
     refChannelBackup = (channelInput >= 1 && channelInput <= 16) ? channelInput
                                                                  : refChannelBackup;
-    referenceMidiChannelBox->setText(juce::String(refChannelBackup), juce::NotificationType::dontSendNotification);
-
 
     auto noteInputTokens = juce::StringArray::fromTokens(referenceMidiNoteBox->getText().trim(), " ", "");
     auto noteInput = noteInputTokens[0].getIntValue();
 
     refNoteBackup = (noteInput >= 0 && noteInput < 128) ? noteInput
                                                         : refNoteBackup;
+    
+    referenceMidiChannelBox->setText(juce::String(refChannelBackup), juce::NotificationType::dontSendNotification);
     referenceMidiNoteBox->setText(juce::String(refNoteBackup), juce::NotificationType::dontSendNotification);
 
     MappedTuningTable::FrequencyReference newReference = { refChannelBackup, refNoteBackup };
@@ -281,7 +295,7 @@ void MappingPanel::mappingRootEdited()
 
     rootChannelBackup = (channelInput >= 1 && channelInput <= 16) ? channelInput
                                                                   : rootChannelBackup;
-    referenceMidiChannelBox->setText(juce::String(rootChannelBackup), juce::NotificationType::dontSendNotification);
+    rootMidiChannelBox->setText(juce::String(rootChannelBackup), juce::NotificationType::dontSendNotification);
 
 
     auto noteInputTokens = juce::StringArray::fromTokens(rootMidiNoteBox->getText().trim(), " ", "");
@@ -292,6 +306,14 @@ void MappingPanel::mappingRootEdited()
     rootMidiNoteBox->setText(juce::String(rootNoteBackup), juce::NotificationType::dontSendNotification);
 
     TuningTableMap::Root newRoot = { rootChannelBackup, rootNoteBackup };
+
+    if (lockReferenceButton->getToggleState()) // If Locked
+    {
+        MappedTuningTable::Root mappedRoot = { MappedTuningTable::FrequencyReference(), rootFrequencyBackup, newRoot };
+        tuningWatchers.call(&TuningWatcher::targetMappedTuningRootChanged, this, mappedRoot);
+        return;
+    }
+
     tuningWatchers.call(&TuningWatcher::targetMappingRootChanged, this, newRoot);
 }
 
