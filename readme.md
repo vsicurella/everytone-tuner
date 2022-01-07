@@ -8,7 +8,7 @@ Everytone Tuner is a free [JUCE](https://juce.com/)-based tool for remapping and
 
 The following features are currently available but are subject to change while in alpha.
 
-- Cross-platform VST3 and standalone app formats
+- Cross-platform VST3, AU, and standalone app formats
 - Load SCL and TUN files
 - Create equal temperament tunings
 - Automatic multichannel MIDI mapping (linear and channel-based periodic)
@@ -22,7 +22,6 @@ The following features are currently available but are subject to change while i
 ### Planned
 
 - More plugin formats
-- Decoupling of *tuning reference* and *mapping root* (internally supported, needs UI)
 - MTS-ESP master & client modes
 - More scale-creation methods (inc. Rank-N, harmonic subsets)
 - Support more interval input types than cents, and display the exact lines from loaded SCL files
