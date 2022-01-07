@@ -25,10 +25,19 @@ public:
     {
         int midiChannel = -1;
         int midiNote = -1;
+        
+        FrequencyReference(int channel = -1, int note = -1)
+            : midiChannel(channel), midiNote(note) {}
 
         bool isInvalid() const
         {
             return !ChannelInMidiRange(midiChannel) || !NoteInMidiRange(midiNote);
+        }
+        
+        void operator=(const FrequencyReference& reference)
+        {
+            midiChannel = reference.midiChannel;
+            midiNote = reference.midiNote;
         }
 
         bool operator==(const FrequencyReference& reference) const

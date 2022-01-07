@@ -272,7 +272,7 @@ void MappingPanel::tuningReferenceEdited()
     referenceMidiChannelBox->setText(juce::String(refChannelBackup), juce::NotificationType::dontSendNotification);
     referenceMidiNoteBox->setText(juce::String(refNoteBackup), juce::NotificationType::dontSendNotification);
 
-    MappedTuningTable::FrequencyReference newReference = { refChannelBackup, refNoteBackup };
+    MappedTuningTable::FrequencyReference newReference(refChannelBackup, refNoteBackup);
     tuningWatchers.call(&TuningWatcher::targetTuningReferenceChanged, this, newReference);
 }
 
