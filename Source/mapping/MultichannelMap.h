@@ -71,7 +71,7 @@ public:
     static TuningTableMap::Definition PeriodicMappingDefinition(int period, int rootMidiChannel, int rootMidiNote, int tuningRootIndex, int tuningTableSize)
     {
         int channelPeriodOffset = -(rootMidiChannel - 1) * period;
-        int currentTuningIndex = mod(channelPeriodOffset + tuningRootIndex + rootMidiNote, tuningTableSize);
+        int currentTuningIndex = mod(channelPeriodOffset + tuningRootIndex - rootMidiNote, tuningTableSize);
 
         std::vector<Map<int>> maps;
         for (int m = 0; m < 16; m++)
