@@ -116,6 +116,7 @@ void MultimapperAudioProcessorEditor::targetTuningChanged(const std::shared_ptr<
     infoBar->setDisplayedTuning(target.get());
     //intervalListModel->setTuning(target.get());
     overviewPanel->setTuningDisplayed(target.get());
+    mappingPanel->setTuningDisplayed(target.get());
     //tuningBackup = std::make_unique<MappedTuningTable>(*audioProcessor.currentTarget());
 }
 
