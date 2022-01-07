@@ -70,7 +70,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
     rootMidiChannelBox.reset(new LabelMouseHighlight("rootMidiChannelBox", juce::String(rootChannelBackup)));
     addAndMakeVisible(rootMidiChannelBox.get());
     rootMidiChannelBox->setEditable(false, true);
-    rootMidiChannelBox->onTextChange = [this]() { tuningReferenceEdited(); };
+    rootMidiChannelBox->onTextChange = [this]() { mappingRootEdited(); };
 
     auto rootChannelLabel = labels.add(new juce::Label("rootChannelLabel", "MIDI Channel:"));
     rootChannelLabel->setJustificationType(juce::Justification::centredRight);
@@ -81,7 +81,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
     rootMidiNoteBox.reset(new LabelMouseHighlight("rootMidiNoteBox", juce::String(rootNoteBackup)));
     addAndMakeVisible(rootMidiNoteBox.get());
     rootMidiNoteBox->setEditable(false, true);
-    rootMidiNoteBox->onTextChange = [this]() { tuningReferenceEdited(); };
+    rootMidiNoteBox->onTextChange = [this]() { mappingRootEdited(); };
 
     auto rootNoteLabel = labels.add(new juce::Label("rootNoteLabel", "MIDI Note:"));
     rootNoteLabel->setJustificationType(juce::Justification::centredRight);
