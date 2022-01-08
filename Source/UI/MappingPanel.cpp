@@ -56,7 +56,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
 
     auto rootFrequencyLabel = labels.add(new juce::Label("rootFrequencyLabel", "Frequency:"));
     rootFrequencyLabel->setJustificationType(juce::Justification::centredRight);
-    rootFrequencyLabel->attachToComponent(rootFrequencyBox.get(), true);
+    rootFrequencyLabel->attachToComponent(rootFrequencyBox.get(), false);
     addAndMakeVisible(rootFrequencyLabel);
 
     lockReferenceButton = std::make_unique<juce::TextButton>("lockReferenceButton", "Lock Tuning Reference to Mapping Root");
@@ -142,6 +142,8 @@ void MappingPanel::resized()
     auto w = getWidth();
     auto h = getHeight();
 
+    int halfHeight = h * 0.5;
+
     auto margin = 0.01;
     margin *= (w > h) ? w : h;
 
@@ -153,15 +155,21 @@ void MappingPanel::resized()
     juce::FlexItem::Margin referenceMargin(0, 0, 0, referenceLabelWidth);
 
 
+    juce::FlexBox main;
+    main.flexDirection = juce::FlexBox::Direction::row;
+
+    // Mapping Root & Tuning Reference column
+
+    int mapRefSectionRows = 5;
+    int mapRefControlHeight = h / (mapRefSectionRows * 2);
+
     juce::FlexBox referenceBox;
     referenceBox.flexDirection = juce::FlexBox::Direction::column;
+    referenceBox.justifyContent = juce::FlexBox::JustifyContent::center;
+    auto rootBox = juce::FlexBox(referenceBox);
 
     referenceBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *referenceMidiChannelBox).withMargin(referenceMargin));
     referenceBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *referenceMidiNoteBox).withMargin(referenceMargin));
-    referenceBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *rootFrequencyBox).withMargin(referenceMargin));
-
-    juce::FlexBox rootBox;
-    rootBox.flexDirection = juce::FlexBox::Direction::column;
 
     rootBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *rootMidiChannelBox).withMargin(referenceMargin));
     rootBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *rootMidiNoteBox).withMargin(referenceMargin));
@@ -175,19 +183,30 @@ void MappingPanel::resized()
     mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *periodicMappingButton));
     rootBox.items.add(juce::FlexItem(buttonWidth * 2, buttonHeight, mappingRow).withMargin(referenceMargin));
 
-    juce::FlexBox main;
-    main.flexDirection = juce::FlexBox::Direction::row;
+    main.items.add(juce::FlexItem(referenceBox).withMinHeight(halfHeight).withMinWidth(referenceControlWidth));
 
-    juce::FlexItem::Margin mainMargin(getHeight() * 0.2f, 0, 0, 0);
+    main.items.add(juce::FlexItem(w * 0.12f, controlHeight, *lockReferenceButton).withAlignSelf(juce::FlexItem::AlignSelf::center));
 
-    main.items.add(juce::FlexItem(getWidth() * 0.4f, getHeight(), referenceBox).withMargin(mainMargin));
-    main.items.add(juce::FlexItem(getWidth() * 0.2f, controlHeight, *lockReferenceButton).withAlignSelf(juce::FlexItem::AlignSelf::center));
-    main.items.add(juce::FlexItem(getWidth() * 0.4f, getHeight(), rootBox).withMargin(mainMargin));
+    int freqSectionColumns = 3;
+    int freqSectionHeight = h / freqSectionColumns;
+
+    juce::FlexBox freqColumnBox;
+    freqColumnBox.flexDirection = juce::FlexBox::Direction::column;
+    freqColumnBox.justifyContent = juce::FlexBox::JustifyContent::center;
+
+    freqColumnBox.items.add(juce::FlexItem(*rootFrequencyBox).withMinWidth(referenceControlWidth).withMinHeight(controlHeight));
+
+    main.items.add(juce::FlexItem(freqColumnBox).withMinWidth(referenceControlWidth).withMinHeight(h));
+
+    //juce::FlexItem::Margin mainMargin(getHeight() * 0.2f, 0, 0, 0);
+
+    //main.items.add(juce::FlexItem(getWidth() * 0.4f, getHeight(), referenceBox).withMargin(mainMargin));
+    //main.items.add(juce::FlexItem(getWidth() * 0.4f, getHeight(), rootBox).withMargin(mainMargin));
     
     main.performLayout(getLocalBounds());
 
-    referenceGroup->setBounds(getLocalBounds().withRight(getWidth() * 0.4f));
-    rootGroup->setBounds(getLocalBounds().withTrimmedLeft(getWidth() * 0.6f));
+    //referenceGroup->setBounds(getLocalBounds().withRight(getWidth() * 0.4f));
+    //rootGroup->setBounds(getLocalBounds().withTrimmedLeft(getWidth() * 0.6f));
 }
 
 void MappingPanel::lockReferenceButtonClicked()
