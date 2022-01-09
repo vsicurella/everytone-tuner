@@ -429,8 +429,8 @@ void MappingPanel::mappingRootEdited()
 void MappingPanel::mtsSnapNoteChanged()
 {
     auto mtsNote = (int)mtsNoteSlider->getValue();
-    
-    // TODO note number to note label
+    auto label = juce::MidiMessage::getMidiNoteName(mtsNote, true, true, 4);
+    mtsNoteLabel->setText(label, juce::NotificationType::dontSendNotification);
 }
 
 void MappingPanel::snapButtonClicked()
