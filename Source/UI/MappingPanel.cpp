@@ -54,10 +54,10 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
     rootFrequencyBox->onTextChange = [this]() { tuningRootFrequencyEdited(); };
     rootFrequencyBackup = mappedRoot.frequency;
 
-    auto rootFrequencyLabel = labels.add(new juce::Label("rootFrequencyLabel", "Frequency:"));
-    rootFrequencyLabel->setJustificationType(juce::Justification::centredRight);
-    rootFrequencyLabel->attachToComponent(rootFrequencyBox.get(), false);
-    addAndMakeVisible(rootFrequencyLabel);
+    //auto rootFrequencyLabel = labels.add(new juce::Label("rootFrequencyLabel", "Frequency:"));
+    //rootFrequencyLabel->setJustificationType(juce::Justification::centredLeft);
+    //rootFrequencyLabel->attachToComponent(rootFrequencyBox.get(), false);
+    //addAndMakeVisible(rootFrequencyLabel);
 
     lockReferenceButton = std::make_unique<juce::TextButton>("lockReferenceButton", "Lock Tuning Reference to Mapping Root");
     addAndMakeVisible(*lockReferenceButton);
@@ -117,18 +117,52 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
 
     rootGroup = std::make_unique<juce::GroupComponent>("RootGroup", "Mapping Root");
     addAndMakeVisible(*rootGroup);
+
+    mappingRootFrequencyLabel = std::make_unique<juce::Label>("MappingRootFrequencyLabel", "");
+    addChildComponent(*mappingRootFrequencyLabel);
+    mappingRootFrequencyLabel->setJustificationType(juce::Justification::centredLeft);
+    mappingRootFrequencyLabel->setFont(mappingRootFrequencyLabel->getFont().withStyle(juce::Font::FontStyleFlags::italic));
+
+    frequencyGroup = std::make_unique<juce::GroupComponent>("FrequencyGroup", getFrequencyGroupTitle());
+    addAndMakeVisible(*frequencyGroup);
+
+    mtsNoteSlider = std::make_unique<juce::Slider>(juce::Slider::SliderStyle::IncDecButtons, juce::Slider::TextEntryBoxPosition::TextBoxLeft);
+    addAndMakeVisible(*mtsNoteSlider);
+    mtsNoteSlider->setName("MtsNoteSlider");
+    mtsNoteSlider->setRange(0, 127, 1);
+    mtsNoteSlider->setValue(69);
+    mtsNoteSlider->onValueChange = [this]() { mtsSnapNoteChanged(); };
+
+    mtsNoteLabel = labels.add(new juce::Label("MtsNoteLabel", "A4"));
+    addAndMakeVisible(*mtsNoteLabel);
+    mtsNoteLabel->setJustificationType(juce::Justification::centred);
+    mtsNoteLabel->attachToComponent(mtsNoteSlider.get(), true);
+
+    mtsSnapButton = std::make_unique<TextButton>("MtsSnapButton", "Snap frequency to selected MTS note");
+    addAndMakeVisible(*mtsSnapButton);
+    mtsSnapButton->setButtonText("Snap!");
+    mtsSnapButton->onClick = [this]() { snapButtonClicked(); };
+
+    mtsSnapGroup = std::make_unique<juce::GroupComponent>("MtsSnapGroup", "MTS Snap");
+    addAndMakeVisible(*mtsSnapGroup);
 }
 
 MappingPanel::~MappingPanel()
 {
+    mtsSnapGroup = nullptr;
+    mtsSnapButton = nullptr;
+    mtsNoteSlider = nullptr;
+    mtsNoteLabel = nullptr;
+    frequencyGroup = nullptr;
+    rootFrequencyBox = nullptr;
+    lockReferenceButton = nullptr;
+    mappingRootFrequencyLabel = nullptr;
     periodicMappingButton = nullptr;
     linearMappingButton = nullptr;
     rootGroup = nullptr;
     rootMidiNoteBox = nullptr;
     rootMidiChannelBox = nullptr;
-    lockReferenceButton = nullptr;
     referenceGroup = nullptr;
-    rootFrequencyBox = nullptr;
     referenceMidiNoteBox = nullptr;
     referenceMidiChannelBox = nullptr;
 }
@@ -142,97 +176,185 @@ void MappingPanel::resized()
     auto w = getWidth();
     auto h = getHeight();
 
-    int halfHeight = h * 0.5;
+    int halfHeight = h * 0.5f;
 
-    auto margin = 0.01;
+    auto margin = 0.01f;
     margin *= (w > h) ? w : h;
 
     auto controlFont = referenceMidiChannelBox->getFont();
-    int referenceControlWidth = controlFont.getStringWidth("9999");
+    int controlWidth = controlFont.getStringWidth("9999");
     auto controlHeight = controlFont.getHeight() + margin * 2;
 
+    int buttonWidth = juce::roundToInt(w * 0.1f);
+
     int referenceLabelWidth = controlFont.getStringWidth(rootChannelLabel->getText());
-    juce::FlexItem::Margin referenceMargin(0, 0, 0, referenceLabelWidth);
+    //juce::FlexItem::Margin referenceMargin(0, 0, 0, referenceLabelWidth);
+
+    int controlXMargin = margin * 4;
+    int controlYMargin = margin * 3;
+    int interControlYMargin = margin * 0.5;
+
+    auto controlBoxWidth = (w - buttonWidth - controlXMargin * 2) * 0.4f;
 
 
-    juce::FlexBox main;
-    main.flexDirection = juce::FlexBox::Direction::row;
-    main.justifyContent = juce::FlexBox::JustifyContent::spaceBetween;
+    auto boundMargin = margin * 2;
+    auto refBoundsWidth = referenceLabelWidth + controlWidth + margin * 2;
+    auto refBoundsHeight = controlHeight * 2 + margin * 4;
+    auto refBounds = juce::Rectangle<int>(boundMargin, margin, controlBoxWidth, refBoundsHeight);
 
-    // Mapping Root & Tuning Reference column
+    auto referenceControlsX = refBounds.getX() + referenceLabelWidth + controlXMargin;
+    referenceMidiChannelBox->setBounds(referenceControlsX, refBounds.getY() + controlYMargin, controlWidth, controlHeight);
+    referenceMidiNoteBox->setBounds(referenceControlsX, referenceMidiChannelBox->getBottom(), controlWidth, controlHeight);
+    referenceGroup->setBounds(refBounds);
 
-    juce::FlexBox mapRefColumnFlex;
-    mapRefColumnFlex.flexDirection = juce::FlexBox::Direction::column;
-    //mapRefColumnFlex.justifyContent = juce::FlexBox::JustifyContent::center;
+    auto rootBoundsHeight = controlHeight * 3 + margin * 4;
+    auto rootBounds = juce::Rectangle<int>(boundMargin, refBounds.getBottom() + boundMargin, controlBoxWidth, rootBoundsHeight);
+    rootMidiChannelBox->setBounds(referenceControlsX, rootBounds.getY() + controlYMargin, controlWidth, controlHeight);
+    rootMidiNoteBox->setBounds(referenceControlsX, rootMidiChannelBox->getBottom(), controlWidth, controlHeight);
 
-    int mapRefSectionRows = 5;
-    int mapRefControlHeight = h / (mapRefSectionRows * 2);
+    auto buttonHeight = controlHeight * 0.8;
+    auto mapButtonMargin = controlFont.getStringWidth("Type: ") + margin;
+    linearMappingButton->setBounds(boundMargin + mapButtonMargin + margin, rootMidiNoteBox->getBottom(), buttonWidth, buttonHeight);
+    periodicMappingButton->setBounds(linearMappingButton->getRight(), linearMappingButton->getY(), buttonWidth, buttonHeight);
+    rootGroup->setBounds(rootBounds);
 
-    juce::FlexBox referenceBox;
-    referenceBox.flexDirection = juce::FlexBox::Direction::column;
-    referenceBox.justifyContent = juce::FlexBox::JustifyContent::center;
-    auto rootBox = juce::FlexBox(referenceBox);
-
-    referenceBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *referenceMidiChannelBox).withMargin(referenceMargin));
-    referenceBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *referenceMidiNoteBox).withMargin(referenceMargin));
-
-    rootBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *rootMidiChannelBox).withMargin(referenceMargin));
-    rootBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *rootMidiNoteBox).withMargin(referenceMargin));
-
-    int buttonWidth = juce::roundToInt(w * 0.1);
-    int buttonHeight = juce::roundToInt(controlHeight * 0.8);
-
-    juce::FlexBox mappingRow;
-    juce::FlexItem::Margin mappingRowMargin(0, 0, 0, w * 0.08);
-    mappingRow.justifyContent = juce::FlexBox::JustifyContent::flexStart;
-    mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *linearMappingButton));
-    mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *periodicMappingButton));
-    rootBox.items.add(juce::FlexItem(buttonWidth * 2, buttonHeight, mappingRow).withMargin(mappingRowMargin));
-
-    auto rootBoxItem = juce::FlexItem(rootBox).withMinWidth(referenceControlWidth).withMinHeight(halfHeight);
-    mapRefColumnFlex.items.add(rootBoxItem);
-
-    auto refBoxItem = juce::FlexItem(referenceBox).withMinWidth(referenceControlWidth).withMinHeight(halfHeight);
-    mapRefColumnFlex.items.add(refBoxItem);
-    main.items.add(juce::FlexItem(mapRefColumnFlex).withMinWidth(referenceControlWidth).withMinHeight(h));
+    lockReferenceButton->setSize(controlWidth + boundMargin * 2, controlHeight);
+    lockReferenceButton->setCentrePosition(w * 0.5, h * 0.5);
 
 
-    main.items.add(juce::FlexItem(buttonWidth, controlHeight, *lockReferenceButton).withAlignSelf(juce::FlexItem::AlignSelf::center));
+    auto frequencyBounds = refBounds.withPosition(w - boundMargin - controlBoxWidth, refBounds.getY());
+    //juce::Rectangle<int>(w - boundMargin - controlBoxWidth, boundMargin, controlBoxWidth, controlHeight + boundMargin * 2);
 
-    int freqSectionColumns = 3;
-    int freqSectionHeight = h / freqSectionColumns;
+    auto freqBoxWidth = rootFrequencyBox->getFont().getStringWidth("9999.999 Hz");
+    rootFrequencyBox->setSize(freqBoxWidth, controlHeight);
+    rootFrequencyBox->setCentrePosition(frequencyBounds.getCentre());
 
-    juce::FlexBox freqColumnBox;
-    freqColumnBox.flexDirection = juce::FlexBox::Direction::column;
-    freqColumnBox.justifyContent = juce::FlexBox::JustifyContent::center;
-    freqColumnBox.alignContent = juce::FlexBox::AlignContent::flexStart;
+    frequencyGroup->setBounds(frequencyBounds);
 
-    freqColumnBox.items.add(juce::FlexItem(*rootFrequencyBox).withMinWidth(referenceControlWidth).withMinHeight(controlHeight));
 
-    main.items.add(juce::FlexItem(freqColumnBox).withMinWidth(referenceControlWidth).withMinHeight(h));
+    auto mtsSnapBounds = rootBounds.withPosition(frequencyBounds.getX(), rootBounds.getY());
+    //juce::Rectangle<int>(, h - mtsBoundsHeight - margin, controlBoxWidth, mtsBoundsHeight);
 
-    //juce::FlexItem::Margin mainMargin(getHeight() * 0.2f, 0, 0, 0);
+    auto mtsNoteLabelWidth = mtsNoteLabel->getFont().getStringWidth("999");
+    juce::FlexItem::Margin mtsNoteSliderMargin(margin, 0, 0, mtsNoteLabelWidth);
 
-    //main.items.add(juce::FlexItem(getWidth() * 0.4f, getHeight(), referenceBox).withMargin(mainMargin));
-    //main.items.add(juce::FlexItem(getWidth() * 0.4f, getHeight(), rootBox).withMargin(mainMargin));
-    
-    main.performLayout(getLocalBounds());
+    auto sliderValueWidth = w * 0.11f;// mtsNoteLabelFont.getStringWidth("9999");
+    auto sliderButtonsWidth = w * 0.09f;// sliderValueWidth * 0.3f;
+    auto sliderWidth = sliderValueWidth + sliderButtonsWidth;
 
-    //rootGroup->setBounds(getLocalBounds().withTrimmedLeft(getWidth() * 0.6f));
-    //referenceGroup->setBounds(getLocalBounds().withRight(getWidth() * 0.4f));
+    auto mtsSnapMargin = (mtsSnapBounds.getHeight() - controlHeight * 2) * 0.5;
 
-    auto groupXMargin = w * 0.02;
-    auto groupYMargin = h * 0.07f;
+    mtsNoteSlider->setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxLeft, false, sliderValueWidth, controlHeight);
+    mtsNoteSlider->setBounds(mtsSnapBounds.getX() + mtsNoteLabelWidth + controlXMargin, mtsSnapBounds.getY() + mtsSnapMargin, sliderWidth, controlHeight);
 
-    auto rootBounds = juce::Rectangle<int>(rootChannelLabel->getPosition(), periodicMappingButton->getBounds().getBottomRight());
-    rootBounds = rootBounds.withRight(rootBounds.getRight() + groupXMargin);
-    DBG(rootBounds.toString());
-    rootGroup->setBounds(rootBounds.expanded(0, groupYMargin));
+    mtsSnapButton->setBounds(mtsNoteSlider->getBounds().translated(0, controlHeight));
 
-    
-    auto refBounds = rootBounds.withPosition(refChannelLabel->getPosition()).withHeight(controlHeight * 2);
-    DBG(refBounds.toString());
-    referenceGroup->setBounds(refBounds.expanded(0, groupYMargin));
+    mtsSnapGroup->setBounds(mtsSnapBounds);
+
+    //juce::FlexBox main;
+    //main.flexDirection = juce::FlexBox::Direction::row;
+    ////main.justifyContent = juce::FlexBox::JustifyContent::spaceBetween;
+
+    //// Mapping Root & Tuning Reference column
+
+    //juce::FlexBox mapRefColumnFlex;
+    //mapRefColumnFlex.flexDirection = juce::FlexBox::Direction::column;
+    ////mapRefColumnFlex.justifyContent = juce::FlexBox::JustifyContent::center;
+
+    //int mapRefSectionRows = 5;
+    //int mapRefControlHeight = h / (mapRefSectionRows * 2);
+
+    //juce::FlexBox referenceBox;
+    //referenceBox.flexDirection = juce::FlexBox::Direction::column;
+    //referenceBox.justifyContent = juce::FlexBox::JustifyContent::center;
+    //auto rootBox = juce::FlexBox(referenceBox);
+
+    //referenceBox.items.add(juce::FlexItem(controlWidth, controlHeight, *referenceMidiChannelBox).withMargin(referenceMargin));
+    //referenceBox.items.add(juce::FlexItem(controlWidth, controlHeight, *referenceMidiNoteBox).withMargin(referenceMargin));
+
+    //rootBox.items.add(juce::FlexItem(controlWidth, controlHeight, *rootMidiChannelBox).withMargin(referenceMargin));
+    //rootBox.items.add(juce::FlexItem(controlWidth, controlHeight, *rootMidiNoteBox).withMargin(referenceMargin));
+
+    //int buttonHeight = juce::roundToInt(controlHeight * 0.8f);
+
+    //juce::FlexBox mappingRow;
+    //juce::FlexItem::Margin mappingRowMargin(0, 0, 0, w * 0.08f);
+    //mappingRow.justifyContent = juce::FlexBox::JustifyContent::flexStart;
+    //mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *linearMappingButton));
+    //mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *periodicMappingButton));
+    //rootBox.items.add(juce::FlexItem(buttonWidth * 2, buttonHeight, mappingRow).withMargin(mappingRowMargin));
+
+    //mapRefColumnFlex.items.add(juce::FlexItem(referenceBox).withMinWidth(controlWidth).withMinHeight(halfHeight));
+    //mapRefColumnFlex.items.add(juce::FlexItem(rootBox).withMinWidth(controlWidth).withMinHeight(halfHeight));
+    //main.items.add(juce::FlexItem(controlBoxWidth, h, mapRefColumnFlex));
+
+    //juce::FlexBox lockBox;
+    //auto lockBoxMarginHeight = (h - controlHeight) * 0.5;
+    //juce::FlexItem::Margin lockBoxMargin = (lockBoxMarginHeight, margin, lockBoxMarginHeight, margin);
+    //lockBox.items.add(juce::FlexItem(buttonWidth, controlHeight, *lockReferenceButton).withMaxHeight(controlHeight).withMargin(lockBoxMargin));
+    //main.items.add(juce::FlexItem(buttonWidth + margin * 2, h, lockBox));
+
+    //juce::FlexBox freqColumnBox;
+    //freqColumnBox.flexDirection = juce::FlexBox::Direction::column;
+    //freqColumnBox.justifyContent = juce::FlexBox::JustifyContent::center;
+    ////freqColumnBox.justifyContent = juce::FlexBox::JustifyContent::spaceBetween;
+    ////freqColumnBox.alignContent = juce::FlexBox::AlignContent::flexEnd;
+
+    //auto freqControlWidth = rootFrequencyBox->getFont().getStringWidth("99999 Hz");
+    //auto freqMarginX = (controlBoxWidth - freqControlWidth) * 0.5f;
+    //auto freqMarginY = (halfHeight - controlHeight) * 0.5;
+    //juce::FlexItem::Margin freqMargin(freqMarginY, freqMarginX, freqMarginY, freqMarginY);
+    //freqColumnBox.items.add(juce::FlexItem(freqControlWidth, controlHeight, *rootFrequencyBox));// .withMargin(freqMargin));
+
+    //juce::FlexBox mtsSnapBox;
+    //mtsSnapBox.flexDirection = juce::FlexBox::Direction::column;
+
+    ////auto mtsLabelFont = mtsSnapLabel->getFont();
+    //auto mtsNoteLabelFont = mtsNoteLabel->getFont();
+    //auto mtsNoteLabelWidth = mtsNoteLabelFont.getStringWidth("999");
+    //juce::FlexItem::Margin mtsNoteSliderMargin(margin, 0, 0, mtsNoteLabelWidth);
+
+    //auto sliderValueWidth = w * 0.11f;// mtsNoteLabelFont.getStringWidth("9999");
+    //auto sliderButtonsWidth = w * 0.09f;// sliderValueWidth * 0.3f;
+    //auto sliderWidth = sliderValueWidth + sliderButtonsWidth;
+
+    //mtsNoteSlider->setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxLeft, false, sliderValueWidth, controlHeight);
+
+    //mtsSnapBox.items.add(juce::FlexItem(sliderWidth, controlHeight, *mtsNoteSlider).withMaxWidth(sliderWidth));// .withMargin(mtsNoteSliderMargin));
+    //mtsSnapBox.items.add(juce::FlexItem(sliderValueWidth, controlHeight, *mtsSnapButton).withMaxWidth(sliderValueWidth));// .withMargin(mtsNoteSliderMargin));
+
+    //freqColumnBox.items.add(juce::FlexItem(sliderWidth, halfHeight, mtsSnapBox));
+
+    //main.items.add(juce::FlexItem(controlBoxWidth, h, freqColumnBox));
+    //
+    //main.performLayout(getLocalBounds());
+
+    //mtsNoteSlider->setSize(sliderWidth, controlHeight);
+
+
+
+    //auto groupXMargin = w * 0.02;
+    //auto groupYMargin = h * 0.07f;
+
+    //auto rootBounds = juce::Rectangle<int>(rootChannelLabel->getPosition(), periodicMappingButton->getBounds().getBottomRight());
+    //rootBounds = rootBounds.withRight(rootBounds.getRight() + groupXMargin);
+    //rootGroup->setBounds(rootBounds.expanded(0, groupYMargin));
+    //
+    //auto refBounds = rootBounds.withPosition(refChannelLabel->getPosition()).withHeight(controlHeight * 2);
+    //referenceGroup->setBounds(refBounds.expanded(0, groupYMargin));
+
+    //auto mapFreqFont = mappingRootFrequencyLabel->getFont();
+    //auto mapFreqCenterX = (mapFreqFont.getStringWidth(mappingRootFrequencyLabel->getText())) * 0.5 + rootBounds.getRight();
+    //auto mapFreqCenterY = (rootMidiChannelBox->getY() + rootMidiNoteBox->getBottom()) * 0.5;
+    //mappingRootFrequencyLabel->setCentrePosition(juce::Point<int>(mapFreqCenterX, mapFreqCenterY));
+
+    //auto freqBounds = rootFrequencyBox->getBounds().expanded(groupXMargin, groupYMargin);
+    //frequencyGroup->setBounds(freqBounds);
+
+    //auto mtsSnapBounds = juce::Rectangle<int>(mtsNoteLabel->getPosition(), mtsNoteSlider->getBounds().getBottomRight())
+    //                                         .withBottom(mtsSnapButton->getBottom())
+    //                                         .expanded(groupXMargin * 2, groupYMargin);
+    //mtsSnapGroup->setBounds(mtsSnapBounds);
 }
 
 void MappingPanel::lockReferenceButtonClicked()
@@ -251,6 +373,15 @@ void MappingPanel::setLockState(bool isLocked, bool sendChangeMessage)
     referenceMidiNoteBox->setText(juce::String(refNoteBackup), juce::NotificationType::dontSendNotification);
     referenceMidiNoteBox->setEnabled(!isLocked);
 
+    frequencyGroup->setText(getFrequencyGroupTitle());
+    frequencyGroup->repaint();
+
+    mappingRootFrequencyLabel->setVisible(!isLocked);
+    if (!isLocked && tuning != nullptr)
+    {
+        mappingRootFrequencyLabel->setText(juce::String(tuning->frequencyFromRoot(0)), juce::NotificationType::dontSendNotification);
+    }
+
     if (sendChangeMessage)
         tuningReferenceEdited();
 }
@@ -266,10 +397,11 @@ void MappingPanel::mappingTypeButtonClicked()
 
 void MappingPanel::setTuningDisplayed(const MappedTuningTable* mappedTuning)
 {
-    auto mappingRoot = mappedTuning->getRoot();
+    tuning = mappedTuning;
+    auto mappingRoot = tuning->getRoot();
 
     rootFrequencyBackup = mappingRoot.frequency;
-    rootFrequencyBox->setText(juce::String(mappingRoot.frequency), juce::NotificationType::dontSendNotification);
+    rootFrequencyBox->setText(juce::String(mappingRoot.frequency) + " Hz", juce::NotificationType::dontSendNotification);
 
     rootChannelBackup = mappingRoot.mapping.midiChannel;
     rootMidiChannelBox->setText(juce::String(rootChannelBackup), juce::NotificationType::dontSendNotification);
@@ -362,3 +494,22 @@ void MappingPanel::mappingRootEdited()
     tuningWatchers.call(&TuningWatcher::targetMappingRootChanged, this, newRoot);
 }
 
+void MappingPanel::mtsSnapNoteChanged()
+{
+    auto mtsNote = (int)mtsNoteSlider->getValue();
+    
+    // TODO note number to note label
+}
+
+void MappingPanel::snapButtonClicked()
+{
+    auto mtsNote = (int)mtsNoteSlider->getValue();
+    auto frequency = mtsToFrequency(mtsNote);
+    rootFrequencyBox->setText(juce::String(frequency) + " Hz", juce::NotificationType(sendNotification));
+}
+
+juce::String MappingPanel::getFrequencyGroupTitle() const
+{
+    return (lockReferenceButton->getToggleState()) ? juce::String("Root Frequency") 
+                                                   : juce::String("Reference Frequency");
+}
