@@ -357,8 +357,12 @@ bool MultimapperAudioProcessorEditor::performOpenTuning(const juce::ApplicationC
             if (result.existsAsFile())
             {
                 TuningFileParser parser(result);
-                audioProcessor.setTuningTarget(parser.getTuning());
-                setContentComponent(overviewPanel.get());
+                auto tuning = parser.getTuning();
+                if (tuning != nullptr)
+                {
+                    audioProcessor.setTuningTarget(tuning);
+                    setContentComponent(overviewPanel.get());
+                }
             }
         });
 

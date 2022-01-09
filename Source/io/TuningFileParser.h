@@ -62,6 +62,8 @@ private:
 
     static juce::String tunInfoToString(const TUN::CSingleScale& tunScale);
 
+    static void showError(juce::String filename, TUN::CErr err);
+
 private:
 
     //juce::String filePath;

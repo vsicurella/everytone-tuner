@@ -59,10 +59,23 @@ std::shared_ptr<FunctionalTuning> TuningFileParser::parseScalaFileDefinition(juc
 
     TUN::CSCL_Import sclImport;
 
-    sclImport.ReadSCL(path.c_str());
+    auto ok = sclImport.ReadSCL(path.c_str());
+
+    if (!ok)
+    {
+        showError(path, sclImport.Err());
+        return nullptr;
+    }
     
     TUN::CSingleScale tunSingleScale;
     sclImport.SetSingleScale(tunSingleScale);
+
+    ok = sclImport.Err().IsOK();
+    if (!ok)
+    {
+        showError(path, tunSingleScale.Err());
+        return nullptr;
+    }
 
     int baseNote = tunSingleScale.GetBaseNote();
     double baseFreq = tunSingleScale.GetBaseFreqHz();
@@ -102,8 +115,12 @@ std::shared_ptr<TuningTable> TuningFileParser::parseTunFileDefinition(juce::File
 
     std::string path = tunFile.getFullPathName().toStdString();
 
-    if (tunSingleScale.Read(path.c_str()) < 1)
+    auto code = tunSingleScale.Read(path.c_str());
+    if (code < 1)
+    {
+        showError(path, tunSingleScale.Err());
         return nullptr;
+    }
 
     juce::Array<double> centsTable;
     int baseNote = tunSingleScale.GetBaseNote();
@@ -219,4 +236,13 @@ juce::String TuningFileParser::tunInfoToString(const TUN::CSingleScale& tunScale
     }
 
     return info;
+}
+
+void TuningFileParser::showError(juce::String fileName, TUN::CErr err)
+{
+    juce::AlertWindow::showMessageBoxAsync(
+        juce::MessageBoxIconType::WarningIcon, 
+        juce::String("Error loading ") + fileName,
+        juce::String(err.GetLastError()), 
+        juce::String("OK"));
 }
