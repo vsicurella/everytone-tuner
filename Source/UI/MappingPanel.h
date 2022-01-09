@@ -74,5 +74,7 @@ private:
 
     juce::String getFrequencyGroupTitle() const;
 
+    static Point<float> getComponentMidPointEdge(juce::Component& component, bool leftEdge);
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MappingPanel)
 };

@@ -162,8 +162,58 @@ MappingPanel::~MappingPanel()
     referenceMidiChannelBox = nullptr;
 }
 
+Point<float> MappingPanel::getComponentMidPointEdge(juce::Component& component, bool leftEdge)
+{
+    return component.getBounds()
+                    .getCentre()
+                    .withX((leftEdge) ? component.getX() : component.getRight())
+                    .toFloat();
+}
+
 void MappingPanel::paint (juce::Graphics& g)
 {
+    juce::Path path;
+    float lineThickness = 1.0f;
+
+    auto referenceMid = getComponentMidPointEdge(*referenceGroup, false);
+    auto frequencyMid = getComponentMidPointEdge(*frequencyGroup, true);
+
+    if (lockReferenceButton->getToggleState())
+    {
+        auto rootMid = getComponentMidPointEdge(*rootGroup, false);
+        auto lockLeftMid = getComponentMidPointEdge(*lockReferenceButton, true);
+        auto lockRightMid = getComponentMidPointEdge(*lockReferenceButton, false);
+
+        auto leftLockMarginMidX = (referenceGroup->getRight() + lockReferenceButton->getX()) * 0.5f;
+
+        auto refLeftLockMarginMid = referenceMid.withX(leftLockMarginMidX);
+        auto rootLeftLockMarginMid = rootMid.withX(leftLockMarginMidX);
+        auto controlMidLeftLockMid = lockLeftMid.withX(leftLockMarginMidX);
+
+        path.addLineSegment(juce::Line<float>(referenceMid, refLeftLockMarginMid), lineThickness);
+        path.addLineSegment(juce::Line<float>(refLeftLockMarginMid, controlMidLeftLockMid), lineThickness);
+
+        path.addLineSegment(juce::Line<float>(rootMid, rootLeftLockMarginMid), lineThickness);
+        path.addLineSegment(juce::Line<float>(rootLeftLockMarginMid, controlMidLeftLockMid), lineThickness);
+
+        path.addLineSegment(juce::Line<float>(controlMidLeftLockMid, lockLeftMid), lineThickness);
+
+
+        auto rightLockMarginMidX = (lockReferenceButton->getRight() + frequencyGroup->getX()) * 0.5f;
+        auto rightLockMarginMid = lockRightMid.withX(rightLockMarginMidX);
+        path.addLineSegment(juce::Line<float>(lockRightMid, rightLockMarginMid), lineThickness);
+
+        auto rightLockMarginFreq = rightLockMarginMid.withY(frequencyMid.getY());
+        path.addLineSegment(juce::Line<float>(rightLockMarginMid, rightLockMarginFreq), lineThickness);
+        path.addLineSegment(juce::Line<float>(rightLockMarginFreq, frequencyMid), lineThickness);
+    }
+    else
+    {
+        path.addLineSegment(juce::Line<float>(referenceMid, frequencyMid), lineThickness);
+    }
+
+    g.setColour(juce::Colours::lightgrey);
+    g.strokePath(path, juce::PathStrokeType(lineThickness));
 }
 
 void MappingPanel::resized()
@@ -261,6 +311,8 @@ void MappingPanel::setLockState(bool isLocked, bool sendChangeMessage)
     {
         mappingRootFrequencyLabel->setText(juce::String(tuning->frequencyFromRoot(0)), juce::NotificationType::dontSendNotification);
     }
+
+    repaint();
 
     if (sendChangeMessage)
         tuningReferenceEdited();
