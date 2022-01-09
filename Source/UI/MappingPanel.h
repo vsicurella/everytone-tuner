@@ -34,7 +34,6 @@ class MappingPanel  : public juce::Component, public TuningChanger, public Optio
     std::unique_ptr<LabelMouseHighlight> rootFrequencyBox;
     std::unique_ptr<juce::GroupComponent> frequencyGroup;
 
-    //std::unique_ptr<juce::Label> mtsNoteLabel;
     std::unique_ptr<juce::Slider> mtsNoteSlider;
     std::unique_ptr<juce::TextButton> mtsSnapButton;
     std::unique_ptr<juce::GroupComponent> mtsSnapGroup;
@@ -47,8 +46,6 @@ class MappingPanel  : public juce::Component, public TuningChanger, public Optio
 
     juce::OwnedArray<juce::Label> labels;
     juce::Label* rootChannelLabel;
-    juce::Label* refChannelLabel;
-    //juce::Label* mtsSnapLabel;
     juce::Label* mtsNoteLabel;
 
     const MappedTuningTable* tuning;
