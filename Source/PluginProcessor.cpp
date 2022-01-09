@@ -289,6 +289,9 @@ void MultimapperAudioProcessor::setStateInformation (const void* data, int sizeI
         loadedOptions = Everytone::Options::fromValueTree(optionsTree);
     }
 
+    if (targetTuning == nullptr)
+        targetTuning = sourceTuning;
+
     if (targetMapping == nullptr)
         tunerController->setTunings(sourceTuning, sourceReference, targetTuning, targetReference);
     else

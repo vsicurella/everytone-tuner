@@ -47,7 +47,7 @@ public:
     struct Root
     {
         int midiChannel = 1;
-        int midiNote = 60;
+        int midiNote = 69;
 
         bool operator==(const TuningTableMap::Root& root) const
         {

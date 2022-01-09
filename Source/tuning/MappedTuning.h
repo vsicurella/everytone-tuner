@@ -52,7 +52,7 @@ public:
     struct Root
     {
         FrequencyReference tuningReference;
-        double frequency = 261.6255653;
+        double frequency = 440.0;
         TuningTableMap::Root mapping;
 
         bool operator==(const Root& root)
