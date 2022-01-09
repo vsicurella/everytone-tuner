@@ -38,6 +38,8 @@ class MappingPanel  : public juce::Component, public TuningChanger, public Optio
     int rootNoteBackup;
 
     juce::OwnedArray<juce::Label> labels;
+    juce::Label* rootChannelLabel;
+    juce::Label* refChannelLabel;
 
     MappedTuningTable* tuning;
 

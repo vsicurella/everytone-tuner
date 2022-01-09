@@ -32,7 +32,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
     referenceMidiChannelBox->setEnabled(!referenceLocked);
     referenceMidiChannelBox->onTextChange = [this]() { tuningReferenceEdited(); };
 
-    auto refChannelLabel = labels.add(new juce::Label("referenceChannelLabel", "MIDI Channel:"));
+    refChannelLabel = labels.add(new juce::Label("referenceChannelLabel", "MIDI Channel:"));
     addAndMakeVisible(*refChannelLabel);
     refChannelLabel->setJustificationType(juce::Justification::centredRight);
     refChannelLabel->attachToComponent(referenceMidiChannelBox.get(), true);
@@ -61,7 +61,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
 
     lockReferenceButton = std::make_unique<juce::TextButton>("lockReferenceButton", "Lock Tuning Reference to Mapping Root");
     addAndMakeVisible(*lockReferenceButton);
-    lockReferenceButton->setButtonText("Lock Reference");
+    lockReferenceButton->setButtonText("Lock");
     lockReferenceButton->setClickingTogglesState(true);
     lockReferenceButton->setToggleState(referenceLocked, juce::NotificationType::dontSendNotification);
     lockReferenceButton->onClick = [this]() { lockReferenceButtonClicked(); };
@@ -72,7 +72,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
     rootMidiChannelBox->setEditable(false, true);
     rootMidiChannelBox->onTextChange = [this]() { mappingRootEdited(); };
 
-    auto rootChannelLabel = labels.add(new juce::Label("rootChannelLabel", "MIDI Channel:"));
+    rootChannelLabel = labels.add(new juce::Label("rootChannelLabel", "MIDI Channel:"));
     rootChannelLabel->setJustificationType(juce::Justification::centredRight);
     rootChannelLabel->attachToComponent(rootMidiChannelBox.get(), true);
     addAndMakeVisible(rootChannelLabel);
@@ -107,7 +107,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
     periodicMappingButton->setToggleState(options.mappingType == Everytone::MappingType::Periodic, juce::NotificationType::dontSendNotification);
     periodicMappingButton->setRadioGroupId(10);
 
-    auto mappingLabel = labels.add(new juce::Label("mappingLabel", "Mapping:"));
+    auto mappingLabel = labels.add(new juce::Label("mappingLabel", "Type:"));
     mappingLabel->setJustificationType(juce::Justification::centredRight);
     mappingLabel->attachToComponent(linearMappingButton.get(), true);
     addAndMakeVisible(mappingLabel);
@@ -147,18 +147,23 @@ void MappingPanel::resized()
     auto margin = 0.01;
     margin *= (w > h) ? w : h;
 
-    auto controlHeight = (h - margin * 5) * 0.2f;
+    auto controlFont = referenceMidiChannelBox->getFont();
+    int referenceControlWidth = controlFont.getStringWidth("9999");
+    auto controlHeight = controlFont.getHeight() + margin * 2;
 
-    int referenceControlWidth = w * 0.18;
-    int referenceWidth = w * 0.38;
-    int referenceLabelWidth = w * 0.15;
+    int referenceLabelWidth = controlFont.getStringWidth(rootChannelLabel->getText());
     juce::FlexItem::Margin referenceMargin(0, 0, 0, referenceLabelWidth);
 
 
     juce::FlexBox main;
     main.flexDirection = juce::FlexBox::Direction::row;
+    main.justifyContent = juce::FlexBox::JustifyContent::spaceBetween;
 
     // Mapping Root & Tuning Reference column
+
+    juce::FlexBox mapRefColumnFlex;
+    mapRefColumnFlex.flexDirection = juce::FlexBox::Direction::column;
+    //mapRefColumnFlex.justifyContent = juce::FlexBox::JustifyContent::center;
 
     int mapRefSectionRows = 5;
     int mapRefControlHeight = h / (mapRefSectionRows * 2);
@@ -174,18 +179,25 @@ void MappingPanel::resized()
     rootBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *rootMidiChannelBox).withMargin(referenceMargin));
     rootBox.items.add(juce::FlexItem(referenceControlWidth, controlHeight, *rootMidiNoteBox).withMargin(referenceMargin));
 
-    int buttonWidth = juce::roundToInt(w * 0.15);
-    int buttonHeight = juce::roundToInt(controlHeight * 0.6);
+    int buttonWidth = juce::roundToInt(w * 0.1);
+    int buttonHeight = juce::roundToInt(controlHeight * 0.8);
 
     juce::FlexBox mappingRow;
+    juce::FlexItem::Margin mappingRowMargin(0, 0, 0, w * 0.08);
     mappingRow.justifyContent = juce::FlexBox::JustifyContent::flexStart;
     mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *linearMappingButton));
     mappingRow.items.add(juce::FlexItem(buttonWidth, buttonHeight, *periodicMappingButton));
-    rootBox.items.add(juce::FlexItem(buttonWidth * 2, buttonHeight, mappingRow).withMargin(referenceMargin));
+    rootBox.items.add(juce::FlexItem(buttonWidth * 2, buttonHeight, mappingRow).withMargin(mappingRowMargin));
 
-    main.items.add(juce::FlexItem(referenceBox).withMinHeight(halfHeight).withMinWidth(referenceControlWidth));
+    auto rootBoxItem = juce::FlexItem(rootBox).withMinWidth(referenceControlWidth).withMinHeight(halfHeight);
+    mapRefColumnFlex.items.add(rootBoxItem);
 
-    main.items.add(juce::FlexItem(w * 0.12f, controlHeight, *lockReferenceButton).withAlignSelf(juce::FlexItem::AlignSelf::center));
+    auto refBoxItem = juce::FlexItem(referenceBox).withMinWidth(referenceControlWidth).withMinHeight(halfHeight);
+    mapRefColumnFlex.items.add(refBoxItem);
+    main.items.add(juce::FlexItem(mapRefColumnFlex).withMinWidth(referenceControlWidth).withMinHeight(h));
+
+
+    main.items.add(juce::FlexItem(buttonWidth, controlHeight, *lockReferenceButton).withAlignSelf(juce::FlexItem::AlignSelf::center));
 
     int freqSectionColumns = 3;
     int freqSectionHeight = h / freqSectionColumns;
@@ -193,6 +205,7 @@ void MappingPanel::resized()
     juce::FlexBox freqColumnBox;
     freqColumnBox.flexDirection = juce::FlexBox::Direction::column;
     freqColumnBox.justifyContent = juce::FlexBox::JustifyContent::center;
+    freqColumnBox.alignContent = juce::FlexBox::AlignContent::flexStart;
 
     freqColumnBox.items.add(juce::FlexItem(*rootFrequencyBox).withMinWidth(referenceControlWidth).withMinHeight(controlHeight));
 
@@ -205,8 +218,21 @@ void MappingPanel::resized()
     
     main.performLayout(getLocalBounds());
 
-    //referenceGroup->setBounds(getLocalBounds().withRight(getWidth() * 0.4f));
     //rootGroup->setBounds(getLocalBounds().withTrimmedLeft(getWidth() * 0.6f));
+    //referenceGroup->setBounds(getLocalBounds().withRight(getWidth() * 0.4f));
+
+    auto groupXMargin = w * 0.02;
+    auto groupYMargin = h * 0.07f;
+
+    auto rootBounds = juce::Rectangle<int>(rootChannelLabel->getPosition(), periodicMappingButton->getBounds().getBottomRight());
+    rootBounds = rootBounds.withRight(rootBounds.getRight() + groupXMargin);
+    DBG(rootBounds.toString());
+    rootGroup->setBounds(rootBounds.expanded(0, groupYMargin));
+
+    
+    auto refBounds = rootBounds.withPosition(refChannelLabel->getPosition()).withHeight(controlHeight * 2);
+    DBG(refBounds.toString());
+    referenceGroup->setBounds(refBounds.expanded(0, groupYMargin));
 }
 
 void MappingPanel::lockReferenceButtonClicked()
