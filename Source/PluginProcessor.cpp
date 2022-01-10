@@ -399,7 +399,7 @@ Everytone::Options MultimapperAudioProcessor::options() const
         tunerController->getMappingMode(),
         tunerController->getMappingType(),
         voiceController->getChannelMode(),
-        Everytone::MpeZone::Lower,
+        voiceController->getMpeZone(),
         Everytone::MidiMode::Mono,
         Everytone::VoiceRule::Ignore,
         voiceInterpolator->getBendMode(),
