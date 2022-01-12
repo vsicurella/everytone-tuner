@@ -21,14 +21,6 @@ MidiVoice::MidiVoice(int channelIn, int noteIn, juce::uint8 velocityIn, int assi
     update();
 }
 
-void MidiVoice::updateMapping()
-{
-    //auto previousMappedNote = currentMappedNote;
-    //currentMappedNote = tuner->getNoteMapping(midiChannel, midiNote);
-    //auto previousTuningIndex = currentTuningIndex;
-    //currentTuningIndex = tuner->get
-}
-
 void MidiVoice::updatePitch()
 {
     auto previousPitch = currentPitch;
@@ -58,7 +50,6 @@ void MidiVoice::updatePitch()
 
 void MidiVoice::update()
 {
-    updateMapping();
     updatePitch();
 }
 

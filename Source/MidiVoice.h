@@ -25,7 +25,10 @@ class MidiVoice
     juce::uint8 velocity = 0;
     juce::uint8 aftertouch = 0;
 
-    const int assignedChannel = -1;
+    // below 0 and above 16 is reserved for invalid voices
+    // 0 is reserved for inactive voices
+    // 1 through 16 are active voices
+    int assignedChannel = -1;
 
     juce::Array<LinkedController> controllers;
 
@@ -54,8 +57,16 @@ public:
     int getMidiNoteIndex() const { return (midiChannel - 1) * 128 + midiNote; }
 
     int getAssignedChannel() const { return assignedChannel; }
+
+    MidiPitch getCurrentPitch() const { return currentPitch; }
+
+    bool isValid() const { return assignedChannel >= 0 && assignedChannel <= 16; }
+
+    bool isInvalid() const { return assignedChannel < 0 || assignedChannel > 16; }
+
+    bool isActive() const { return assignedChannel > 0 && assignedChannel <= 16; }
     
-    void updateMapping();
+    void reassignChannel(int midiChannel) { assignedChannel = midiChannel; }
 
     void updatePitch();
 
