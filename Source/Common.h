@@ -55,7 +55,7 @@ namespace Everytone
         static juce::Identifier MidiMode("MidiMode");
         static juce::Identifier MpeZone("MpeZone");
         static juce::Identifier MpeChannels("MpeChannels");
-        static juce::Identifier VoiceRule("VoiceRule");
+        static juce::Identifier NotePriority("NotePriority");
         static juce::Identifier BendMode("BendMode");
         static juce::Identifier VoiceLimit("VoiceLimit");
         static juce::Identifier PitchbendRange("PitchbendRange");
@@ -107,30 +107,33 @@ namespace Everytone
         Poly = 3, // Multiple notes on a channel, but only if the pitchbend is the same
     };
 
-    enum class VoiceRule
+    enum class NotePriority
     {
-        Ignore,        // Ignore new notes if voice limit is met
-        Overwrite,    // Overwrite oldest note if voice limit is met
+        Lowest,     // Create note-ons for the lowest held notes
+        Highest,    // Create note-ons for the highest held notes
+        Last,       // Create note-ons for each played note, and when voice becomes available, retrigger previous note
     };
+
+    // TODO Mode for retriggering or bending (given pitchbend range limits)
 
     enum class BendMode
     {
-        Static = 1,        // Send one pitchbend per note Note On
-        Persistent,        // Send pitchbend messages while notes are on
-        Dynamic            // Send pitchbend messages to active notes when tuning changes
+        Static = 1,     // Send one pitchbend per note Note On
+        Persistent,     // Send pitchbend messages while notes are on
+        Dynamic         // Send pitchbend messages to active notes when tuning changes
     };
 
     struct Options
     {
-        MappingMode mappingMode     = MappingMode::Auto;
-        MappingType mappingType     = MappingType::Linear;
-        ChannelMode channelMode     = ChannelMode::FirstAvailable;
-        MpeZone     mpeZone         = MpeZone::Lower;
-        MidiMode    midiMode        = MidiMode::Mono;
-        VoiceRule   voiceRule       = VoiceRule::Ignore;
-        BendMode    bendMode        = BendMode::Static;
-        int         voiceLimit      = 16;
-        int         pitchbendRange  = 96; // Unsure if this should be +/- 2 or MPE default
+        MappingMode     mappingMode     = MappingMode::Auto;
+        MappingType     mappingType     = MappingType::Linear;
+        ChannelMode     channelMode     = ChannelMode::FirstAvailable;
+        MpeZone         mpeZone         = MpeZone::Lower;
+        MidiMode        midiMode        = MidiMode::Mono;
+        NotePriority    notePriority    = NotePriority::Last;
+        BendMode        bendMode        = BendMode::Static;
+        int             voiceLimit      = 16;
+        int             pitchbendRange  = 96; // Unsure if this should be +/- 2 or MPE default
 
         juce::ValueTree toValueTree() const
         {
@@ -141,7 +144,7 @@ namespace Everytone
             tree.setProperty(ID::MpeZone,           (int)mpeZone,           nullptr);
             tree.setProperty(ID::MidiMode,          (int)midiMode,          nullptr);
             tree.setProperty(ID::BendMode,          (int)bendMode,          nullptr);
-            tree.setProperty(ID::VoiceRule,         (int)voiceRule,         nullptr);
+            tree.setProperty(ID::NotePriority,      (int)notePriority,         nullptr);
             tree.setProperty(ID::VoiceLimit,        (int)voiceLimit,        nullptr);
             tree.setProperty(ID::PitchbendRange,    (int)pitchbendRange,    nullptr);
             return tree;
@@ -157,7 +160,7 @@ namespace Everytone
                 if (tree.hasProperty(ID::ChannelMode))      options.channelMode     = ChannelMode   ((int)tree[ID::ChannelMode]);
                 if (tree.hasProperty(ID::MpeZone))          options.mpeZone         = MpeZone       ((int)tree[ID::MpeZone]);
                 if (tree.hasProperty(ID::MidiMode))         options.midiMode        = MidiMode      ((int)tree[ID::MidiMode]);
-                if (tree.hasProperty(ID::VoiceRule))        options.voiceRule       = VoiceRule     ((int)tree[ID::VoiceRule]);
+                if (tree.hasProperty(ID::NotePriority))     options.notePriority    = NotePriority  ((int)tree[ID::NotePriority]);
                 if (tree.hasProperty(ID::BendMode))         options.bendMode        = BendMode      ((int)tree[ID::BendMode]);
                 if (tree.hasProperty(ID::VoiceLimit))       options.voiceLimit      = (int)tree[ID::VoiceLimit];
                 if (tree.hasProperty(ID::PitchbendRange))   options.pitchbendRange  = (int)tree[ID::PitchbendRange];
