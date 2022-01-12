@@ -51,7 +51,8 @@ void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, bool 
     if (setReference)
         sourceReference = reference;
 
-    setSourceTuning(tuning, mapForTuning(tuning.get(), false), true);
+    auto mapping = mapForTuning(tuning.get(), false);
+    setSourceTuning(tuning, mapping, true);
 }
 
 void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping)
@@ -70,7 +71,8 @@ void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, bool 
     if (setReference)
         targetReference = reference;
 
-    setTargetTuning(tuning, mapForTuning(tuning.get(), true), true);
+    auto mapping = mapForTuning(tuning.get(), true);
+    setTargetTuning(tuning, mapping, true);
 }
 
 void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping)
@@ -86,8 +88,10 @@ void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, std::
 
 void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTable> targetTuning)
 {
-    setTunings(sourceTuning, mapForTuning(sourceTuning.get(), false),
-               targetTuning, mapForTuning(targetTuning.get(), true), true);
+    auto newSourceMapping = mapForTuning(sourceTuning.get(), false);
+    auto newTargetMapping = mapForTuning(targetTuning.get(), true);
+    setTunings(sourceTuning, newSourceMapping,
+               targetTuning, newTargetMapping, true);
 }
 
 void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, MappedTuningTable::FrequencyReference sourceReferenceIn,
@@ -267,7 +271,7 @@ void TunerController::setPitchbendRange(int pitchbendRangeIn)
     juce::Logger::writeToLog("Pitchbend range of " + juce::String(pitchbendRangeIn) + " was ignored.");
 }
 
-void TunerController::setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner)
+void TunerController::setSourceTuning(std::shared_ptr<TuningTable>& tuning, std::shared_ptr<TuningTableMap>& mapping, bool updateTuner)
 {
     auto mappedSource = std::make_shared<MappedTuningTable>(tuning, mapping);
     setSource(mappedSource, updateTuner);
@@ -287,7 +291,7 @@ void TunerController::setSource(std::shared_ptr<MappedTuningTable>& mappedTuning
     }
 }
 
-void TunerController::setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner)
+void TunerController::setTargetTuning(std::shared_ptr<TuningTable>& tuning, std::shared_ptr<TuningTableMap>& mapping, bool updateTuner)
 {
     auto mappedTarget = std::make_shared<MappedTuningTable>(tuning, mapping, targetReference);
     setTarget(mappedTarget, updateTuner);
@@ -307,8 +311,8 @@ void TunerController::setTarget(std::shared_ptr<MappedTuningTable>& mappedTuning
     }
 }
 
-void TunerController::setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
-                                 std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping, bool sendChangeMessages)
+void TunerController::setTunings(std::shared_ptr<TuningTable>& sourceTuning, std::shared_ptr<TuningTableMap>& sourceMapping,
+                                 std::shared_ptr<TuningTable>& targetTuning, std::shared_ptr<TuningTableMap>& targetMapping, bool sendChangeMessages)
 {
     setSourceTuning(sourceTuning, sourceMapping, false);
     setTargetTuning(targetTuning, targetMapping, false);

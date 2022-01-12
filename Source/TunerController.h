@@ -6,7 +6,10 @@
     Author:  Vincenzo
 
     Manage tunings and mappings, and also create mappings in AutoMapping mode.
-    It should only allocate data when necessary by using shared pointers.
+    
+    Uses shared pointers to preserve MidiNoteTuner objects that are assigned
+    to active notes so that Note-Off messages are still scoped to the parameters
+    the associated Note-On message was created with.
 
   ==============================================================================
 */
@@ -131,14 +134,14 @@ private:
 
     std::shared_ptr<TuningTableMap> mapForTuning(const TuningTable* tuning, bool isTarget);
 
-    void setSourceTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner);
+    void setSourceTuning(std::shared_ptr<TuningTable>& tuning, std::shared_ptr<TuningTableMap>& mapping, bool updateTuner);
     void setSource(std::shared_ptr<MappedTuningTable>& mappedTuning, bool updateTuner);
 
-    void setTargetTuning(std::shared_ptr<TuningTable> tuning, std::shared_ptr<TuningTableMap> mapping, bool updateTuner);
+    void setTargetTuning(std::shared_ptr<TuningTable>& tuning, std::shared_ptr<TuningTableMap>& mapping, bool updateTuner);
     void setTarget(std::shared_ptr<MappedTuningTable>& mappedTuning, bool updateTuner);
 
-    void setTunings(std::shared_ptr<TuningTable> sourceTuning, std::shared_ptr<TuningTableMap> sourceMapping,
-                    std::shared_ptr<TuningTable> targetTuning, std::shared_ptr<TuningTableMap> targetMapping, bool sendChangeMessages);
+    void setTunings(std::shared_ptr<TuningTable>& sourceTuning, std::shared_ptr<TuningTableMap>& sourceMapping,
+                    std::shared_ptr<TuningTable>& targetTuning, std::shared_ptr<TuningTableMap>& targetMapping, bool sendChangeMessages);
 
     void updateCurrentTuner();
 
