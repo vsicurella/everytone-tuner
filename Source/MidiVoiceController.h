@@ -24,6 +24,7 @@ public:
     public:
 
         virtual void voiceAdded(MidiVoice* voice) {}
+        virtual void voiceChanged(MidiVoice* voice) {}
         virtual void voiceRemoved(MidiVoice* voice) {}
     };
 
@@ -36,8 +37,11 @@ private:
 
     juce::Array<bool> midiChannelDisabled;
 
+    MidiBuffer inactiveVoiceMessages;
+
     Everytone::ChannelMode channelMode = Everytone::ChannelMode::FirstAvailable;
     Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower;
+    Everytone::NotePriority notePriority = Everytone::NotePriority::Last;
 
     int voiceLimit = MULTIMAPPER_MAX_VOICES;
 
@@ -45,6 +49,11 @@ private:
     int lastChannelAssigned = 0;
 
 private:
+
+    int findLowestVoiceIndex(bool active) const;
+    int findHighestVoiceIndex(bool active) const;
+    int findOldestVoice(bool active) const;
+    int findMostRecentVoice(bool active) const;
 
     int nextAvailableVoiceIndex() const;
     int nextRoundRobinVoiceIndex() const;
@@ -57,7 +66,8 @@ private:
 
     int effectiveVoiceLimit() const;
 
-    const MidiVoice* getVoice(int index) const;
+    const MidiVoice* addVoice(int midiChannel, int midiNote, juce::uint8 velocity);
+    const MidiVoice* getExistingVoice(int index) const;
     MidiVoice removeVoice(int index);
 
 public:
@@ -70,28 +80,29 @@ public:
 
     Everytone::ChannelMode getChannelMode() const { return channelMode; }
     Everytone::MpeZone getMpeZone() const { return mpeZone; }
+    Everytone::NotePriority getNotePriority() const { return notePriority; }
 
     int getVoiceLimit() const { return voiceLimit; }
 
+    // Number of all voices held, regardless if they are active
+    int numAllVoices() const;
 
-    const MidiVoice* getVoice(int midiChannel, int midiNote) const;
-    const MidiVoice* getVoice(const juce::MidiMessage& msg) const;
+    // Array of all voices held, regardless if they are active
+    juce::Array<MidiVoice> getAllVoices() const;
 
-    //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;
+    int numActiveVoices() const;
 
-    int numVoices() const;
-    juce::Array<MidiVoice> getActiveVoices() const;
-
-    int channelOfVoice(int midiChannel, int midiNote) const;
-    int channelOfVoice(const juce::MidiMessage& msg) const;
-
-
-    const MidiVoice* addVoice(int midiChannel, int midiNote, juce::uint8 velocity);
-    const MidiVoice* addVoice(const juce::MidiMessage& msg);
+    const MidiVoice* getVoice(int midiChannel, int midiNote, juce::uint8 velocity = 0);
+    const MidiVoice* getVoice(const juce::MidiMessage& msg);
 
     MidiVoice removeVoice(int midiChannel, int midiNote);
     MidiVoice removeVoice(const juce::MidiMessage& msg);
     MidiVoice removeVoice(const MidiVoice* voice);
+
+    //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;
+
+    int channelOfVoice(int midiChannel, int midiNote) const;
+    int channelOfVoice(const juce::MidiMessage& msg) const;
 
     bool channelIsFree(int channelNumber, MidiPitch pitchToAssign = MidiPitch()) const;
 
@@ -99,6 +110,7 @@ public:
     
     void setChannelMode(Everytone::ChannelMode mode);
     void setMpeZone(Everytone::MpeZone zone);
+    void setNotePriority(Everytone::NotePriority notePriorityIn);
     void setVoiceLimit(int voiceLimit);
 
 };

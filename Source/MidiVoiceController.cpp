@@ -31,47 +31,24 @@ MidiVoiceController::~MidiVoiceController()
 
 }
 
-
-const MidiVoice* MidiVoiceController::getVoice(int index) const
-{
-    return voices[index];
-}
-
-
-const MidiVoice* MidiVoiceController::getVoice(int midiChannel, int midiNote) const
-{
-    auto voiceIndex = indexOfVoice(midiChannel, midiNote);
-    if (voiceIndex >= 0 && voiceIndex < MULTIMAPPER_MAX_VOICES)
-        return getVoice(voiceIndex);
-    return nullptr;
-}
-
-const MidiVoice* MidiVoiceController::getVoice(const juce::MidiMessage& msg) const
-{
-    auto channel = msg.getChannel();
-    auto note = msg.getNoteNumber();
-    return getVoice(channel, note);
-}
-
-int MidiVoiceController::numVoices() const
-{
-    //int num = 0;
-    //for (int i = 0; i < voices.size(); i++)
-    //{
-    //    if (getVoice(i)->getAssignedChannel() >= 0)
-    //        num++;
-    //}
-
-    //return num;
-    return activeVoices.size();
-}
-
-juce::Array<MidiVoice> MidiVoiceController::getActiveVoices() const
+juce::Array<MidiVoice> MidiVoiceController::getAllVoices() const
 {
     juce::Array<MidiVoice> activeVoicesCopy;
     for (auto voice : activeVoices)
         activeVoicesCopy.add(*voice);
     return activeVoicesCopy;
+}
+
+int MidiVoiceController::numActiveVoices() const
+{
+    int num = 0;
+    for (int i = 0; i < voices.size(); i++)
+    {
+        if (getExistingVoice(i)->isActive() >= 0)
+            num++;
+    }
+
+    return num;
 }
 
 int MidiVoiceController::channelOfVoice(int midiChannel, int midiNote) const
@@ -104,14 +81,6 @@ const MidiVoice* MidiVoiceController::addVoice(int midiChannel, int midiNote, ju
     return nullptr;
 }
 
-const MidiVoice* MidiVoiceController::addVoice(const juce::MidiMessage& msg)
-{
-    auto channel = msg.getChannel();
-    auto note = msg.getNoteNumber();
-    auto velocity = msg.getVelocity();
-    return addVoice(channel, note, velocity);
-}
-
 MidiVoice MidiVoiceController::removeVoice(int index)
 {
     if (index >= 0 && index < MULTIMAPPER_MAX_VOICES)
@@ -122,6 +91,33 @@ MidiVoice MidiVoiceController::removeVoice(int index)
         return voice;
     }
     return MidiVoice();
+}
+
+const MidiVoice* MidiVoiceController::getExistingVoice(int index) const
+{
+    return voices[index];
+}
+
+const MidiVoice* MidiVoiceController::getVoice(int midiChannel, int midiNote, juce::uint8 velocity = 0)
+{
+    auto voiceIndex = indexOfVoice(midiChannel, midiNote);
+    if (voiceIndex >= 0 && voiceIndex < MULTIMAPPER_MAX_VOICES)
+        return getVoice(voiceIndex);
+
+    return addVoice(midiChannel, midiNote, velocity);
+}
+
+const MidiVoice* MidiVoiceController::getVoice(const juce::MidiMessage& msg)
+{
+    auto channel = msg.getChannel();
+    auto note = msg.getNoteNumber();
+
+    return getVoice(channel, note);
+}
+
+int MidiVoiceController::numAllVoices() const
+{
+    return activeVoices.size();
 }
 
 MidiVoice MidiVoiceController::removeVoice(int midiChannel, int midiNote)
@@ -160,7 +156,7 @@ bool MidiVoiceController::channelIsFree(int channelIndex, MidiPitch pitchToAssig
 
     if (!notAvailable)
     {
-        auto voice = getVoice(channelIndex);
+        auto voice = getExistingVoice(channelIndex);
         if (voice != nullptr)
         {
             auto ch = voice->getAssignedChannel();
@@ -192,14 +188,102 @@ void MidiVoiceController::setMpeZone(Everytone::MpeZone zone)
     juce::Logger::writeToLog("MPE Zone set to " + juce::String((int)mpeZone));
 }
 
+void MidiVoiceController::setNotePriority(Everytone::NotePriority notePriorityIn)
+{
+    notePriority = notePriorityIn;
+    juce::Logger::writeToLog("NotePriority set to " + juce::String((int)notePriority));
+}
+
 void MidiVoiceController::setVoiceLimit(int limit)
 {
     voiceLimit = limit;
     juce::Logger::writeToLog("VoiceLimit set to " + juce::String((int)voiceLimit));
 }
 
+int MidiVoiceController::findLowestVoiceIndex(bool active) const
+{
+    if (currentVoices == 0)
+        return 0;
+
+    auto lowestPitch = voices[0]->getCurrentPitch();
+    int lowestIndex = 0;
+    for (int i = 1; i < voices.size(); i++)
+    {
+        auto voice = getExistingVoice(i);
+        if (active && !voice->isActive())
+            continue;
+        
+        auto voicePitch = voice->getCurrentPitch();
+        if (voicePitch.comparedTo(lowestPitch) < 0)
+        {
+            lowestPitch = voicePitch;
+            lowestIndex = i;
+        }
+    }
+
+    return lowestIndex;
+}
+
+int MidiVoiceController::findHighestVoiceIndex(bool active) const
+{
+    if (currentVoices == 0)
+        return 0;
+
+    auto highestPitch = voices[0]->getCurrentPitch();
+    int highestIndex = 0;
+    for (int i = 1; i < voices.size(); i++)
+    {
+        auto voice = getExistingVoice(i);
+        if (active && !voice->isActive())
+            continue;
+
+        auto voicePitch = voice->getCurrentPitch();
+        if (voicePitch.comparedTo(highestPitch) > 0)
+        {
+            highestPitch = voicePitch;
+            highestIndex = i;
+        }
+    }
+
+    return highestIndex;
+}
+
+int MidiVoiceController::findOldestVoice(bool active) const
+{
+    for (int i = 0; i < activeVoices.size(); i++)
+    {
+        auto voice = activeVoices.getUnchecked(i);
+        if (active && !voice->isActive())
+            continue;
+
+        return indexOfVoice(voice);
+    }
+
+    return 0;
+}
+
+int MidiVoiceController::findMostRecentVoice(bool active) const
+{
+    for (int i = 0; i < activeVoices.size(); i++)
+    {
+        int index = activeVoices.size() - i - 1;
+        auto voice = activeVoices.getUnchecked(index);
+        if (active && !voice->isActive())
+            continue;
+
+        return indexOfVoice(voice);
+    }
+
+    return 0;
+}
+
 int MidiVoiceController::nextAvailableVoiceIndex() const
 {
+    if (currentVoices >= voiceLimit)
+    {
+
+    }
+
     for (int i = 0; i < voices.size(); i++)
     {
         if (channelIsFree(i))
@@ -210,6 +294,8 @@ int MidiVoiceController::nextAvailableVoiceIndex() const
 
 int MidiVoiceController::nextRoundRobinVoiceIndex() const
 {
+    bool stealVoice = currentVoices >= voiceLimit;
+
     auto i = lastChannelAssigned + 1;
     int channelsChecked = 0;
     while (channelsChecked < MULTIMAPPER_MAX_VOICES)
@@ -226,9 +312,6 @@ int MidiVoiceController::nextRoundRobinVoiceIndex() const
 
 int MidiVoiceController::getNextVoiceIndex() const
 {
-    if (currentVoices >= voiceLimit)
-        return -1;
-
     switch (channelMode)
     {
     case Everytone::ChannelMode::FirstAvailable:
@@ -241,7 +324,7 @@ int MidiVoiceController::getNextVoiceIndex() const
         jassertfalse;
     }
 
-    return 0;
+    return -1;
 }
 
 
@@ -255,7 +338,7 @@ int MidiVoiceController::indexOfVoice(int midiChannel, int midiNote) const
     auto midiIndex = midiNoteIndex(midiChannel, midiNote);
     for (int i = 0; i < voices.size(); i++)
     {
-        auto voice = getVoice(i);
+        auto voice = getExistingVoice(i);
         if (voice == nullptr)
             continue;
 
@@ -268,7 +351,7 @@ int MidiVoiceController::indexOfVoice(int midiChannel, int midiNote) const
 int MidiVoiceController::indexOfVoice(const MidiVoice* voice) const
 {
     for (int i = 0; i < voices.size(); i++)
-        if (getVoice(i) == voice)
+        if (getExistingVoice(i) == voice)
             return i;
     return -1;
 }

@@ -71,7 +71,7 @@ void MidiVoiceInterpolator::updateTargetVoices()
     switch (bendMode)
     {
     case Everytone::BendMode::Persistent:
-        activeVoiceTargets = voiceController.getActiveVoices();
+        activeVoiceTargets = voiceController.getAllVoices();
         break;
 
     case Everytone::BendMode::Dynamic:
