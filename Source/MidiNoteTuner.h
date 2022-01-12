@@ -24,6 +24,47 @@ struct MidiPitch
 			&& pitchbend == pitch.pitchbend 
 			&& mapped == pitch.mapped;
 	}
+
+	// Comparisons always return true if callee is mapped and arg is unmapped
+
+	bool isLowerThan(const MidiPitch& pitch) const
+	{
+		return (mapped && !pitch.mapped)
+			|| (coarse < pitch.coarse 
+				|| (coarse == pitch.coarse && pitchbend < pitch.pitchbend)
+				);
+	}
+
+	bool isHigherThan(const MidiPitch& pitch) const
+	{
+		return (mapped && !pitch.mapped)
+			|| (coarse > pitch.coarse
+				|| (coarse == pitch.coarse && pitchbend > pitch.pitchbend)
+				);
+	}
+
+	// -1 if this is lower than arg
+	// 0 if they're the same
+	// 1 if this is higher than arg
+	int comparedTo(const MidiPitch& pitch) const
+	{
+		if (coarse == pitch.coarse)
+		{
+			if (pitchbend == pitch.pitchbend)
+				return 0;
+
+			if (pitchbend > pitch.pitchbend)
+				return 1;
+
+			if (pitchbend < pitch.pitchbend)
+				return -1;
+		}
+
+		if (coarse < pitch.coarse)
+			return -1;
+
+		return 1;
+	}
 };
 
 class MidiNoteTuner
