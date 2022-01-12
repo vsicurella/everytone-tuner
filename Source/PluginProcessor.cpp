@@ -333,39 +333,49 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
     for (auto metadata : buffer)
     {
         auto msg = metadata.getMessage();
-        auto status = msg.getRawData()[0];
-        bool isVoice = status >= 0x80 && status < 0xb0;
+        auto status = msg.getRawData()[0] & 0xF0;
 
-        if (isVoice)
+        switch (status)
         {
-            const MidiVoice* voice = nullptr;
-            if (msg.isNoteOn())
+            case 0x80: // Note Off
             {
-                // Check if voice already exists??
-                voice = voiceController->addVoice(msg);
-                if (voice == nullptr)
-                    continue;
+                voiceController->removeVoice(msg);
+                break;
+            }
 
-                auto pbmsg = voice->getPitchbend();
-
-                if (pbmsg.getPitchWheelValue() != 8192)
+            case 0x90: // Note On
+            {
+                if (msg.isNoteOn())
                 {
-                    processedBuffer.addEvent(pbmsg, sample++);
+                    // Check if voice already exists??
+                    auto voice = voiceController->getVoice(msg);
+                    if (voice == nullptr)
+                        continue;
+
+                    voice->mapMidiMessage(msg);
+
+                    auto pbmsg = voice->getPitchbend();
+
+                    if (pbmsg.getPitchWheelValue() != 8192)
+                    {
+                        processedBuffer.addEvent(pbmsg, sample++);
+                    }
                 }
+                break;
             }
-            else
+
+            case 0xA0: // Aftertouch
             {
-                voice = voiceController->getVoice(msg);
+                auto voice = voiceController->getVoice(msg);
                 if (voice == nullptr)
-                    continue;
+                    continue;            
+                
+                voice->mapMidiMessage(msg);
+                break;
             }
 
-            voice->mapMidiMessage(msg);
-
-            if (msg.isNoteOff())
-            {
-                voiceController->removeVoice(voice);
-            }
+            default:
+                break;
         }
 
         processedBuffer.addEvent(msg, sample++);
@@ -401,7 +411,7 @@ Everytone::Options MultimapperAudioProcessor::options() const
         voiceController->getChannelMode(),
         voiceController->getMpeZone(),
         Everytone::MidiMode::Mono,
-        Everytone::VoiceRule::Ignore,
+        voiceController->getNotePriority(),
         voiceInterpolator->getBendMode(),
         voiceController->getVoiceLimit(),
         tunerController->getPitchbendRange()
