@@ -28,6 +28,42 @@ void MidiVoiceInterpolator::timerCallback()
     updateTargetVoices();
 }
 
+void MidiVoiceInterpolator::voiceAdded(MidiVoice voice)
+{
+    voices.add(voice);
+    targetsNeedUpdate = true;
+}
+
+void MidiVoiceInterpolator::voiceChanged(MidiVoice voice)
+{
+    bool found = false;
+    for (int i = 0; i < activeVoiceTargets.size(); i++)
+    {
+        auto activeVoice = activeVoiceTargets[i];
+        if (activeVoice.getMidiNoteIndex() == voice.getMidiNoteIndex())
+        {
+            if (!voice.isActive())
+            {
+                found = true;
+                voices.remove(i);
+                break;
+            }
+        }
+    }
+
+    if (!found)
+    {
+        voices.add(voice);
+        targetsNeedUpdate = true;
+    }
+
+}
+
+void MidiVoiceInterpolator::voiceRemoved(MidiVoice voice)
+{
+    voices.removeAllInstancesOf(voice);
+    targetsNeedUpdate = true;
+}
 
 juce::Array<MidiVoice>MidiVoiceInterpolator:: getVoiceTargets() const
 {
@@ -37,6 +73,7 @@ juce::Array<MidiVoice>MidiVoiceInterpolator:: getVoiceTargets() const
 void MidiVoiceInterpolator::clearVoiceTargets()
 {
     activeVoiceTargets.clearQuick();
+    targetsNeedUpdate = false;
 }
 
 juce::Array<MidiVoice> MidiVoiceInterpolator::getAndClearVoiceTargets()
@@ -68,10 +105,13 @@ void MidiVoiceInterpolator::setBendMode(Everytone::BendMode bendModeIn)
 
 void MidiVoiceInterpolator::updateTargetVoices()
 {
+    if (!targetsNeedUpdate)
+        return;
+
     switch (bendMode)
     {
     case Everytone::BendMode::Persistent:
-        activeVoiceTargets = voiceController.getAllVoices();
+        activeVoiceTargets = voices;
         break;
 
     case Everytone::BendMode::Dynamic:

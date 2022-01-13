@@ -12,13 +12,19 @@
 #include "TunerController.h"
 #include "MidiVoiceController.h"
 
-class MidiVoiceInterpolator : public juce::Timer
+class MidiVoiceInterpolator : public juce::Timer, public MidiVoiceController::Watcher
 {
     const MidiVoiceController& voiceController;
 
     Everytone::BendMode bendMode = Everytone::BendMode::Static;
 
+    // Voices that are held, changed by MidiVoiceController::Watcher implementation
+    juce::Array<MidiVoice> voices;
+
+    // Voices to send update messages for
     juce::Array<MidiVoice> activeVoiceTargets;
+
+    bool targetsNeedUpdate = false;
 
     int updateRateMs = 50;
 
@@ -31,6 +37,11 @@ public:
 
     // juce::Timer implementation
     void timerCallback() override;
+
+    // MidiVoiceController::Watcher implementation
+    void voiceAdded(MidiVoice voice) override;
+    void voiceChanged(MidiVoice voice) override;
+    void voiceRemoved(MidiVoice voice) override;
 
     juce::Array<MidiVoice> getVoiceTargets() const;
 

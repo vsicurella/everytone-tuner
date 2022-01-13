@@ -40,6 +40,7 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
     juce::Logger::setCurrentLogger(logger.get());
 #endif
 
+    voiceController->addVoiceWatcher(voiceInterpolator.get());
 
 #if RUN_MULTIMAPPER_TESTS
     DBG("Running tests...");
@@ -67,6 +68,9 @@ MultimapperAudioProcessor::~MultimapperAudioProcessor()
     juce::Logger::setCurrentLogger(nullptr);
     logger = nullptr;
 
+    voiceController->removeVoiceWatcher(voiceInterpolator.get());
+
+    voiceInterpolator = nullptr;
     voiceController = nullptr;
     tunerController = nullptr;
 }
@@ -343,12 +347,14 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
             case 0x80: // Note Off
             {
                 auto voice = voiceController->removeVoice(msg);
-                if (voice.isValid())
+                if (voice.isActive())
                     voice.mapMidiMessage(msg);
                 else
-                {
-                    jassertfalse;
-                }
+                    continue;
+                //else
+                //{
+                //    jassertfalse;
+                //}
 
                 break;
             }
