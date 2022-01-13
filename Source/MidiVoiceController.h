@@ -13,7 +13,7 @@
 #include "TunerController.h"
 #include "MidiVoice.h"
 
-#define MULTIMAPPER_MAX_VOICES 16
+#define EVERYTONE_LOG_VOICES 0
 
 class MidiVoiceController
 {
@@ -32,20 +32,22 @@ public:
 private:
     TunerController& tuningController;
 
+    int maxVoiceLimit = 16;
+
     juce::OwnedArray<MidiVoice> voices;
-    juce::Array<MidiVoice*> activeVoices;
+    juce::Array<MidiVoice*> heldVoices;
 
     juce::Array<bool> midiChannelDisabled;
 
-    MidiBuffer inactiveVoiceMessages;
+    MidiBuffer notePriorityQueue;
+    int notePrioritySample = 0;
 
     Everytone::ChannelMode channelMode = Everytone::ChannelMode::FirstAvailable;
     Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower;
     Everytone::NotePriority notePriority = Everytone::NotePriority::Last;
 
-    int voiceLimit = MULTIMAPPER_MAX_VOICES;
+    int voiceLimit = maxVoiceLimit;
 
-    int currentVoices = 0;
     int lastChannelAssigned = 0;
 
 private:
@@ -57,6 +59,10 @@ private:
 
     int nextAvailableVoiceIndex() const;
     int nextRoundRobinVoiceIndex() const;
+
+    int getNextVoiceIndexToSteal() const;
+    int getNextVoiceToRetrigger() const;
+
     int getNextVoiceIndex() const;
 
     int midiNoteIndex(int midiChannel, int midiNote) const;
@@ -66,16 +72,20 @@ private:
 
     int effectiveVoiceLimit() const;
 
-    const MidiVoice* addVoice(int midiChannel, int midiNote, juce::uint8 velocity);
     const MidiVoice* getExistingVoice(int index) const;
+    void stealExistingVoice(int index);
+
+    MidiVoice* createVoice(int index, int midiChannel, int midiNote, juce::uint8 velocity);
+    const MidiVoice* findChannelAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity);
+
+    void retriggerExistingVoice(int index, int midiChannel);
     MidiVoice removeVoice(int index);
 
 public:
 
     MidiVoiceController(TunerController& tuningController, 
                         Everytone::ChannelMode channelmodeIn = Everytone::ChannelMode::FirstAvailable,
-                        Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower,
-                        int voiceLimit = MULTIMAPPER_MAX_VOICES);
+                        Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower);
     ~MidiVoiceController();
 
     Everytone::ChannelMode getChannelMode() const { return channelMode; }
@@ -90,7 +100,7 @@ public:
     // Array of all voices held, regardless if they are active
     juce::Array<MidiVoice> getAllVoices() const;
 
-    int numActiveVoices() const;
+    int numHeldVoices() const;
 
     const MidiVoice* getVoice(int midiChannel, int midiNote, juce::uint8 velocity = 0);
     const MidiVoice* getVoice(const juce::MidiMessage& msg);
@@ -98,6 +108,10 @@ public:
     MidiVoice removeVoice(int midiChannel, int midiNote);
     MidiVoice removeVoice(const juce::MidiMessage& msg);
     MidiVoice removeVoice(const MidiVoice* voice);
+
+    // Returns note-off messages for voices that were de-prioritized via NotePriority setting
+    // and clears the buffer
+    MidiBuffer serveNotePriorityMessages();
 
     //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;
 
