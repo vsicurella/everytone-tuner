@@ -119,9 +119,8 @@ public:
 
     void clearAllVoices();
 
-    // Returns note-off messages for voices that were de-prioritized via NotePriority setting
-    // and clears the buffer
-    MidiBuffer serveNotePriorityMessages();
+    // Get messages queued for NotePriority settings, returns size of buffer
+    int serveNotePriorityMessages(MidiBuffer& queueOut);
 
     //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;
 
