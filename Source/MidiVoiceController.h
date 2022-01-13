@@ -23,11 +23,18 @@ public:
     {
     public:
 
-        virtual void voiceAdded(MidiVoice* voice) {}
-        virtual void voiceChanged(MidiVoice* voice) {}
-        virtual void voiceRemoved(MidiVoice* voice) {}
+        virtual void voiceAdded(MidiVoice voice) {}
+        virtual void voiceChanged(MidiVoice voice) {}
+        virtual void voiceRemoved(MidiVoice voice) {}
     };
 
+private:
+
+    juce::ListenerList<MidiVoiceController::Watcher> voiceWatchers;
+    
+public:
+    void addVoiceWatcher(MidiVoiceController::Watcher* watcherIn) { voiceWatchers.add(watcherIn); }
+    void removeVoiceWatcher(MidiVoiceController::Watcher* watcherIn) { voiceWatchers.remove(watcherIn); }
 
 private:
     TunerController& tuningController;
@@ -136,5 +143,4 @@ public:
     void setMpeZone(Everytone::MpeZone zone);
     void setNotePriority(Everytone::NotePriority notePriorityIn);
     void setVoiceLimit(int voiceLimit);
-
 };

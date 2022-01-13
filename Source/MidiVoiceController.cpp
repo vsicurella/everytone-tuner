@@ -105,6 +105,8 @@ void MidiVoiceController::stealExistingVoice(int index)
         queueVoiceNoteOff(voice);
 
         addVoiceToChannel(0, voice);
+
+        voiceWatchers.call(&MidiVoiceController::Watcher::voiceChanged, *voice);
     }
 }
 
@@ -119,6 +121,8 @@ void MidiVoiceController::retriggerExistingVoice(int index, int midiChannel)
 
             removeVoiceFromChannel(0, retriggerVoice);
             addVoiceToChannel(midiChannel, retriggerVoice);
+
+            voiceWatchers.call(&MidiVoiceController::Watcher::voiceChanged, *retriggerVoice);
 
             queueVoiceNoteOn(retriggerVoice);
         }
@@ -180,6 +184,9 @@ const MidiVoice* MidiVoiceController::findChannelAndAddVoice(int midiChannel, in
         lastChannelAssigned = newChannel;
         voices.add(newVoice);
         addVoiceToChannel(newChannel, newVoice);
+
+        voiceWatchers.call(&MidiVoiceController::Watcher::voiceAdded, *newVoice);
+
         return newVoice;
     }
      
@@ -199,6 +206,9 @@ MidiVoice MidiVoiceController::removeVoice(int index)
 
         auto voiceCopy = *voice;
         voices.remove(index);
+
+        voiceWatchers.call(&MidiVoiceController::Watcher::voiceRemoved, voiceCopy);
+
         return voiceCopy;
     }
     return MidiVoice();
