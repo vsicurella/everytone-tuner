@@ -314,22 +314,25 @@ MultimapperLog* MultimapperAudioProcessor::getLog() const
 
 void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
 {
-    juce::MidiBuffer processedBuffer;
-    int sample = 0;
-
     // Update active voices
+    juce::MidiBuffer interpolationMessages;
+    int interpolationSample = 0;
+
     auto voiceTargets = voiceInterpolator->getAndClearVoiceTargets();
     for (auto voice : voiceTargets)
     {
         if (voice.getAssignedChannel() >= 0)
         {
-            processedBuffer.addEvent(voice.getPitchbend(), sample++);
+            interpolationMessages.addEvent(voice.getPitchbend(), interpolationSample++);
         }
         else
             jassertfalse;
     }
 
     // Process new messages
+    juce::MidiBuffer processedBuffer;
+    int processedSample = 0;
+
     for (auto metadata : buffer)
     {
         auto msg = metadata.getMessage();
@@ -339,7 +342,14 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
         {
             case 0x80: // Note Off
             {
-                voiceController->removeVoice(msg);
+                auto voice = voiceController->removeVoice(msg);
+                if (voice.isValid())
+                    voice.mapMidiMessage(msg);
+                else
+                {
+                    jassertfalse;
+                }
+
                 break;
             }
 
@@ -347,7 +357,6 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
             {
                 if (msg.isNoteOn())
                 {
-                    // Check if voice already exists??
                     auto voice = voiceController->getVoice(msg);
                     if (voice == nullptr)
                         continue;
@@ -355,10 +364,9 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
                     voice->mapMidiMessage(msg);
 
                     auto pbmsg = voice->getPitchbend();
-
                     if (pbmsg.getPitchWheelValue() != 8192)
                     {
-                        processedBuffer.addEvent(pbmsg, sample++);
+                        processedBuffer.addEvent(pbmsg, processedSample++);
                     }
                 }
                 break;
@@ -378,10 +386,20 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
                 break;
         }
 
-        processedBuffer.addEvent(msg, sample++);
+        processedBuffer.addEvent(msg, processedSample++);
     }
 
-    buffer.swapWith(processedBuffer);
+    MidiBuffer priorityBuffer;
+    int priorityBufferSize = voiceController->serveNotePriorityMessages(priorityBuffer);
+    
+    // Insert in order: Interpolation buffer, NotePriority buffer, Processed buffer
+
+    MidiBuffer combinedBuffer;
+    combinedBuffer.addEvents(interpolationMessages, 0, interpolationSample, 0);
+    combinedBuffer.addEvents(priorityBuffer, 0, priorityBufferSize, interpolationSample);
+    combinedBuffer.addEvents(processedBuffer, 0, processedSample, interpolationSample + priorityBufferSize);
+
+    buffer.swapWith(combinedBuffer);
 }
 
 //void MultimapperAudioProcessor::testMidi()
