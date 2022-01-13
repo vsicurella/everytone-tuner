@@ -35,7 +35,8 @@ private:
     int maxVoiceLimit = 16;
 
     juce::OwnedArray<MidiVoice> voices;
-    juce::Array<MidiVoice*> heldVoices;
+    juce::Array<juce::Array<MidiVoice*>> voicesPerChannel;
+    juce::Array<MidiVoice*> activeVoices;
 
     juce::Array<bool> midiChannelDisabled;
 
@@ -52,18 +53,20 @@ private:
 
 private:
 
+    void resetVoicesPerChannel();
+
     int findLowestVoiceIndex(bool active) const;
     int findHighestVoiceIndex(bool active) const;
-    int findOldestVoice(bool active) const;
-    int findMostRecentVoice(bool active) const;
+    int findOldestVoiceIndex(bool active) const;
+    int findMostRecentVoiceIndex(bool active) const;
 
-    int nextAvailableVoiceIndex() const;
-    int nextRoundRobinVoiceIndex() const;
+    int nextAvailableChannel() const;
+    int nextRoundRobinChannel() const;
 
     int getNextVoiceIndexToSteal() const;
     int getNextVoiceToRetrigger() const;
 
-    int getNextVoiceIndex() const;
+    int getNextVoiceChannel(MidiPitch pitchOfVoice = MidiPitch()) const;
 
     int midiNoteIndex(int midiChannel, int midiNote) const;
 
@@ -73,12 +76,17 @@ private:
     int effectiveVoiceLimit() const;
 
     const MidiVoice* getExistingVoice(int index) const;
+
+    void queueVoiceNoteOff(MidiVoice* voice);
+    void queueVoiceNoteOn(MidiVoice* voice);
+    
+    void addVoiceToChannel(int midiChannel, MidiVoice* voice);
+    void removeVoiceFromChannel(int midiChannel, MidiVoice* voice);
+    
     void stealExistingVoice(int index);
-
-    MidiVoice* createVoice(int index, int midiChannel, int midiNote, juce::uint8 velocity);
-    const MidiVoice* findChannelAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity);
-
     void retriggerExistingVoice(int index, int midiChannel);
+
+    const MidiVoice* findChannelAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity);    
     MidiVoice removeVoice(int index);
 
 public:
@@ -100,7 +108,7 @@ public:
     // Array of all voices held, regardless if they are active
     juce::Array<MidiVoice> getAllVoices() const;
 
-    int numHeldVoices() const;
+    int numActiveVoices() const;
 
     const MidiVoice* getVoice(int midiChannel, int midiNote, juce::uint8 velocity = 0);
     const MidiVoice* getVoice(const juce::MidiMessage& msg);
@@ -109,6 +117,8 @@ public:
     MidiVoice removeVoice(const juce::MidiMessage& msg);
     MidiVoice removeVoice(const MidiVoice* voice);
 
+    void clearAllVoices();
+
     // Returns note-off messages for voices that were de-prioritized via NotePriority setting
     // and clears the buffer
     MidiBuffer serveNotePriorityMessages();
@@ -116,9 +126,10 @@ public:
     //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;
 
     int channelOfVoice(int midiChannel, int midiNote) const;
+    int channelOfVoice(MidiVoice* voice) const;
     int channelOfVoice(const juce::MidiMessage& msg) const;
 
-    bool channelIsFree(int channelNumber, MidiPitch pitchToAssign = MidiPitch()) const;
+    bool channelIsFree(int midiChannel, MidiPitch pitchToAssign = MidiPitch()) const;
 
     void setChannelDisabled(int midiChannel, bool disabled);
     
