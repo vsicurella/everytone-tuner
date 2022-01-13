@@ -50,6 +50,16 @@ public:
     
     ~MidiVoice() {}
 
+    bool operator==(const MidiVoice& voice) const
+    {
+        return tuner.get() == voice.tuner.get()
+            && midiChannel == voice.midiChannel
+            && midiNote == voice.midiNote;
+        // match assigned channel too?
+    }
+
+    bool operator!=(const MidiVoice& voice) const { return !operator==(voice); }
+
     int getMidiChannel() const { return midiChannel; }
 
     int getMidiNote() const { return midiNote; }
