@@ -33,12 +33,31 @@ void MidiVoiceController::resetVoicesPerChannel()
         voicesPerChannel.add(juce::Array<MidiVoice*>());
 }
 
+MidiVoiceController::NewVoiceState MidiVoiceController::getNewVoiceState() const
+{
+    if (channelMode == Everytone::ChannelMode::Monophonic)
+        return MidiVoiceController::NewVoiceState::Monophonic;
+        
+    if (numActiveVoices() <= voiceLimit)
+        return MidiVoiceController::NewVoiceState::Overflow;
+
+    return MidiVoiceController::NewVoiceState::Normal;
+}
+
 juce::Array<MidiVoice> MidiVoiceController::getAllVoices() const
 {
     juce::Array<MidiVoice> activeVoicesCopy;
     for (auto voice : voices)
         activeVoicesCopy.add(*voice);
     return activeVoicesCopy;
+}
+
+juce::Array<MidiVoice*> MidiVoiceController::getVoicesInChannel(int midiChannel) const
+{
+    if (midiChannel >= 0 && midiChannel < voicesPerChannel.size())
+        return voicesPerChannel[midiChannel];
+    
+    return juce::Array<MidiVoice*>();
 }
 
 int MidiVoiceController::numActiveVoices() const
@@ -160,21 +179,7 @@ const MidiVoice* MidiVoiceController::findChannelAndAddVoice(int midiChannel, in
 {
     auto newVoice = new MidiVoice(midiChannel, midiNote, velocity, 0, tuningController.getTuner());
 
-    int newChannel = -1;
-
-    if (numActiveVoices() >= voiceLimit)
-    {
-        auto stealIndex = getNextVoiceIndexToSteal();
-        auto voiceToSteal = getExistingVoice(stealIndex);
-        if (voiceToSteal != nullptr)
-        {
-            newChannel = voiceToSteal->getAssignedChannel();
-            stealExistingVoice(stealIndex);
-        }
-    }
-
-    else
-        newChannel = getNextVoiceChannel();
+    int newChannel = findNextVoiceChannel();
 
     if (ChannelInMidiRange(newChannel))
     {
@@ -182,6 +187,16 @@ const MidiVoice* MidiVoiceController::findChannelAndAddVoice(int midiChannel, in
             return nullptr;
 
         lastChannelAssigned = newChannel;
+
+        // See if channel is occupied
+        // TODO poly channel mode
+        auto channelVoices = getVoicesInChannel(newChannel);
+        if (channelVoices.size() > 0)
+        {
+            auto voiceIndex = indexOfVoice(channelVoices[0]);
+            stealExistingVoice(voiceIndex);
+        }
+
         voices.add(newVoice);
         addVoiceToChannel(newChannel, newVoice);
 
@@ -478,7 +493,8 @@ int MidiVoiceController::getNextVoiceIndexToSteal() const
 
 int MidiVoiceController::getNextVoiceToRetrigger() const
 {
-    if (numActiveVoices() <= voiceLimit)
+    auto inactiveVoices = getVoicesInChannel(0);
+    if (inactiveVoices.size() == 0)
         return -1;
 
     switch (notePriority)
@@ -499,21 +515,53 @@ int MidiVoiceController::getNextVoiceToRetrigger() const
     return -1;
 }
 
-int MidiVoiceController::getNextVoiceChannel(MidiPitch pitchOfNewVoice) const
+int MidiVoiceController::findNextVoiceChannel(MidiPitch pitchOfNewVoice) const
 {
-    switch (channelMode)
-    {
-    case Everytone::ChannelMode::FirstAvailable:
-        return nextAvailableChannel();
+    auto newVoiceState = getNewVoiceState();
 
-    case Everytone::ChannelMode::RoundRobin:
-        return nextRoundRobinChannel();
+    int newChannel = -1;
+
+    switch (newVoiceState)
+    {
+    case MidiVoiceController::NewVoiceState::Monophonic:
+        //todo
+        break;
+
+    case MidiVoiceController::NewVoiceState::Overflow:
+    {
+        auto stealIndex = getNextVoiceIndexToSteal();
+        auto voiceToSteal = getExistingVoice(stealIndex);
+        if (voiceToSteal != nullptr)
+        {
+            newChannel = voiceToSteal->getAssignedChannel();
+            //stealExistingVoice(stealIndex);
+        }
+    }
+
+    case MidiVoiceController::NewVoiceState::Normal:
+    {
+        switch (channelMode)
+        {
+        case Everytone::ChannelMode::FirstAvailable:
+            newChannel = nextAvailableChannel();
+            break;
+
+        case Everytone::ChannelMode::RoundRobin:
+            newChannel = nextRoundRobinChannel();
+            break;
+
+        default:
+            jassertfalse;
+        }
+
+        break;
+    }
 
     default:
         jassertfalse;
     }
 
-    return -1;
+    return newChannel;
 }
 
 

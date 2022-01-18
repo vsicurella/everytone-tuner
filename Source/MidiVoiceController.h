@@ -37,6 +37,17 @@ public:
     void removeVoiceWatcher(MidiVoiceController::Watcher* watcherIn) { voiceWatchers.remove(watcherIn); }
 
 private:
+
+    enum class NewVoiceState
+    {
+        Normal = 0, // Not all voices are used - get next channel
+        Overflow,   // All voices are used, determine action via NotePriority
+        Monophonic  // One voice at a time - continue using same channel
+    };
+
+
+private:
+
     TunerController& tuningController;
 
     int maxVoiceLimit = 16;
@@ -62,6 +73,8 @@ private:
 
     void resetVoicesPerChannel();
 
+    NewVoiceState getNewVoiceState() const;
+
     int findLowestVoiceIndex(bool active) const;
     int findHighestVoiceIndex(bool active) const;
     int findOldestVoiceIndex(bool active) const;
@@ -73,7 +86,7 @@ private:
     int getNextVoiceIndexToSteal() const;
     int getNextVoiceToRetrigger() const;
 
-    int getNextVoiceChannel(MidiPitch pitchOfVoice = MidiPitch()) const;
+    int findNextVoiceChannel(MidiPitch pitchOfVoice = MidiPitch()) const;
 
     int midiNoteIndex(int midiChannel, int midiNote) const;
 
@@ -114,6 +127,9 @@ public:
 
     // Array of all voices held, regardless if they are active
     juce::Array<MidiVoice> getAllVoices() const;
+
+    // Returns a copy of the array of pointers to MidiVoices that are in the given channel
+    juce::Array<MidiVoice*> getVoicesInChannel(int midiChannel) const;
 
     int numActiveVoices() const;
 

@@ -347,7 +347,7 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
             case 0x80: // Note Off
             {
                 auto voice = voiceController->removeVoice(msg);
-                if (voice.isActive())
+                if (voice.isValid())
                     voice.mapMidiMessage(msg);
                 else
                     continue;
