@@ -90,15 +90,16 @@ namespace Everytone
 
     enum class ChannelMode
     {
-        FirstAvailable = 1,    // Finds the first available voice from Channel 1
-        RoundRobin,        // Finds the first available voice from last channel assigned
+        FirstAvailable = 1, // Finds the first available voice from Channel 1
+        RoundRobin,         // Finds the first available voice from last channel assigned
+        Monophonic          // Only one voice is tuned on the same channel
     };
 
     enum class MpeZone
     {
-        Lower = 1,        // Channel 1 is the global channel
-        Upper,            // Channel 16 is the global channel
-        Omnichannel      // Legacy mode, use all 16 MIDI channels
+        Lower = 1,      // Channel 1 is the global channel
+        Upper,          // Channel 16 is the global channel
+        Omnichannel,    // Legacy mode, use all 16 MIDI channels
     };
 
     enum class MidiMode

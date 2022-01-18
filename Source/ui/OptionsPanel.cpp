@@ -17,6 +17,7 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     channelModeBox = std::make_unique<juce::ComboBox>("ChannelModeBox");
     channelModeBox->addItem("First Available", (int)Everytone::ChannelMode::FirstAvailable);
     channelModeBox->addItem("Round Robin", (int)Everytone::ChannelMode::RoundRobin);
+    channelModeBox->addItem("Monophonic", (int)Everytone::ChannelMode::Monophonic);
     channelModeBox->setSelectedId((int)options.channelMode, juce::NotificationType::dontSendNotification);
     channelModeBox->onChange = [&]() 
     { 
@@ -29,6 +30,7 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     addAndMakeVisible(*channelModeBoxLabel);
 
 
+    // NOT YET IMPLEMENTED
     channelRulesBox = std::make_unique<juce::ComboBox>("ChannelRulesBox");
     channelRulesBox->addItem("One note per channel", (int)Everytone::MidiMode::Mono);
     channelRulesBox->addItem("Poly channels if pitchbend match", (int)Everytone::MidiMode::Poly);
@@ -37,11 +39,11 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     {
         optionsWatchers.call(&OptionsWatcher::midiModeChanged, Everytone::MidiMode(channelRulesBox->getSelectedId()));
     };
-    addAndMakeVisible(*channelRulesBox);
+    //addAndMakeVisible(*channelRulesBox);
     
     auto channelRulesBoxLabel = labels.add(new juce::Label("ChannelRulesLabel", "Channel Rules:"));
     channelRulesBoxLabel->attachToComponent(channelRulesBox.get(), false);
-    addAndMakeVisible(*channelRulesBoxLabel);
+    //addAndMakeVisible(*channelRulesBoxLabel);
 
 
     bendModeBox = std::make_unique<juce::ComboBox>("bendModeBox");
