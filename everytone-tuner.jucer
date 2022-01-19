@@ -10,6 +10,10 @@
       <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="ui">
         <FILE id="xcZSj4" name="MappingTableModel.cpp" compile="1" resource="0"
               file="Source/ui/MappingTableModel.cpp"/>
+        <FILE id="fFKDXj" name="ChannelComponent.h" compile="0" resource="0"
+              file="Source/ui/ChannelComponent.h"/>
+        <FILE id="fM2iVc" name="ChannelComponent.cpp" compile="1" resource="0"
+              file="Source/ui/ChannelComponent.cpp"/>
         <FILE id="E1h8UT" name="MappingTableModel.h" compile="0" resource="0"
               file="Source/ui/MappingTableModel.h"/>
         <FILE id="BKMfF7" name="TuningTableViewer.cpp" compile="1" resource="0"
