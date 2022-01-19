@@ -361,27 +361,21 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
 
             case 0x90: // Note On
             {
-                if (msg.isNoteOn())
-                {
-                    auto voice = voiceController->getVoice(msg);
-                    if (voice == nullptr)
-                        continue;
+                auto voice = voiceController->getVoice(msg);
+                if (voice == nullptr)
+                    continue;
 
-                    voice->mapMidiMessage(msg);
+                voice->mapMidiMessage(msg);
 
-                    auto pbmsg = voice->getPitchbend();
-                    if (pbmsg.getPitchWheelValue() != 8192)
-                    {
-                        processedBuffer.addEvent(pbmsg, processedSample++);
-                    }
-                }
+                auto pbmsg = voice->getPitchbend();
+                processedBuffer.addEvent(pbmsg, processedSample++);
                 break;
             }
 
             case 0xA0: // Aftertouch
             {
                 auto voice = voiceController->getVoice(msg);
-                if (voice == nullptr)
+                if (voice == nullptr || !voice->isActive())
                     continue;            
                 
                 voice->mapMidiMessage(msg);

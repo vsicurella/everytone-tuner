@@ -98,7 +98,7 @@ private:
     const MidiVoice* getExistingVoice(int index) const;
 
     void queueVoiceNoteOff(MidiVoice* voice);
-    void queueVoiceNoteOn(MidiVoice* voice);
+    void queueVoiceNoteOn(MidiVoice* voice, bool pitchbendOnly=false);
     
     void addVoiceToChannel(int midiChannel, MidiVoice* voice);
     void removeVoiceFromChannel(int midiChannel, MidiVoice* voice);

@@ -104,24 +104,35 @@ void MidiVoiceController::queueVoiceNoteOff(MidiVoice* voice)
     notePriorityQueue.addEvent(noteOffMsg, notePrioritySample++);
 }
 
-void MidiVoiceController::queueVoiceNoteOn(MidiVoice* voice)
+void MidiVoiceController::queueVoiceNoteOn(MidiVoice* voice, bool pitchbendOnly)
 {
     jassert(voice->isActive());
+
     auto pbmsg = voice->getPitchbend();
-    auto noteOn = voice->getNoteOn();
     notePriorityQueue.addEvent(pbmsg, notePrioritySample++);
+
+    if (pitchbendOnly)
+        return;
+
+    auto noteOn = voice->getNoteOn();
     notePriorityQueue.addEvent(noteOn, notePrioritySample++);
 }
 
 void MidiVoiceController::stealExistingVoice(int index)
 {
+    if (index < 0 || index >= voices.size())
+    {
+        return;
+    }
+
     auto voice = voices[index];
     if (voice->isActive())
     {
         auto channel = voice->getAssignedChannel();
         removeVoiceFromChannel(channel, voice);
 
-        queueVoiceNoteOff(voice);
+        if (channelMode != Everytone::ChannelMode::Monophonic)
+            queueVoiceNoteOff(voice);
 
         addVoiceToChannel(0, voice);
 
@@ -136,14 +147,13 @@ void MidiVoiceController::retriggerExistingVoice(int index, int midiChannel)
         auto retriggerVoice = voices[index];
         if (retriggerVoice->isValid())
         {
-            retriggerVoice->reassignChannel(midiChannel);
-
             removeVoiceFromChannel(0, retriggerVoice);
             addVoiceToChannel(midiChannel, retriggerVoice);
 
             voiceWatchers.call(&MidiVoiceController::Watcher::voiceChanged, *retriggerVoice);
 
-            queueVoiceNoteOn(retriggerVoice);
+            // In Monophonic mode we just have to send a new pitchbend message
+            queueVoiceNoteOn(retriggerVoice, channelMode == Everytone::ChannelMode::Monophonic);
         }
     }
 }
@@ -153,7 +163,10 @@ void MidiVoiceController::addVoiceToChannel(int midiChannel, MidiVoice* voice)
     jassert(midiChannel == 0 || ChannelInMidiRange(midiChannel));
     if (midiChannel == 0 || ChannelInMidiRange(midiChannel))
     {
-        voicesPerChannel.getReference(midiChannel).add(voice);
+        auto channelVoices = voicesPerChannel[midiChannel];
+        channelVoices.add(voice);
+        voicesPerChannel.set(midiChannel, channelVoices);
+
         voice->reassignChannel(midiChannel);
 
         if (midiChannel > 0)
@@ -167,7 +180,6 @@ void MidiVoiceController::removeVoiceFromChannel(int midiChannel, MidiVoice* voi
     {
         auto channel = voicesPerChannel[midiChannel];
         channel.removeFirstMatchingValue(voice);
-
         voicesPerChannel.set(midiChannel, channel);
 
         if (midiChannel > 0)
@@ -193,7 +205,7 @@ const MidiVoice* MidiVoiceController::findChannelAndAddVoice(int midiChannel, in
         auto channelVoices = getVoicesInChannel(newChannel);
         if (channelVoices.size() > 0)
         {
-            auto voiceIndex = indexOfVoice(channelVoices[0]);
+            auto voiceIndex = getNextVoiceIndexToSteal();
             stealExistingVoice(voiceIndex);
         }
 
@@ -216,11 +228,19 @@ MidiVoice MidiVoiceController::removeVoice(int index)
         auto voice = voices[index];
         removeVoiceFromChannel(voice->getAssignedChannel(), voice);
 
-        auto retriggerIndex = getNextVoiceToRetrigger();
-        retriggerExistingVoice(retriggerIndex, voice->getAssignedChannel());
+        // Only retrigger if an active voice was removed
+        if (voice->isActive())
+        {
+            auto retriggerIndex = getNextVoiceToRetrigger();
+            retriggerExistingVoice(retriggerIndex, voice->getAssignedChannel());
+        }
 
         auto voiceCopy = *voice;
         voices.remove(index);
+
+        // Monophonic mode does not send note offs per note on, so send note off to proper channel
+        if (voiceCopy.getAssignedChannel() == 0 && channelMode == Everytone::ChannelMode::Monophonic)
+            voiceCopy.reassignChannel(lastChannelAssigned);
 
         voiceWatchers.call(&MidiVoiceController::Watcher::voiceRemoved, voiceCopy);
 
@@ -233,7 +253,7 @@ const MidiVoice* MidiVoiceController::getVoice(int midiChannel, int midiNote, ju
 {
     auto voiceIndex = indexOfVoice(midiChannel, midiNote);
     if (voiceIndex >= 0 && voiceIndex < maxVoiceLimit)
-        return getVoice(voiceIndex);
+        return getExistingVoice(voiceIndex);
 
     return findChannelAndAddVoice(midiChannel, midiNote, velocity);
 }
@@ -242,7 +262,8 @@ const MidiVoice* MidiVoiceController::getVoice(const juce::MidiMessage& msg)
 {
     auto channel = msg.getChannel();
     auto note = msg.getNoteNumber();
-    return getVoice(channel, note);
+    auto velocity = msg.getVelocity();
+    return getVoice(channel, note, velocity);
 }
 
 int MidiVoiceController::numAllVoices() const
@@ -418,6 +439,9 @@ int MidiVoiceController::findOldestVoiceIndex(bool active) const
         if (active && !voice->isActive())
             continue;
 
+        if (!active && voice->isActive())
+            continue;
+
         return indexOfVoice(voice);
     }
 
@@ -431,6 +455,9 @@ int MidiVoiceController::findMostRecentVoiceIndex(bool active) const
         int index = voices.size() - i - 1;
         auto voice = voices.getUnchecked(index);
         if (active && !voice->isActive())
+            continue;
+
+        if (!active && voice->isActive())
             continue;
 
         return indexOfVoice(voice);
@@ -524,7 +551,9 @@ int MidiVoiceController::findNextVoiceChannel(MidiPitch pitchOfNewVoice) const
     switch (newVoiceState)
     {
     case MidiVoiceController::NewVoiceState::Monophonic:
-        //todo
+        newChannel = lastChannelAssigned;
+        if (!ChannelInMidiRange(newChannel))
+            newChannel = nextAvailableChannel();
         break;
 
     case MidiVoiceController::NewVoiceState::Overflow:
