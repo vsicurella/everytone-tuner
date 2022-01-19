@@ -94,6 +94,8 @@ private:
     int indexOfVoice(const MidiVoice* voice) const;
 
     int effectiveVoiceLimit() const;
+    void updateVoiceLimitCache();
+    int numVoicesAvailable() const;
 
     const MidiVoice* getExistingVoice(int index) const;
 
@@ -119,6 +121,7 @@ public:
     Everytone::ChannelMode getChannelMode() const { return channelMode; }
     Everytone::MpeZone getMpeZone() const { return mpeZone; }
     Everytone::NotePriority getNotePriority() const { return notePriority; }
+    juce::Array<bool> getChannelsDisabled() const { return midiChannelDisabled; }
 
     int getVoiceLimit() const { return voiceLimit; }
 
@@ -153,10 +156,8 @@ public:
 
     bool channelIsFree(int midiChannel, MidiPitch pitchToAssign = MidiPitch()) const;
 
-    void setChannelDisabled(int midiChannel, bool disabled);
-    
     void setChannelMode(Everytone::ChannelMode mode);
     void setMpeZone(Everytone::MpeZone zone);
     void setNotePriority(Everytone::NotePriority notePriorityIn);
-    void setVoiceLimit(int voiceLimit);
+    void setChannelsDisabled(juce::Array<bool> channelsDisabledIn);
 };

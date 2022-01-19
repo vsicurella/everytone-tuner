@@ -38,7 +38,7 @@ MidiVoiceController::NewVoiceState MidiVoiceController::getNewVoiceState() const
     if (channelMode == Everytone::ChannelMode::Monophonic)
         return MidiVoiceController::NewVoiceState::Monophonic;
         
-    if (numActiveVoices() <= voiceLimit)
+    if (numVoicesAvailable() < 1)
         return MidiVoiceController::NewVoiceState::Overflow;
 
     return MidiVoiceController::NewVoiceState::Normal;
@@ -348,36 +348,31 @@ bool MidiVoiceController::channelIsFree(int midiChannel, MidiPitch pitchToAssign
     return false;
 }
 
-void MidiVoiceController::setChannelDisabled(int midiChannel, bool disabled)
+void MidiVoiceController::setChannelsDisabled(juce::Array<bool> channelsDisabled)
 {
-    midiChannelDisabled.set(midiChannel - 1, disabled);
-    auto message = "MIDI Channel " + juce::String((int)midiChannel);
-    message += (disabled) ? " was disabled" : " was enabled";
-    juce::Logger::writeToLog(message);
+    midiChannelDisabled = channelsDisabled;
+    midiChannelDisabled.resize(16);
+    updateVoiceLimitCache();
 }
 
 void MidiVoiceController::setChannelMode(Everytone::ChannelMode mode)
 {
     channelMode = mode;
     juce::Logger::writeToLog("ChannelMode set to " + juce::String((int)channelMode));
+    updateVoiceLimitCache();
 }
 
 void MidiVoiceController::setMpeZone(Everytone::MpeZone zone)
 {
     mpeZone = zone;
     juce::Logger::writeToLog("MPE Zone set to " + juce::String((int)mpeZone));
+    updateVoiceLimitCache();
 }
 
 void MidiVoiceController::setNotePriority(Everytone::NotePriority notePriorityIn)
 {
     notePriority = notePriorityIn;
     juce::Logger::writeToLog("NotePriority set to " + juce::String((int)notePriority));
-}
-
-void MidiVoiceController::setVoiceLimit(int limit)
-{
-    voiceLimit = limit;
-    juce::Logger::writeToLog("VoiceLimit set to " + juce::String((int)voiceLimit));
 }
 
 int MidiVoiceController::findLowestVoiceIndex(bool active) const
@@ -628,8 +623,26 @@ int MidiVoiceController::effectiveVoiceLimit() const
     for (auto isDisabled : midiChannelDisabled)
         numDisabled += (isDisabled) ? 1 : 0;
 
-    int limit = voiceLimit - numDisabled;
+    int limit = maxVoiceLimit - numDisabled;
     limit -= (mpeZone == Everytone::MpeZone::Omnichannel) ? 0 : 1;
     return limit;
 }
 
+void MidiVoiceController::updateVoiceLimitCache()
+{
+    // TODO poly channel mode
+    auto voicesAllowed = effectiveVoiceLimit();
+}
+
+int MidiVoiceController::numVoicesAvailable() const
+{
+    // TODO poly channel mode
+    switch (channelMode)
+    {
+    case Everytone::ChannelMode::Monophonic:
+        return 1;
+
+    default:
+        return voiceLimit - activeVoices.size();
+    }
+}
