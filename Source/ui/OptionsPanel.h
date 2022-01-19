@@ -11,7 +11,8 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "../Common.h"
+#include "./ChannelComponent.h"
+
 //==============================================================================
 /*
 */
@@ -27,6 +28,8 @@ public:
 
     void setPitchbendRangeText(int pitchbendRange);
 
+    void channelModeChangedCallback();
+
 private:
     
     //Everytone::ControlLookAndFeel controlLookAndFeel;
@@ -35,10 +38,11 @@ private:
     std::unique_ptr<juce::ComboBox> channelRulesBox;
     std::unique_ptr<juce::ComboBox> bendModeBox;
     std::unique_ptr<juce::ComboBox> mpeZoneBox;
-    std::unique_ptr<LabelMouseHighlight> voiceLimitValueLabel;
+
+    std::unique_ptr<ChannelComponent> channelComponent;
+
     std::unique_ptr<LabelMouseHighlight> pitchbendRangeValue;
 
-    juce::Label* voiceLimitLabel;
     juce::Label* pitchbendRangeLabel;
 
     juce::OwnedArray<juce::Label> labels;

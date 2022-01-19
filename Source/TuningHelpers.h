@@ -14,20 +14,6 @@
 #include "./tuning/MappedTuning.h"
 #include "Common.h"
 
-template <typename ARR>
-static juce::ValueTree arrayToValueTree(ARR array, juce::Identifier id, juce::Identifier nodeId, juce::Identifier valueId = Everytone::ID::Value)
-{
-    auto tree = juce::ValueTree(id);
-    for (auto value : array)
-    {
-        auto node = juce::ValueTree(nodeId);
-        node.setProperty(valueId, value, nullptr);
-        tree.addChild(node, -1, nullptr);
-    }
-
-    return tree;
-}
-
 static juce::ValueTree tuningBaseToValueTree(const TuningBase* tuning, juce::ValueTree parent = juce::ValueTree())
 {
     auto tree = parent;
@@ -55,7 +41,7 @@ static juce::ValueTree tuningTableToValueTree(const TuningTable* tuning, juce::V
     tree.setProperty(Everytone::ID::VirtualSize, tuning->getVirtualSize(), nullptr);
 
     auto frequencies = tuning->getFrequencyTable();
-    auto frequencyNode = arrayToValueTree(frequencies, Everytone::ID::FrequencyTable, Everytone::ID::Frequency);
+    auto frequencyNode = arrayToValueTree(frequencies, Everytone::ID::FrequencyTable, Everytone::ID::Frequency, Everytone::ID::Value);
     tree.addChild(frequencyNode, 0, nullptr);
 
     return tree;
@@ -67,10 +53,13 @@ static juce::ValueTree functionalTuningToValueTree(const FunctionalTuning* tunin
     if (!parent.isValid())
         tree = juce::ValueTree(Everytone::ID::Tuning);
 
-    tuningTableToValueTree(tuning, tree);
+    tuningBaseToValueTree(tuning, tree);
+    tree.setProperty(Everytone::ID::PeriodString, tuning->getPeriodString(), nullptr);
+    tree.setProperty(Everytone::ID::VirtualPeriod, tuning->getVirtualPeriod(), nullptr);
+    tree.setProperty(Everytone::ID::VirtualSize, tuning->getVirtualSize(), nullptr);
 
     auto intervals = tuning->getIntervalCentsList();
-    auto intervalTree = arrayToValueTree(intervals, Everytone::ID::CentsTable, Everytone::ID::Cents);
+    auto intervalTree = arrayToValueTree(intervals, Everytone::ID::CentsTable, Everytone::ID::Cents, Everytone::ID::Value);
     tree.addChild(intervalTree, 0, nullptr);
 
     return tree;
@@ -193,7 +182,7 @@ static juce::ValueTree tuningTableMapToValueTree(const TuningTableMap* midiMap, 
     tree.setProperty(Everytone::ID::MapRoot,          definition.map.mapRoot(),        nullptr);
     tree.setProperty(Everytone::ID::Transpose,        definition.map.transposition(),  nullptr);
 
-    auto pattern = arrayToValueTree(definition.map.pattern(), Everytone::ID::Pattern, Everytone::ID::Pattern);
+    auto pattern = arrayToValueTree(definition.map.pattern(), Everytone::ID::Pattern, Everytone::ID::Pattern, Everytone::ID::Value);
 
     tree.addChild(pattern, -1, nullptr);
 

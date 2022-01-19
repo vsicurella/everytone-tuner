@@ -175,11 +175,6 @@ void MultimapperAudioProcessorEditor::midiModeChanged(Everytone::MidiMode newMid
     
 }
 
-void MultimapperAudioProcessorEditor::voiceLimitChanged(int newVoiceLimit)
-{
-    audioProcessor.voiceLimit(newVoiceLimit);
-}
-
 void MultimapperAudioProcessorEditor::pitchbendRangeChanged(int pitchbendRange)
 {
     audioProcessor.pitchbendRange(pitchbendRange);
@@ -189,6 +184,11 @@ void MultimapperAudioProcessorEditor::pitchbendRangeChanged(int pitchbendRange)
 void MultimapperAudioProcessorEditor::bendModeChanged(Everytone::BendMode newBendMode)
 {
     audioProcessor.bendMode(newBendMode);
+}
+
+void MultimapperAudioProcessorEditor::disabledChannelsChanged(juce::Array<bool> channelsDisabled)
+{
+    audioProcessor.disabledChannels(channelsDisabled);
 }
 
 juce::ApplicationCommandTarget* MultimapperAudioProcessorEditor::getFirstCommandTarget(juce::CommandID commandID)

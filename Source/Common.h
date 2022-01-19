@@ -11,6 +11,20 @@
 #pragma once
 #include <JuceHeader.h>
 
+template <typename ARR>
+static juce::ValueTree arrayToValueTree(ARR array, juce::Identifier id, juce::Identifier nodeId, juce::Identifier valueId)
+{
+    auto tree = juce::ValueTree(id);
+    for (auto value : array)
+    {
+        auto node = juce::ValueTree(nodeId);
+        node.setProperty(valueId, value, nullptr);
+        tree.addChild(node, -1, nullptr);
+    }
+
+    return tree;
+}
+
 namespace Everytone
 {
     namespace ID
@@ -57,9 +71,9 @@ namespace Everytone
         static juce::Identifier MpeChannels("MpeChannels");
         static juce::Identifier NotePriority("NotePriority");
         static juce::Identifier BendMode("BendMode");
-        static juce::Identifier VoiceLimit("VoiceLimit");
         static juce::Identifier PitchbendRange("PitchbendRange");
-
+        static juce::Identifier DisabledChannels("DisabledChannels");
+        static juce::Identifier MidiChannel("MidiChannel");
 
         static juce::Identifier Value("Value");
     }
@@ -133,8 +147,26 @@ namespace Everytone
         MidiMode        midiMode        = MidiMode::Mono;
         NotePriority    notePriority    = NotePriority::Last;
         BendMode        bendMode        = BendMode::Static;
-        int             voiceLimit      = 16;
-        int             pitchbendRange  = 96; // Unsure if this should be +/- 2 or MPE default
+        int             pitchbendRange  = 4; // Unsure if this should be +/- 2 or MPE default
+        juce::Array<bool> disabledChannels = juce::Array<bool>();
+
+        static juce::ValueTree disabledChannelsToValueTree(juce::Array<bool> disabledChannels)
+        {
+            auto tree = arrayToValueTree(disabledChannels, Everytone::ID::DisabledChannels, Everytone::ID::MidiChannel, Everytone::ID::Value);
+            return tree;
+        }
+
+        static juce::Array<bool> disabledChannelsFromValueTree(juce::ValueTree disabledChannelsTree)
+        {
+            if (!disabledChannelsTree.hasType(Everytone::ID::DisabledChannels))
+                return juce::Array<bool>();
+
+            juce::Array<bool> disabledChannels;
+            for (auto child : disabledChannelsTree)
+                disabledChannels.add((bool)child[ID::Value]);
+
+            return disabledChannels;
+        }
 
         juce::ValueTree toValueTree() const
         {
@@ -145,9 +177,12 @@ namespace Everytone
             tree.setProperty(ID::MpeZone,           (int)mpeZone,           nullptr);
             tree.setProperty(ID::MidiMode,          (int)midiMode,          nullptr);
             tree.setProperty(ID::BendMode,          (int)bendMode,          nullptr);
-            tree.setProperty(ID::NotePriority,      (int)notePriority,         nullptr);
-            tree.setProperty(ID::VoiceLimit,        (int)voiceLimit,        nullptr);
+            tree.setProperty(ID::NotePriority,      (int)notePriority,      nullptr);
             tree.setProperty(ID::PitchbendRange,    (int)pitchbendRange,    nullptr);
+            
+            auto disabledChannelsTree = disabledChannelsToValueTree(disabledChannels);
+            tree.addChild(disabledChannelsTree, 0, nullptr);
+
             return tree;
         }
 
@@ -156,15 +191,18 @@ namespace Everytone
             Options options;
             if (tree.hasType(ID::Options))
             {
-                if (tree.hasProperty(ID::MappingMode))      options.mappingMode     = MappingMode   ((int)tree[ID::MappingMode]);
-                if (tree.hasProperty(ID::MappingType))      options.mappingType     = MappingType   ((int)tree[ID::MappingType]);
-                if (tree.hasProperty(ID::ChannelMode))      options.channelMode     = ChannelMode   ((int)tree[ID::ChannelMode]);
-                if (tree.hasProperty(ID::MpeZone))          options.mpeZone         = MpeZone       ((int)tree[ID::MpeZone]);
-                if (tree.hasProperty(ID::MidiMode))         options.midiMode        = MidiMode      ((int)tree[ID::MidiMode]);
-                if (tree.hasProperty(ID::NotePriority))     options.notePriority    = NotePriority  ((int)tree[ID::NotePriority]);
-                if (tree.hasProperty(ID::BendMode))         options.bendMode        = BendMode      ((int)tree[ID::BendMode]);
-                if (tree.hasProperty(ID::VoiceLimit))       options.voiceLimit      = (int)tree[ID::VoiceLimit];
-                if (tree.hasProperty(ID::PitchbendRange))   options.pitchbendRange  = (int)tree[ID::PitchbendRange];
+                if (tree.hasProperty(ID::MappingMode))      options.mappingMode      = MappingMode   ((int)tree[ID::MappingMode]);
+                if (tree.hasProperty(ID::MappingType))      options.mappingType      = MappingType   ((int)tree[ID::MappingType]);
+                if (tree.hasProperty(ID::ChannelMode))      options.channelMode      = ChannelMode   ((int)tree[ID::ChannelMode]);
+                if (tree.hasProperty(ID::MpeZone))          options.mpeZone          = MpeZone       ((int)tree[ID::MpeZone]);
+                if (tree.hasProperty(ID::MidiMode))         options.midiMode         = MidiMode      ((int)tree[ID::MidiMode]);
+                if (tree.hasProperty(ID::NotePriority))     options.notePriority     = NotePriority  ((int)tree[ID::NotePriority]);
+                if (tree.hasProperty(ID::BendMode))         options.bendMode         = BendMode      ((int)tree[ID::BendMode]);
+                if (tree.hasProperty(ID::PitchbendRange))   options.pitchbendRange   = (int)tree[ID::PitchbendRange];
+                
+                auto disabledChannelsTree = tree.getChildWithName(ID::DisabledChannels);
+                if (disabledChannelsTree.isValid())
+                    options.disabledChannels = disabledChannelsFromValueTree(disabledChannelsTree);
             }
 
             return options;
@@ -178,14 +216,14 @@ class OptionsChanger;
 class OptionsWatcher
 {
 public:
-    virtual void mappingModeChanged(Everytone::MappingMode mode) = 0;
-    virtual void mappingTypeChanged(Everytone::MappingType type) = 0;
-    virtual void channelModeChanged(Everytone::ChannelMode newChannelMode) = 0;
-    virtual void mpeZoneChanged(Everytone::MpeZone zone) = 0;
-    virtual void midiModeChanged(Everytone::MidiMode newMidiMode) = 0;
-    virtual void bendModeChanged(Everytone::BendMode newBendMode) = 0;
-    virtual void voiceLimitChanged(int newVoiceLimit) = 0;
-    virtual void pitchbendRangeChanged(int newPitchbendRange) = 0;
+    virtual void mappingModeChanged(Everytone::MappingMode mode) {};
+    virtual void mappingTypeChanged(Everytone::MappingType type) {};
+    virtual void channelModeChanged(Everytone::ChannelMode newChannelMode) {};
+    virtual void mpeZoneChanged(Everytone::MpeZone zone) {};
+    virtual void midiModeChanged(Everytone::MidiMode newMidiMode) {};
+    virtual void bendModeChanged(Everytone::BendMode newBendMode) {};
+    virtual void pitchbendRangeChanged(int newPitchbendRange) {};
+    virtual void disabledChannelsChanged(juce::Array<bool> disabledChannels) {};
 };
 
 class OptionsChanger

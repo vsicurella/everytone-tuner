@@ -431,8 +431,8 @@ Everytone::Options MultimapperAudioProcessor::options() const
         Everytone::MidiMode::Mono,
         voiceController->getNotePriority(),
         voiceInterpolator->getBendMode(),
-        voiceController->getVoiceLimit(),
-        tunerController->getPitchbendRange()
+        tunerController->getPitchbendRange(),
+        voiceController->getChannelsDisabled()
     };
 }
 
@@ -503,11 +503,6 @@ void MultimapperAudioProcessor::mpeZone(Everytone::MpeZone zone)
     voiceController->setMpeZone(zone);
 }
 
-void MultimapperAudioProcessor::voiceLimit(int voiceLimit)
-{
-    voiceController->setVoiceLimit(voiceLimit);
-}
-
 void MultimapperAudioProcessor::pitchbendRange(int pitchbendRange)
 {
     tunerController->setPitchbendRange(pitchbendRange);
@@ -518,12 +513,17 @@ void MultimapperAudioProcessor::bendMode(Everytone::BendMode bendMode)
     voiceInterpolator->setBendMode(bendMode);
 }
 
+void MultimapperAudioProcessor::disabledChannels(juce::Array<bool> disabledChannelsIn)
+{
+    voiceController->setChannelsDisabled(disabledChannelsIn);
+}
+
 void MultimapperAudioProcessor::options(Everytone::Options optionsIn)
 {
     autoMappingType(optionsIn.mappingType);
     mappingMode(optionsIn.mappingMode);
     channelMode(optionsIn.channelMode);
     bendMode(optionsIn.bendMode);
-    voiceLimit(optionsIn.voiceLimit);
     pitchbendRange(optionsIn.pitchbendRange);
+    disabledChannels(optionsIn.disabledChannels);
 }

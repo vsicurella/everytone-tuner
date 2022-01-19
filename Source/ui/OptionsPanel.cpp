@@ -19,9 +19,12 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     channelModeBox->addItem("Round Robin", (int)Everytone::ChannelMode::RoundRobin);
     channelModeBox->addItem("Monophonic", (int)Everytone::ChannelMode::Monophonic);
     channelModeBox->setSelectedId((int)options.channelMode, juce::NotificationType::dontSendNotification);
+    // Set mode at end since it affects other components
     channelModeBox->onChange = [&]() 
     { 
-        optionsWatchers.call(&OptionsWatcher::channelModeChanged, Everytone::ChannelMode(channelModeBox->getSelectedId())); 
+        auto mode = Everytone::ChannelMode(channelModeBox->getSelectedId());
+        optionsWatchers.call(&OptionsWatcher::channelModeChanged, mode); 
+        channelModeChangedCallback();
     };
     addAndMakeVisible(*channelModeBox);
 
@@ -63,7 +66,12 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     mpeZoneBox->addItem("Upper", (int)Everytone::MpeZone::Upper);
     mpeZoneBox->addItem("Omnichannel", (int)Everytone::MpeZone::Omnichannel);
     mpeZoneBox->setSelectedId((int)options.mpeZone, juce::NotificationType::dontSendNotification);
-    mpeZoneBox->onChange = [&]() { optionsWatchers.call(&OptionsWatcher::mpeZoneChanged, Everytone::MpeZone(mpeZoneBox->getSelectedId())); };
+    mpeZoneBox->onChange = [&]() 
+    { 
+        auto zone = Everytone::MpeZone(mpeZoneBox->getSelectedId());
+        optionsWatchers.call(&OptionsWatcher::mpeZoneChanged, zone);
+        channelComponent->setMpeZone(zone);
+    };
     addAndMakeVisible(*mpeZoneBox);
 
     auto mpeZoneLabel = labels.add(new juce::Label("MpeZoneLabel", "MPE Zone:"));
@@ -71,20 +79,18 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     addAndMakeVisible(*mpeZoneLabel);
 
 
-    voiceLimitValueLabel = std::make_unique<LabelMouseHighlight>("VoiceLimitValue");
-    voiceLimitValueLabel->setEditable(true);
-    voiceLimitValueLabel->setText(juce::String(options.voiceLimit), juce::NotificationType::dontSendNotification);
-    voiceLimitValueLabel->onTextChange = [&]()
+    channelComponent = std::make_unique<ChannelComponent>(options.disabledChannels, "ChannelComponent");
+    channelComponent->setLayout(ChannelComponent::Layout::Rectangle);
+    channelComponent->setMpeZone(options.mpeZone);
+    channelComponent->onChange = [&]()
     {
-        optionsWatchers.call(&OptionsWatcher::voiceLimitChanged, voiceLimitValueLabel->getText().getIntValue());
+        optionsWatchers.call(&OptionsWatcher::disabledChannelsChanged, channelComponent->getChannelsDisabled());
     };
-    addAndMakeVisible(*voiceLimitValueLabel);
+    addAndMakeVisible(*channelComponent);
 
-    voiceLimitLabel = labels.add(new juce::Label("VoiceLimitLabel", "Voice Limit:"));
-    voiceLimitLabel->setJustificationType(juce::Justification::centredRight);
-    voiceLimitLabel->attachToComponent(voiceLimitValueLabel.get(), true);
-    addAndMakeVisible(*voiceLimitLabel);
-
+    auto channelLabel = labels.add(new juce::Label("ChannelsLabel", "MIDI Channels:"));
+    channelLabel->attachToComponent(channelComponent.get(), false);
+    addAndMakeVisible(channelLabel);
 
     pitchbendRangeValue = std::make_unique<LabelMouseHighlight>("pitchbendRangeValue");
     pitchbendRangeValue->setEditable(false, true);
@@ -110,6 +116,8 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     pitchbendRangeLabel = labels.add(new juce::Label("pitchbendLabel", "Pitchbend Range:"));
     pitchbendRangeLabel->attachToComponent(pitchbendRangeValue.get(), true);
     addAndMakeVisible(pitchbendRangeLabel);
+
+    channelModeChangedCallback();
 }
 
 OptionsPanel::~OptionsPanel()
@@ -117,7 +125,6 @@ OptionsPanel::~OptionsPanel()
     labels.clear();
 
     pitchbendRangeValue = nullptr;
-    voiceLimitValueLabel = nullptr;
     mpeZoneBox = nullptr;
     channelRulesBox = nullptr;
     channelModeBox = nullptr;
@@ -160,12 +167,7 @@ void OptionsPanel::resized()
     rightHalf.alignItems = juce::FlexBox::AlignItems::flexStart;
     rightHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *mpeZoneBox).withMargin(controlMargin));
 
-    auto voiceLimitWidth = voiceLimitValueLabel->getFont().getStringWidth("999999") + margin;
-    auto voiceLimitLabelWidth = voiceLimitLabel->getFont().getStringWidth(voiceLimitLabel->getText());
-    auto voiceLimitItemMargin = controlMargin;
-    voiceLimitItemMargin.left = voiceLimitLabelWidth + margin;
-    rightHalf.items.add(juce::FlexItem(voiceLimitWidth, controlHeight, *voiceLimitValueLabel).withMargin(voiceLimitItemMargin));
-
+    rightHalf.items.add(juce::FlexItem(controlWidth, controlHeight * 2, *channelComponent).withMargin(controlMargin));
 
     auto pitchbendWidth = pitchbendRangeValue->getFont().getStringWidth(pitchbendRangeValue->getText()) + margin;
     auto pitchbendLabelWidth = pitchbendRangeLabel->getFont().getStringWidth(pitchbendRangeLabel->getText());
@@ -190,4 +192,19 @@ void OptionsPanel::setPitchbendRangeText(int pitchbendRange)
 {
     auto value = "+/- " + juce::String(pitchbendRange / 2) + " semitones";
     pitchbendRangeValue->setText(value, juce::NotificationType::dontSendNotification);
+}
+
+void OptionsPanel::channelModeChangedCallback()
+{
+    auto mode = Everytone::ChannelMode(channelModeBox->getSelectedId());
+    channelComponent->setChannelMode(mode);
+    
+    if (mode == Everytone::ChannelMode::Monophonic)
+    {
+        mpeZoneBox->setEnabled(false);
+    }
+    else
+    {
+        mpeZoneBox->setEnabled(true);
+    }
 }

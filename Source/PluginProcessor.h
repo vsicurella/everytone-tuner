@@ -119,14 +119,14 @@ public:
     Everytone::MpeZone mpeZone() const { return voiceController->getMpeZone(); }
     void mpeZone(Everytone::MpeZone zone);
 
-    int voiceLimit() const { return voiceController->getVoiceLimit(); }
-    void voiceLimit(int voiceLimit);
-
     int pitchbendRange() const { return tunerController->getPitchbendRange(); }
     void pitchbendRange(int pitchbendRange);
 
     Everytone::BendMode bendMode() const { return voiceInterpolator->getBendMode(); }
     void bendMode(Everytone::BendMode bendMode);
+
+    juce::Array<bool> disabledChannels() const { return voiceController->getChannelsDisabled(); }
+    void disabledChannels(juce::Array<bool> disabledChannelsIn);
 
     //==============================================================================
 
