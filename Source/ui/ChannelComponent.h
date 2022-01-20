@@ -19,6 +19,7 @@
 */
 class ChannelComponent : public juce::Component,
                          public juce::ChangeBroadcaster,
+    public juce::TooltipClient,
                          public OptionsWatcher
 {
 public:
@@ -98,6 +99,8 @@ public:
 
     void mouseExit(const juce::MouseEvent& event) override;
 
+    juce::String getTooltip() override;
+
     //====================================================================================
     // OptionsWatcher implementation
 
@@ -141,8 +144,6 @@ private:
     int lastChannelMouseClicked = -1;
     int mouseOverChannel = -1;
     juce::Point<double> mousePosition;
-
-    juce::TooltipWindow tooltipWindow;
 
     // DRAWING HELPERS
     int channelControlWidth;

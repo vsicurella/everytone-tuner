@@ -109,7 +109,10 @@ juce::String ChannelComponent::getChannelStateTooltip(ChannelComponent::ChannelS
         return juce::String("Global MPE channel");
 
     case ChannelComponent::ChannelState::ModeDisabled:
-        return juce::String("Monophonic mode on channel ") + juce::String(channelIndex + 1);
+    {
+        auto monoChannel = channelsDisabled.indexOf(false);
+        return juce::String("Monophonic mode on channel ") + juce::String(monoChannel + 1);
+    }
 
     case ChannelComponent::ChannelState::ManualDisabled:
         return juce::String("Channel ") + juce::String(channelIndex + 1) + juce::String(" Disabled");
@@ -253,6 +256,17 @@ void ChannelComponent::mouseExit(const juce::MouseEvent& event)
 {
     mouseOverChannel = -1;
     repaint();
+}
+
+juce::String ChannelComponent::getTooltip()
+{
+    if (mouseOverChannel >= 0)
+    {
+        auto state = getChannelState(mouseOverChannel);
+        return getChannelStateTooltip(state, mouseOverChannel);
+    }
+
+    return juce::String();
 }
 
 void ChannelComponent::channelModeChanged(Everytone::ChannelMode newChannelMode)

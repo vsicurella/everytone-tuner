@@ -18,12 +18,13 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     channelModeBox->addItem("First Available", (int)Everytone::ChannelMode::FirstAvailable);
     channelModeBox->addItem("Round Robin", (int)Everytone::ChannelMode::RoundRobin);
     channelModeBox->addItem("Monophonic", (int)Everytone::ChannelMode::Monophonic);
-    channelModeBox->setSelectedId((int)options.channelMode, juce::NotificationType::dontSendNotification);
+    channelModeBox->setSelectedId((int)options.channelMode);
     // Set mode at end since it affects other components
     channelModeBox->onChange = [&]() 
     { 
         auto mode = Everytone::ChannelMode(channelModeBox->getSelectedId());
-        optionsWatchers.call(&OptionsWatcher::channelModeChanged, mode); 
+        optionsWatchers.call(&OptionsWatcher::channelModeChanged, mode);
+        channelModeBox->setTooltip(Everytone::getTooltip(mode));
         channelModeChangedCallback();
     };
     addAndMakeVisible(*channelModeBox);
@@ -37,11 +38,11 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     channelRulesBox = std::make_unique<juce::ComboBox>("ChannelRulesBox");
     channelRulesBox->addItem("One note per channel", (int)Everytone::MidiMode::Mono);
     channelRulesBox->addItem("Poly channels if pitchbend match", (int)Everytone::MidiMode::Poly);
-    channelRulesBox->setSelectedId((int)options.midiMode, juce::NotificationType::dontSendNotification);
     channelRulesBox->onChange = [&]()
     {
         optionsWatchers.call(&OptionsWatcher::midiModeChanged, Everytone::MidiMode(channelRulesBox->getSelectedId()));
     };
+    channelRulesBox->setSelectedId((int)options.midiMode);
     //addAndMakeVisible(*channelRulesBox);
     
     auto channelRulesBoxLabel = labels.add(new juce::Label("ChannelRulesLabel", "Channel Rules:"));
@@ -52,8 +53,13 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     bendModeBox = std::make_unique<juce::ComboBox>("bendModeBox");
     bendModeBox->addItem("Static", (int)Everytone::BendMode::Static);
     bendModeBox->addItem("Persistent", (int)Everytone::BendMode::Persistent);
+    bendModeBox->onChange = [&]() 
+    { 
+        auto bendMode = Everytone::BendMode(bendModeBox->getSelectedId());
+        bendModeBox->setTooltip(Everytone::getTooltip(bendMode));
+        optionsWatchers.call(&OptionsWatcher::bendModeChanged, bendMode); 
+    };
     bendModeBox->setSelectedId((int)options.bendMode);
-    bendModeBox->onChange = [&]() { optionsWatchers.call(&OptionsWatcher::bendModeChanged, Everytone::BendMode(bendModeBox->getSelectedId())); };
     addAndMakeVisible(*bendModeBox);
 
     auto bendModeLabel = labels.add(new juce::Label("BendModeLabel", "Pitchbend Mode:"));
@@ -61,27 +67,8 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     addAndMakeVisible(*bendModeLabel);
 
 
-    mpeZoneBox = std::make_unique<juce::ComboBox>("mpeZoneBox");
-    mpeZoneBox->addItem("Lower", (int)Everytone::MpeZone::Lower);
-    mpeZoneBox->addItem("Upper", (int)Everytone::MpeZone::Upper);
-    mpeZoneBox->addItem("Omnichannel", (int)Everytone::MpeZone::Omnichannel);
-    mpeZoneBox->setSelectedId((int)options.mpeZone, juce::NotificationType::dontSendNotification);
-    mpeZoneBox->onChange = [&]() 
-    { 
-        auto zone = Everytone::MpeZone(mpeZoneBox->getSelectedId());
-        optionsWatchers.call(&OptionsWatcher::mpeZoneChanged, zone);
-        channelComponent->setMpeZone(zone);
-    };
-    addAndMakeVisible(*mpeZoneBox);
-
-    auto mpeZoneLabel = labels.add(new juce::Label("MpeZoneLabel", "MPE Zone:"));
-    mpeZoneLabel->attachToComponent(mpeZoneBox.get(), false);
-    addAndMakeVisible(*mpeZoneLabel);
-
-
     channelComponent = std::make_unique<ChannelComponent>(options.disabledChannels, "ChannelComponent");
     channelComponent->setLayout(ChannelComponent::Layout::Rectangle);
-    channelComponent->setMpeZone(options.mpeZone);
     channelComponent->onChange = [&]()
     {
         optionsWatchers.call(&OptionsWatcher::disabledChannelsChanged, channelComponent->getChannelsDisabled());
@@ -91,6 +78,26 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     auto channelLabel = labels.add(new juce::Label("ChannelsLabel", "MIDI Channels:"));
     channelLabel->attachToComponent(channelComponent.get(), false);
     addAndMakeVisible(channelLabel);
+
+
+    mpeZoneBox = std::make_unique<juce::ComboBox>("mpeZoneBox");
+    mpeZoneBox->addItem("Lower", (int)Everytone::MpeZone::Lower);
+    mpeZoneBox->addItem("Upper", (int)Everytone::MpeZone::Upper);
+    mpeZoneBox->addItem("Omnichannel", (int)Everytone::MpeZone::Omnichannel);
+    mpeZoneBox->onChange = [&]()
+    {
+        auto zone = Everytone::MpeZone(mpeZoneBox->getSelectedId());
+        mpeZoneBox->setTooltip(Everytone::getTooltip(zone));
+        optionsWatchers.call(&OptionsWatcher::mpeZoneChanged, zone);
+        channelComponent->setMpeZone(zone);
+    };
+    mpeZoneBox->setSelectedId((int)options.mpeZone);
+    addAndMakeVisible(*mpeZoneBox);
+
+    auto mpeZoneLabel = labels.add(new juce::Label("MpeZoneLabel", "MPE Zone:"));
+    mpeZoneLabel->attachToComponent(mpeZoneBox.get(), false);
+    addAndMakeVisible(*mpeZoneLabel);
+
 
     pitchbendRangeValue = std::make_unique<LabelMouseHighlight>("pitchbendRangeValue");
     pitchbendRangeValue->setEditable(false, true);
@@ -109,9 +116,11 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     pitchbendRangeValue->onTextChange = [&]()
     {
         auto newRange = pitchbendRangeValue->getText().getIntValue();
+        pitchbendRangeValue->setTooltip(Everytone::getPitchbendRangeTooltip(newRange));
         optionsWatchers.call(&OptionsWatcher::pitchbendRangeChanged, newRange);
     };
     setPitchbendRangeText(options.pitchbendRange);
+    pitchbendRangeValue->setTooltip(Everytone::getPitchbendRangeTooltip(options.pitchbendRange));
 
     pitchbendRangeLabel = labels.add(new juce::Label("pitchbendLabel", "Pitchbend Range:"));
     pitchbendRangeLabel->attachToComponent(pitchbendRangeValue.get(), true);
