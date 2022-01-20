@@ -91,16 +91,38 @@ namespace Everytone
 
     enum class MappingMode
     {
-        Manual = 0,    // Manually set tuning table mapping
+        Manual = 0, // Manually set tuning table mapping
         Auto        // Create tuning table mapping based on tuning
     };
 
     enum class MappingType
     {
-        Linear,        // Map root extends linearly in either direction
+        Linear,      // Map root extends linearly in either direction
         Periodic,    // Map root designated start of period and extends linearly up to 128 notes in either direction, then restarts a period multiple away from the root
         Custom
     };
+
+    static juce::String getTooltip(MappingType mappingType)
+    {
+        switch (mappingType)
+        {
+        case MappingType::Linear:
+            return juce::String("MIDI notes extend linearly from the root channel & note. "
+                                "Tuning table indices will wraparound when out of bounds.");
+
+        case MappingType::Periodic:
+            return juce::String("MIDI notes are offset by one period of the tuning per channel away from root channel. "
+                                "Notes extend linearly between the root notes of each channel. "
+                                "Tuning table indicies will wraparound when out of bounds.");
+
+        case MappingType::Custom:
+            return juce::String("Custom mapping scheme.");
+
+        default:
+            jassertfalse;
+            return juce::String();
+        }
+    }
 
     enum class ChannelMode
     {
@@ -109,12 +131,50 @@ namespace Everytone
         Monophonic          // Only one voice is tuned on the same channel
     };
 
+    static juce::String getTooltip(ChannelMode channelMode)
+    {
+        switch (channelMode)
+        {
+        case ChannelMode::FirstAvailable:
+            return juce::String("Finds the first available MIDI Channel starting from Channel 1.");
+
+        case ChannelMode::RoundRobin:
+            return juce::String("Finds the next MIDI channel available, starting from the last assigned channel, and wrapping around after Channel 16.");
+
+        case ChannelMode::Monophonic:
+            return juce::String("Only use one MIDI channel, for use with monophonic synthesizers.");
+
+        default:
+            jassertfalse;
+            return juce::String();
+        }
+    }
+
     enum class MpeZone
     {
         Lower = 1,      // Channel 1 is the global channel
         Upper,          // Channel 16 is the global channel
         Omnichannel,    // Legacy mode, use all 16 MIDI channels
     };
+
+    static juce::String getTooltip(MpeZone zone)
+    {
+        switch (zone)
+        {
+        case MpeZone::Lower:
+            return juce::String("Reserve MIDI Channel 1 for global pitchbend and controller messages, and use channels 2-16 for tuned voices.");
+
+        case MpeZone::Upper:
+            return juce::String("Reserve MIDI Channel 16 for global pitchbend and controller messages, and use channels 1-15 for tuned voices.");
+
+        case MpeZone::Omnichannel:
+            return juce::String("Use all 16 MIDI channels without reserving a global channel");
+
+        default:
+            jassertfalse;
+            return juce::String();
+        }
+    }
 
     enum class MidiMode
     {
@@ -129,6 +189,25 @@ namespace Everytone
         Last,       // Create note-ons for each played note, and when voice becomes available, retrigger previous note
     };
 
+    static juce::String getTooltip(NotePriority notePriority)
+    {
+        switch (notePriority)
+        {
+        case NotePriority::Lowest:
+            return juce::String("After all voices are used, allow a new lowest note to be triggered by stealing the highest held note.");
+
+        case NotePriority::Highest:
+            return juce::String("After all voices are used, allow a new highest note to be triggered by stealing the lowest held note.");
+
+        case NotePriority::Last:
+            return juce::String("After all voices are used, allow a new note to be triggered by stealing the oldest held note.");
+
+        default:
+            jassertfalse;
+            return juce::String();
+        }
+    }
+
     // TODO Mode for retriggering or bending (given pitchbend range limits)
 
     enum class BendMode
@@ -137,6 +216,27 @@ namespace Everytone
         Persistent,     // Send pitchbend messages while notes are on
         Dynamic         // Send pitchbend messages to active notes when tuning changes
     };
+
+    static juce::String getTooltip(BendMode bendMode)
+    {
+        switch (bendMode)
+        {
+        case BendMode::Static:
+            return juce::String("Only send one pitchbend message per note.");
+
+        case BendMode::Persistent:
+            return juce::String("Send a stream of pitchbend messages while notes are on.");
+
+        default:
+            jassertfalse;
+            return juce::String();
+        }
+    }
+
+    static juce::String getPitchbendRangeTooltip(int pitchbendRange)
+    {
+        return juce::String("Total pitchbend range of ") + juce::String(pitchbendRange) + juce::String(" semitones.");
+    }
 
     struct Options
     {
