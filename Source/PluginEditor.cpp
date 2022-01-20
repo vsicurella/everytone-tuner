@@ -51,6 +51,7 @@ MultimapperAudioProcessorEditor::MultimapperAudioProcessorEditor (MultimapperAud
     audioProcessor.addTunerControllerWatcher(this);
 
     contentComponent = overviewPanel.get();
+    panelStack = juce::Array<Component*>(contentComponent);
 
     setSize (600, 250);
 
@@ -312,21 +313,11 @@ bool MultimapperAudioProcessorEditor::perform(const juce::ApplicationCommandTarg
 
 bool MultimapperAudioProcessorEditor::performBack(const juce::ApplicationCommandTarget::InvocationInfo& info)
 {
-    if (contentComponent == overviewPanel.get())
+    if (panelStack.size() == 1)
         return false;
 
-    if (contentComponent == newTuningPanel.get())
-    {
-        // TODO: finish preview implementation
-        // Revert tuning if preview is on
-        //if (newTuningPanel->previewOn())
-        //{
-        //    auto definition
-        //    audioProcessor.loadTuningTarget(*tuningBackup);
-        //}
-    }
-
-    setContentComponent(overviewPanel.get());
+    panelStack.removeLast();
+    setContentComponent(panelStack.getLast());
     return true;
 }
 
@@ -382,6 +373,9 @@ void MultimapperAudioProcessorEditor::setContentComponent(juce::Component* compo
 
     contentComponent = component;
     contentComponent->setVisible(true);
+
+    if (!panelStack.contains(component))
+        panelStack.add(component);
 
     infoBar->setButtonBackState(contentComponent != overviewPanel.get());
 

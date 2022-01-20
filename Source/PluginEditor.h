@@ -110,6 +110,7 @@ private:
     //std::unique_ptr<MappedTuningTable> tuningBackup;
 
     juce::Component* contentComponent = nullptr;
+    juce::Array<Component*> panelStack;
 
     std::unique_ptr<InfoBar> infoBar;
     std::unique_ptr<MenuPanel> menuPanel;
