@@ -13,6 +13,7 @@
 #include "../TuningChanger.h"
 #include "../Common.h"
 #include "EqualTemperamentInterface.h"
+#include "NewListTuningInterface.h"
 
 
 class NewTuningPanel : public juce::TabbedComponent,
@@ -22,6 +23,7 @@ class NewTuningPanel : public juce::TabbedComponent,
     juce::ApplicationCommandManager* cmdManager;
 
     std::unique_ptr<EqualTemperamentInterface> equalTemperamentInterface;
+    std::unique_ptr<NewListTuningInterface> listTuningInterface;
 
     std::unique_ptr<juce::TextButton> saveButton;
     std::unique_ptr<juce::TextButton> backButton;
@@ -37,6 +39,7 @@ public:
     {
         EqualTemperament = 0,
         Rank2Temperament,
+        IntervalList,
     };
 
     NewTuningPanel(juce::ApplicationCommandManager* cmdManager);

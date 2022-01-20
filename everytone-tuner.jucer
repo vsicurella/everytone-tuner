@@ -8,6 +8,8 @@
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
       <FILE id="oMI0GT" name="Common.h" compile="0" resource="0" file="Source/Common.h"/>
       <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="ui">
+        <FILE id="UMIQIZ" name="NewListTuningInterface.h" compile="0" resource="0"
+              file="Source/ui/NewListTuningInterface.h"/>
         <FILE id="xcZSj4" name="MappingTableModel.cpp" compile="1" resource="0"
               file="Source/ui/MappingTableModel.cpp"/>
         <FILE id="fFKDXj" name="ChannelComponent.h" compile="0" resource="0"

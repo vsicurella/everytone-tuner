@@ -17,6 +17,10 @@ NewTuningPanel::NewTuningPanel(juce::ApplicationCommandManager* cmdManagerIn)
     addChildComponent(*equalTemperamentInterface);
     equalTemperamentInterface->addTuningWatcher(this);
 
+    listTuningInterface = std::make_unique<NewListTuningInterface>("ListTuningInterface");
+    addChildComponent(*listTuningInterface);
+    listTuningInterface->addTuningWatcher(this);
+
     saveButton.reset(new juce::TextButton(juce::translate("Save"), juce::translate("Confirm new tuning and go back to main window.")));
     //saveButton->setCommandToTrigger(cmdManager, Everytone::Commands::Save, false);
     saveButton->onClick = [&]() { saveTuning(); };
@@ -31,12 +35,17 @@ NewTuningPanel::NewTuningPanel(juce::ApplicationCommandManager* cmdManagerIn)
     //addAndMakeVisible(*previewButton);
 
     addTab("Equal", juce::Colours::transparentBlack, equalTemperamentInterface.get(), false, NewTuningTabs::EqualTemperament);
+    addTab("List", juce::Colours::transparentBlack, listTuningInterface.get(), false, NewTuningTabs::IntervalList);
 
     setCurrentTabIndex(NewTuningTabs::EqualTemperament, true);
 }
 
 NewTuningPanel::~NewTuningPanel()
 {
+    previewButton = nullptr;
+    backButton = nullptr;
+    saveButton = nullptr;
+    listTuningInterface = nullptr;
     equalTemperamentInterface = nullptr;
     tuningWatchers.clear();
 }
@@ -78,6 +87,8 @@ void NewTuningPanel::targetDefinitionLoaded(TuningChanger* changer, CentsDefinit
 {
     tuningStaged = std::make_unique<CentsDefinition>(definition);
 
-    if (previewOn())
-        tuningWatchers.call(&TuningWatcher::targetDefinitionLoaded, this, *tuningStaged);
+    if (getCurrentContentComponent() != listTuningInterface.get())
+        listTuningInterface->setIntervalList(definition);
+    //if (previewOn())
+    //    tuningWatchers.call(&TuningWatcher::targetDefinitionLoaded, this, *tuningStaged);
 }
