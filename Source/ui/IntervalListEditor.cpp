@@ -13,12 +13,14 @@
 IntervalListHeader::IntervalListHeader(bool inEditMode)
 {
     addColumn("#",          (int)Columns::Index, 48);
-    addColumn("Interval",   (int)Columns::Interval, 96);
+    addColumn("Interval",   (int)Columns::Interval, 72);
     addColumn("Type",       (int)Columns::Type, 72);
 
     if (inEditMode)
     {
-        addColumn("", (int)Columns::InsertAbove, 24);
+        addColumn("", (int)Columns::InsertBelow, 24);
+        addColumn("", (int)Columns::SwapAbove, 24);
+        addColumn("", (int)Columns::SwapBelow, 24);
         addColumn("", (int)Columns::Delete, 24);
     }
 }
@@ -36,10 +38,16 @@ void IntervalListModel::setTuning(const FunctionalTuning* tuningIn)
     {
         definition = CentsDefinition();
         definition.intervalCents = {};
+        setTuningDefinition(definition);
         return;
     }
 
-    definition = tuning->getDefinition();
+    setTuningDefinition(tuningIn->getDefinition());
+}
+
+void IntervalListModel::setTuningDefinition(CentsDefinition definitionIn)
+{
+    definition = definitionIn;
 }
 
 void IntervalListModel::sendCentsDefinitionUpdateChange()
@@ -66,13 +74,10 @@ void IntervalListModel::removeInterval(int indexToRemove)
 }
 
 
-// juce::TablelistModel implemetnation
+// juce::TablelistModel implementation
 
 int IntervalListModel::getNumRows()
 {
-    if (tuning == nullptr)
-        return 0;
-
     return definition.intervalCents.size();
 }
 
@@ -121,16 +126,48 @@ juce::Component* IntervalListModel::refreshComponentForCell(int rowNumber, int c
             existingComponentToUpdate = typeLabel;
             return typeLabel;
         }
-        case IntervalListHeader::Columns::InsertAbove:
+        case IntervalListHeader::Columns::InsertBelow:
         {
-            auto insertButton = new juce::TextButton("Insert" + indexString + "Button", "Insert a new interval above this one");
-            insertButton->setButtonText("^");
+            auto insertButton = new juce::TextButton("Insert" + indexString + "Button", "Insert a new interval below this one");
+            insertButton->setButtonText("+");
             insertButton->onClick = [&, rowNumber]()
             {
-                insertInterval(rowNumber, definition.intervalCents[rowNumber]);
+                insertInterval(rowNumber + 1, definition.intervalCents[rowNumber]);
                 sendCentsDefinitionUpdateChange();
             };
             return insertButton;
+        }
+        case IntervalListHeader::Columns::SwapAbove:
+        {
+            auto swapButton = new juce::TextButton("SwapAbove" + indexString + "Button", "Swap interval with the one before this");
+            swapButton->setButtonText("^");
+            swapButton->onClick = [&, rowNumber]()
+            {
+                auto beforeInterval = definition.intervalCents[rowNumber - 1];
+                auto rowInterval = definition.intervalCents[rowNumber];
+                modifyInterval(rowNumber - 1, rowInterval);
+                modifyInterval(rowNumber, beforeInterval);
+                sendCentsDefinitionUpdateChange();
+            };
+
+            existingComponentToUpdate = swapButton;
+            break;
+        }
+        case IntervalListHeader::Columns::SwapBelow:
+        {
+            auto swapButton = new juce::TextButton("SwapBelow" + indexString + "Button", "Swap interval with the one after this");
+            swapButton->setButtonText("v");
+            swapButton->onClick = [&, rowNumber]()
+            {
+                auto afterInterval = definition.intervalCents[rowNumber + 1];
+                auto rowInterval = definition.intervalCents[rowNumber];
+                modifyInterval(rowNumber, afterInterval);
+                modifyInterval(rowNumber + 1, rowInterval);
+                sendCentsDefinitionUpdateChange();
+            };
+
+            existingComponentToUpdate = swapButton;
+            break;
         }
         case IntervalListHeader::Columns::Delete:
         {
@@ -140,7 +177,9 @@ juce::Component* IntervalListModel::refreshComponentForCell(int rowNumber, int c
             {
                 removeInterval(rowNumber);
             };
-            return deleteButton;
+            
+            existingComponentToUpdate = deleteButton;
+            break;
         }
         default:
             jassertfalse;
@@ -173,6 +212,22 @@ juce::Component* IntervalListModel::refreshComponentForCell(int rowNumber, int c
         label->setText("cents", juce::NotificationType::dontSendNotification);
         return label;
     }
+    case IntervalListHeader::Columns::SwapAbove:
+        if (rowNumber == 0)
+        {
+            delete existingComponentToUpdate;
+            existingComponentToUpdate = nullptr;
+        }
+        break;
+
+    case IntervalListHeader::Columns::SwapBelow:
+        if ((rowNumber + 1) == getNumRows())
+        {
+            delete existingComponentToUpdate;
+            existingComponentToUpdate = nullptr;
+        }
+        break;
+
     case IntervalListHeader::Columns::Delete:
         if (definition.intervalCents.size() == 1)
         {

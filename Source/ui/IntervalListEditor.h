@@ -20,7 +20,9 @@ public:
         Index = 1,
         Interval,
         Type,
-        InsertAbove,
+        InsertBelow,
+        SwapAbove,
+        SwapBelow,
         Delete
     };
 
@@ -40,6 +42,7 @@ public:
     IntervalListModel(bool inEditMode = false, const FunctionalTuning* tuning = nullptr);
 
     void setTuning(const FunctionalTuning* tuning);
+    void setTuningDefinition(CentsDefinition definitionIn);
 
     void sendCentsDefinitionUpdateChange();
 
