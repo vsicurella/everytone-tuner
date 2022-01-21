@@ -70,6 +70,15 @@ void FunctionalTuning::setupCentsMap(const juce::Array<double>& cents)
 
 TuningTable::Definition FunctionalTuning::setupEmptyTableDefinition(const CentsDefinition& definition)
 {
+    // Fill these if empty
+    auto virtualPeriod = definition.virtualPeriod;
+    if (virtualPeriod == 0)
+        virtualPeriod = definition.intervalCents.getLast();
+
+    auto virtualSize = definition.virtualSize;
+    if (virtualSize == 0)
+        virtualSize = definition.intervalCents.size();
+
     juce::Array<double> emptyTable;
     TuningTable::Definition tableDefinition =
     {
@@ -78,8 +87,8 @@ TuningTable::Definition FunctionalTuning::setupEmptyTableDefinition(const CentsD
         definition.name,
         definition.description,
         definition.getPeriodString(),
-        definition.virtualPeriod,
-        definition.virtualSize
+        virtualPeriod,
+        virtualSize
     };
 
     return tableDefinition;
