@@ -48,7 +48,7 @@ public:
 
     void resized() override
     {
-        intervalTable->setBounds(getLocalBounds().withWidth(getWidth() / 2));
+        intervalTable->setBounds(getLocalBounds());
     }
 
     void setIntervalList(const CentsDefinition& definitionIn)

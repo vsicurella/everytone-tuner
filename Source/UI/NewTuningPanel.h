@@ -14,6 +14,7 @@
 #include "../Common.h"
 #include "EqualTemperamentInterface.h"
 #include "NewListTuningInterface.h"
+#include "ToneCircle.h"
 
 
 class NewTuningPanel : public juce::TabbedComponent,
@@ -29,7 +30,10 @@ class NewTuningPanel : public juce::TabbedComponent,
     std::unique_ptr<juce::TextButton> backButton;
     std::unique_ptr<juce::TextButton> previewButton;
 
-    std::unique_ptr<CentsDefinition> tuningStaged;
+    std::unique_ptr<FunctionalTuning> tuningStaged;
+    CentsDefinition definitionStaged;
+
+    std::unique_ptr<ToneCircle> toneCircle;
 
     int lastTabIndex = 1;
 
@@ -47,7 +51,7 @@ public:
 
     
     bool previewOn() const { return previewButton->getToggleState(); }
-    const CentsDefinition& stagedTuning() const { return *tuningStaged; }
+    CentsDefinition stagedTuning() const { return tuningStaged->getDefinition(); }
 
     void saveTuning();
 

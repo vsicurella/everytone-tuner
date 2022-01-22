@@ -34,6 +34,9 @@ NewTuningPanel::NewTuningPanel(juce::ApplicationCommandManager* cmdManagerIn)
     previewButton->setClickingTogglesState(true);
     //addAndMakeVisible(*previewButton);
 
+    toneCircle = std::make_unique<ToneCircle>("NewTuningToneCircle");
+    addAndMakeVisible(*toneCircle);
+
     addTab("Equal", juce::Colours::transparentBlack, equalTemperamentInterface.get(), false, NewTuningTabs::EqualTemperament);
     addTab("List", juce::Colours::transparentBlack, listTuningInterface.get(), false, NewTuningTabs::IntervalList);
 
@@ -52,7 +55,7 @@ NewTuningPanel::~NewTuningPanel()
 
 void NewTuningPanel::saveTuning()
 {
-    tuningWatchers.call(&TuningWatcher::targetDefinitionLoaded, this, *tuningStaged);
+    tuningWatchers.call(&TuningWatcher::targetDefinitionLoaded, this, definitionStaged);
 }
 
 void NewTuningPanel::resized()
@@ -73,19 +76,25 @@ void NewTuningPanel::resized()
     if (contentComponent != nullptr)
     {
         //contentComponent->setVisible(true);
-        contentComponent->setBounds(getLocalBounds().withTop(tabs->getBottom()).withBottom(buttonTop));
+        contentComponent->setBounds(getLocalBounds().withTop(tabs->getBottom()).withBottom(buttonTop).withRight(w / 2));
     }
 
-    double buttonWidth = w * 0.2;
+    toneCircle->setBounds(getLocalBounds().withTop(tabs->getBottom()).withLeft(w / 2));
+
+    double buttonWidth = w * 0.25;
 
     backButton->setBounds(0, buttonTop, buttonWidth, eighthHeight);
     saveButton->setBounds(backButton->getBounds().translated(buttonWidth, 0));
-    previewButton->setBounds(saveButton->getBounds().translated(buttonWidth, 0));
+    //previewButton->setBounds(saveButton->getBounds().translated(buttonWidth, 0));
 }
 
 void NewTuningPanel::targetDefinitionLoaded(TuningChanger* changer, CentsDefinition definition)
 {
-    tuningStaged = std::make_unique<CentsDefinition>(definition);
+    definitionStaged = definition;
+    tuningStaged = std::make_unique<FunctionalTuning>(definition);
+
+    toneCircle->setScale(tuningStaged.get());
+    toneCircle->repaint();
 
     if (getCurrentContentComponent() != listTuningInterface.get())
         listTuningInterface->setIntervalList(definition);
