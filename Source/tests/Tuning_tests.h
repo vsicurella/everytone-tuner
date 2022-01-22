@@ -169,6 +169,8 @@ private:
     void defaultTuningTest()
     {
         CentsDefinition defaultDefinition;
+        defaultDefinition.virtualPeriod = 1200.0;
+        defaultDefinition.virtualSize = 12;
         auto defaultTuning = std::make_unique<FunctionalTuning>(defaultDefinition);
 
         const int size = 12;
@@ -273,8 +275,8 @@ private:
             440.0,
             juce::String("31-edo"),
             juce::String("The octave divided into 31 equal steps"),
-            0,
-            0,
+            1200.0,
+            31.0,
         };
 
         auto tuning = FunctionalTuning(definition);
