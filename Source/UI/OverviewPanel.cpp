@@ -167,7 +167,7 @@ void OverviewPanel::setTuningDisplayed(const MappedTuningTable* mappedTuningIn)
 
 	//listEditorComponent->updateContent();
 	tuningTableViewer->set(mappedTuning);
-	toneCircle->setTuning(mappedTuning);
+	toneCircle->setScale(mappedTuning->getTuning());
 }
 
 void OverviewPanel::setListEditorModel(IntervalListModel* listEditor)

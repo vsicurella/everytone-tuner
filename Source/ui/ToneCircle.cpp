@@ -99,17 +99,17 @@ void ToneCircle::resized()
 	}
 }
 
-void ToneCircle::setTuning(const MappedTuningTable* tuningIn)
+void ToneCircle::updateScale(const CentsDefinition& scaleToCopy)
 {
-	tuning = tuningIn;
+	centsScale = scaleToCopy;
 
 	double period = tuning->getVirtualPeriod();
 	if (period == 0)
-		period = 1200.0;
+		period = centsScale.intervalCents.getLast();
 
 	int size = tuning->getVirtualSize();
 	if (size == 0)
-		size = tuning->getTuningSize();
+		size = centsScale.intervalCents.size();
 
 	degreeAngles.clear();
 	for (int i = 0; i < size; i++)
@@ -120,6 +120,36 @@ void ToneCircle::setTuning(const MappedTuningTable* tuningIn)
 
 	resized();
 }
+
+void ToneCircle::setScale(const TuningTableBase* tuningIn)
+{
+	tuning = tuningIn;
+
+	// User functional definition if we can
+	auto functional = dynamic_cast<const FunctionalTuning*>(tuningIn);
+	if (functional)
+	{
+		return setScale(functional);
+	}
+
+	auto definition = CentsDefinition::ExtractFromTuningTable(tuning);
+	updateScale(definition);
+}
+
+void ToneCircle::setScale(const FunctionalTuning* tuningIn)
+{
+	tuning = tuningIn;
+	
+	auto definition = tuningIn->getDefinition();
+	updateScale(definition);
+}
+
+void ToneCircle::setScale(const CentsDefinition& centsScale)
+{
+	tuning = nullptr;
+	updateScale(centsScale);
+}
+
 
 float ToneCircle::scaleDegreeToAngle(int scaleDegreeIn, double period) const
 {

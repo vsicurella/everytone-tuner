@@ -28,27 +28,12 @@ public:
 		intervalEndColourId = 0x00200102
 	};
 
-public:
-    ToneCircle(juce::String componentName);
-    ~ToneCircle() override;
-
-    void paint (juce::Graphics&) override;
-    void resized() override;
-
-	void setTuning(const MappedTuningTable* tuningIn);
-
-	void mouseMove(const juce::MouseEvent&) override;
-
-//==============================================================================
 private:
+	// Optional pointer to last set tuning
+	const TuningTableBase* tuning;
 
-	float scaleDegreeToAngle(int scaleDegreeIn, double period) const;
-
-//==============================================================================
-
-private:
-
-	const MappedTuningTable* tuning;
+	// Displayed tuning
+	CentsDefinition centsScale;
 
 	juce::Array<float> degreeAngles;
 	juce::Array<juce::Point<float>> degreePoints;
@@ -61,12 +46,32 @@ private:
 
 	// Drawing helpers
 	juce::Point<float> center;
-	
+
 	float margin = 1.0f / 8.0f;
 	float circleRadius;
 	juce::Rectangle<float> circleBounds;
 
 	float noteMarkerRadius = 6.0f;
+
+private:
+
+	void updateScale(const CentsDefinition& scaleToCopy);
+
+	float scaleDegreeToAngle(int scaleDegreeIn, double period) const;
+
+
+public:
+    ToneCircle(juce::String componentName);
+    ~ToneCircle() override;
+
+    void paint (juce::Graphics&) override;
+    void resized() override;
+
+	void mouseMove(const juce::MouseEvent&) override;
+
+	void setScale(const TuningTableBase* tuningIn);
+	void setScale(const FunctionalTuning* tuningIn);
+	void setScale(const CentsDefinition& scaleToCopy);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ToneCircle)
 };
