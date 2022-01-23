@@ -560,6 +560,7 @@ int MidiVoiceController::findNextVoiceChannel(MidiPitch pitchOfNewVoice) const
             newChannel = voiceToSteal->getAssignedChannel();
             //stealExistingVoice(stealIndex);
         }
+        break;
     }
 
     case MidiVoiceController::NewVoiceState::Normal:
@@ -631,7 +632,7 @@ int MidiVoiceController::effectiveVoiceLimit() const
 void MidiVoiceController::updateVoiceLimitCache()
 {
     // TODO poly channel mode
-    auto voicesAllowed = effectiveVoiceLimit();
+    voiceLimit = effectiveVoiceLimit();
 }
 
 int MidiVoiceController::numVoicesAvailable() const

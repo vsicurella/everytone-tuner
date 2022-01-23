@@ -37,9 +37,9 @@ void MidiVoiceInterpolator::voiceAdded(MidiVoice voice)
 void MidiVoiceInterpolator::voiceChanged(MidiVoice voice)
 {
     bool found = false;
-    for (int i = 0; i < activeVoiceTargets.size(); i++)
+    for (int i = 0; i < voices.size(); i++)
     {
-        auto activeVoice = activeVoiceTargets[i];
+        auto activeVoice = voices[i];
         if (activeVoice.getMidiNoteIndex() == voice.getMidiNoteIndex())
         {
             if (!voice.isActive())
