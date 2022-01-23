@@ -225,7 +225,7 @@ struct CentsDefinition
         {
             int index = i + rootIndex;
             auto ratio = frequencyTable[index] / frequencyTable[index - 1];
-            auto cents = roundN(6, ratioToCents(ratio));
+            auto cents = roundN(3, ratioToCents(ratio));
             stepsInCents.add(cents);
         }
 
