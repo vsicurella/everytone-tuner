@@ -58,8 +58,13 @@ private:
 
     juce::Array<bool> midiChannelDisabled;
 
-    MidiBuffer notePriorityQueue;
-    int notePrioritySample = 0;
+    // For messages that need to be in the same chunk
+    MidiBuffer sameChunkPriorityQueue;
+    int sameChunkSample = 0;
+
+    // For messages that need to be in the next chunk
+    MidiBuffer nextChunkPriorityQueue;
+    int nextChunkSample = 0;
 
     Everytone::ChannelMode channelMode = Everytone::ChannelMode::FirstAvailable;
     Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower;
@@ -99,8 +104,8 @@ private:
 
     const MidiVoice* getExistingVoice(int index) const;
 
-    void queueVoiceNoteOff(MidiVoice* voice);
-    void queueVoiceNoteOn(MidiVoice* voice, bool pitchbendOnly=false);
+    void queueVoiceNoteOff(MidiVoice* voice, bool sameChunk);
+    void queueVoiceNoteOn(MidiVoice* voice, bool sameChunk, bool pitchbendOnly=false);
     
     void addVoiceToChannel(int midiChannel, MidiVoice* voice);
     void removeVoiceFromChannel(int midiChannel, MidiVoice* voice);
@@ -146,7 +151,8 @@ public:
     void clearAllVoices();
 
     // Get messages queued for NotePriority settings, returns size of buffer
-    int serveNotePriorityMessages(MidiBuffer& queueOut);
+    int serveSameChunkPriorityBuffer(MidiBuffer& queueOut);
+    int serveNextChunkPriorityBuffer(MidiBuffer& queueOut);
 
     //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;
 
