@@ -374,7 +374,10 @@ void MultimapperAudioProcessorEditor::setContentComponent(juce::Component* compo
     contentComponent = component;
     contentComponent->setVisible(true);
 
-    if (!panelStack.contains(component))
+    if (component == overviewPanel.get())
+        panelStack = juce::Array<Component*>(component);
+
+    else if (!panelStack.contains(component))
         panelStack.add(component);
 
     infoBar->setButtonBackState(contentComponent != overviewPanel.get());
