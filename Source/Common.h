@@ -102,6 +102,25 @@ namespace Everytone
         Custom
     };
 
+    static juce::String getName(MappingType type)
+    {
+        switch (type)
+        {
+        case MappingType::Linear:
+            return juce::String("Linear");
+
+        case MappingType::Periodic:
+            return juce::String("Periodic");
+
+        case MappingType::Custom:
+            return juce::String("Custom");
+
+        default:
+            jassertfalse;
+            return juce::String();
+        }
+    }
+
     static juce::String getTooltip(MappingType mappingType)
     {
         switch (mappingType)
@@ -131,6 +150,25 @@ namespace Everytone
         Monophonic          // Only one voice is tuned on the same channel
     };
 
+    static juce::String getName(ChannelMode mode)
+    {
+        switch (mode)
+        {
+        case ChannelMode::FirstAvailable:
+            return juce::String("FirstAvailable");
+
+        case ChannelMode::RoundRobin:
+            return juce::String("RoundRobin");
+
+        case ChannelMode::Monophonic:
+            return juce::String("Monophonic");
+
+        default:
+            jassertfalse;
+            return juce::String();
+        }
+    }
+
     static juce::String getTooltip(ChannelMode channelMode)
     {
         switch (channelMode)
@@ -156,6 +194,25 @@ namespace Everytone
         Upper,          // Channel 16 is the global channel
         Omnichannel,    // Legacy mode, use all 16 MIDI channels
     };
+
+    static juce::String getName(MpeZone zone)
+    {
+        switch (zone)
+        {
+        case MpeZone::Lower:
+            return juce::String("Lower");
+
+        case MpeZone::Upper:
+            return juce::String("Upper");
+
+        case MpeZone::Omnichannel:
+            return juce::String("Omnichannel");
+
+        default:
+            jassertfalse;
+            return juce::String();
+        }
+    }
 
     static juce::String getTooltip(MpeZone zone)
     {
@@ -189,6 +246,25 @@ namespace Everytone
         Last,       // Create note-ons for each played note, and when voice becomes available, retrigger previous note
     };
 
+    static juce::String getName(NotePriority mode)
+    {
+        switch (mode)
+        {
+        case NotePriority::Lowest:
+            return juce::String("Lowest");
+
+        case NotePriority::Highest:
+            return juce::String("Highest");
+
+        case NotePriority::Last:
+            return juce::String("Last");
+
+        default:
+            jassertfalse;
+            return juce::String();
+        }
+    }
+
     static juce::String getTooltip(NotePriority notePriority)
     {
         switch (notePriority)
@@ -216,6 +292,22 @@ namespace Everytone
         Persistent,     // Send pitchbend messages while notes are on
         Dynamic         // Send pitchbend messages to active notes when tuning changes
     };
+
+    static juce::String getName(BendMode mode)
+    {
+        switch (mode)
+        {
+        case BendMode::Static:
+            return juce::String("Static");
+
+        case BendMode::Persistent:
+            return juce::String("Persistent");
+
+        default:
+            jassertfalse;
+            return juce::String();
+        }
+    }
 
     static juce::String getTooltip(BendMode bendMode)
     {

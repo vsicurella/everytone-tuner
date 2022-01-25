@@ -358,21 +358,21 @@ void MidiVoiceController::setChannelsDisabled(juce::Array<bool> channelsDisabled
 void MidiVoiceController::setChannelMode(Everytone::ChannelMode mode)
 {
     channelMode = mode;
-    juce::Logger::writeToLog("ChannelMode set to " + juce::String((int)channelMode));
+    juce::Logger::writeToLog("ChannelMode set to " + Everytone::getName(channelMode));
     updateVoiceLimitCache();
 }
 
 void MidiVoiceController::setMpeZone(Everytone::MpeZone zone)
 {
     mpeZone = zone;
-    juce::Logger::writeToLog("MPE Zone set to " + juce::String((int)mpeZone));
+    juce::Logger::writeToLog("MPE Zone set to " + Everytone::getName(mpeZone));
     updateVoiceLimitCache();
 }
 
 void MidiVoiceController::setNotePriority(Everytone::NotePriority notePriorityIn)
 {
     notePriority = notePriorityIn;
-    juce::Logger::writeToLog("NotePriority set to " + juce::String((int)notePriority));
+    juce::Logger::writeToLog("NotePriority set to " + Everytone::getName(notePriority));
 }
 
 int MidiVoiceController::findLowestVoiceIndex(bool active) const
