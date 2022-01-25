@@ -97,25 +97,34 @@ const MidiVoice* MidiVoiceController::getExistingVoice(int index) const
     return nullptr;
 }
 
-void MidiVoiceController::queueVoiceNoteOff(MidiVoice* voice)
+void MidiVoiceController::queueVoiceNoteOff(MidiVoice* voice, bool sameChunk)
 {
     jassert(voice->isActive());
     auto noteOffMsg = voice->getNoteOff();
-    notePriorityQueue.addEvent(noteOffMsg, notePrioritySample++);
+    if (sameChunk)
+        sameChunkPriorityQueue.addEvent(noteOffMsg, sameChunkSample++);
+    else
+        nextChunkPriorityQueue.addEvent(noteOffMsg, nextChunkSample++);
 }
 
-void MidiVoiceController::queueVoiceNoteOn(MidiVoice* voice, bool pitchbendOnly)
+void MidiVoiceController::queueVoiceNoteOn(MidiVoice* voice, bool sameChunk, bool pitchbendOnly)
 {
     jassert(voice->isActive());
 
     auto pbmsg = voice->getPitchbend();
-    notePriorityQueue.addEvent(pbmsg, notePrioritySample++);
+    if (sameChunk)
+        sameChunkPriorityQueue.addEvent(pbmsg, sameChunkSample++);
+    else
+        nextChunkPriorityQueue.addEvent(pbmsg, nextChunkSample++);
 
     if (pitchbendOnly)
         return;
 
     auto noteOn = voice->getNoteOn();
-    notePriorityQueue.addEvent(noteOn, notePrioritySample++);
+    if (sameChunk)
+        sameChunkPriorityQueue.addEvent(noteOn, sameChunkSample++);
+    else
+        nextChunkPriorityQueue.addEvent(noteOn, nextChunkSample++);
 }
 
 void MidiVoiceController::stealExistingVoice(int index)
@@ -132,7 +141,7 @@ void MidiVoiceController::stealExistingVoice(int index)
         removeVoiceFromChannel(channel, voice);
 
         if (channelMode != Everytone::ChannelMode::Monophonic)
-            queueVoiceNoteOff(voice);
+            queueVoiceNoteOff(voice, true);
 
         addVoiceToChannel(0, voice);
 
@@ -153,7 +162,7 @@ void MidiVoiceController::retriggerExistingVoice(int index, int midiChannel)
             voiceWatchers.call(&MidiVoiceController::Watcher::voiceChanged, *retriggerVoice);
 
             // In Monophonic mode we just have to send a new pitchbend message
-            queueVoiceNoteOn(retriggerVoice, channelMode == Everytone::ChannelMode::Monophonic);
+            queueVoiceNoteOn(retriggerVoice, false, channelMode == Everytone::ChannelMode::Monophonic);
         }
     }
 }
@@ -294,7 +303,7 @@ void MidiVoiceController::clearAllVoices()
 {
     for (auto voice : voices)
     {
-        queueVoiceNoteOff(voice);
+        queueVoiceNoteOff(voice, false);
         removeVoiceFromChannel(voice->getAssignedChannel(), voice);
     }
 
@@ -303,15 +312,27 @@ void MidiVoiceController::clearAllVoices()
     voices.clear();
 }
 
-int MidiVoiceController::serveNotePriorityMessages(MidiBuffer& queueOut)
+int MidiVoiceController::serveSameChunkPriorityBuffer(MidiBuffer& queueOut)
 {
     MidiBuffer tempBuffer;
-    notePriorityQueue.swapWith(tempBuffer);
 
-    int bufferSize = notePrioritySample;
+    sameChunkPriorityQueue.swapWith(tempBuffer);
     queueOut.swapWith(tempBuffer);
 
-    notePrioritySample = 0;
+    int bufferSize = sameChunkSample;
+    sameChunkSample = 0;
+    return bufferSize;
+}
+
+int MidiVoiceController::serveNextChunkPriorityBuffer(MidiBuffer& queueOut)
+{
+    MidiBuffer tempBuffer;
+
+    nextChunkPriorityQueue.swapWith(tempBuffer);
+    queueOut.swapWith(tempBuffer);
+
+    int bufferSize = nextChunkSample;
+    nextChunkSample = 0;
     return bufferSize;
 }
 
@@ -560,6 +581,7 @@ int MidiVoiceController::findNextVoiceChannel(MidiPitch pitchOfNewVoice) const
             newChannel = voiceToSteal->getAssignedChannel();
             //stealExistingVoice(stealIndex);
         }
+        break;
     }
 
     case MidiVoiceController::NewVoiceState::Normal:
@@ -631,7 +653,7 @@ int MidiVoiceController::effectiveVoiceLimit() const
 void MidiVoiceController::updateVoiceLimitCache()
 {
     // TODO poly channel mode
-    auto voicesAllowed = effectiveVoiceLimit();
+    voiceLimit = effectiveVoiceLimit();
 }
 
 int MidiVoiceController::numVoicesAvailable() const

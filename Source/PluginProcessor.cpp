@@ -333,6 +333,9 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
             jassertfalse;
     }
 
+    MidiBuffer previousChunkPriority;
+    int previousPrioritySize = voiceController->serveNextChunkPriorityBuffer(previousChunkPriority);
+
     // Process new messages
     juce::MidiBuffer processedBuffer;
     int processedSample = 0;
@@ -347,15 +350,10 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
             case 0x80: // Note Off
             {
                 auto voice = voiceController->removeVoice(msg);
-                if (voice.isValid())
-                    voice.mapMidiMessage(msg);
-                else
+                if (!voice.isActive())
                     continue;
-                //else
-                //{
-                //    jassertfalse;
-                //}
-
+                
+                voice.mapMidiMessage(msg);
                 break;
             }
 
@@ -389,15 +387,16 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
         processedBuffer.addEvent(msg, processedSample++);
     }
 
-    MidiBuffer priorityBuffer;
-    int priorityBufferSize = voiceController->serveNotePriorityMessages(priorityBuffer);
+    MidiBuffer sameChunkPriority;
+    int sameChunkPrioritySize = voiceController->serveSameChunkPriorityBuffer(sameChunkPriority);
     
-    // Insert in order: Interpolation buffer, NotePriority buffer, Processed buffer
+    // Insert in order: Interpolation buffer, PreviousChunkPriorityBuffer, SameChunkPriorityBuffer, Processed buffer
 
     MidiBuffer combinedBuffer;
     combinedBuffer.addEvents(interpolationMessages, 0, interpolationSample, 0);
-    combinedBuffer.addEvents(priorityBuffer, 0, priorityBufferSize, interpolationSample);
-    combinedBuffer.addEvents(processedBuffer, 0, processedSample, interpolationSample + priorityBufferSize);
+    combinedBuffer.addEvents(previousChunkPriority, 0, previousPrioritySize, interpolationSample);
+    combinedBuffer.addEvents(sameChunkPriority, 0, sameChunkPrioritySize, interpolationSample + previousPrioritySize);
+    combinedBuffer.addEvents(processedBuffer, 0, processedSample, interpolationSample + previousPrioritySize + sameChunkPrioritySize);
 
     buffer.swapWith(combinedBuffer);
 }

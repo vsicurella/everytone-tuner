@@ -186,8 +186,6 @@ struct CentsDefinition
         return definition;
     }
 
-    // I think this should work alright when given a frequency table with an accurate root, but I'm having
-    // trouble getting this using an unmodified TUN library, so this is shelved for the moment.
     static CentsDefinition ExtractFromFrequencyTable(juce::Array<double> frequencyTable, int rootIndex)
     {
         int maxSize = frequencyTable.size() - rootIndex;
@@ -195,129 +193,92 @@ struct CentsDefinition
         if (maxSize <= 0)
             return CentsDefinition({});
 
-        // I suspect there might be a better way to do this
-
-        // If root is not a whole number frequency, try to find an alternate one
+        // If root is not a whole number frequency, try to find one with an integer MTS value
         double rootFrequency = roundN(6, frequencyTable[rootIndex]);
         if (rootFrequency != (int)rootFrequency)
         {
             for (int i = 0; i < frequencyTable.size(); i++)
             {
-                auto freq = roundN(6, frequencyTable[i]);
+                auto freq = frequencyTable[i];
                 if (freq == 0) // Corrupted/malformed frequency table
                     return CentsDefinition({});
 
-                auto intFreq = (int)freq;
-                if (freq != intFreq)
+                auto mts = roundN(3, frequencyToMTS(freq));
+                auto intMts = (int)mts;
+                if (mts != intMts)
                     continue;
 
                 rootIndex = i;
                 rootFrequency = freq;
+                maxSize = frequencyTable.size() - rootIndex;
                 break;
             }
         }
 
-        // First, try to find an octave
-        auto remainingSize = frequencyTable.size() - rootIndex;
-        int octaveIndex = 0;
-        for (int i = 1; i < remainingSize; i++)
+        // I suspect there's a better way to do this
+
+        // Convert frequency table to the first derivative of it's cents representation
+        // ie. each index is how many cents away from the previous frequency
+
+        juce::Array<double> stepsInCents;
+        for (int i = 1; i < maxSize; i++)
         {
-            auto index = i + rootIndex;
-            auto freq = roundN(6, frequencyTable[index]);
-            auto ratio = roundN(6, freq / rootFrequency);
-            if (ratio == 2.0)
-            {
-                octaveIndex = index;
-                break;
-            }
+            int index = i + rootIndex;
+            auto ratio = frequencyTable[index] / frequencyTable[index - 1];
+            auto cents = roundN(3, ratioToCents(ratio));
+            stepsInCents.add(cents);
         }
 
-        // Success!
-        juce::Array<double> centsScale;
-        if (octaveIndex > 0)
+        // Test chunks of the cents-steps pattern, with incrementing sizes,
+        // and figure out at what size the pattern appears to repeat
+
+        int successfulSize = 0;
+        for (int size = 1; size < stepsInCents.size(); size++)
         {
-            for (int i = rootIndex + 1; i <= octaveIndex; i++)
+            bool sizeFailed = false;
+
+            // debug
+            juce::String chunkString = arrayToString(stepsInCents.getRawDataPointer(), size, false);
+            DBG("Testing chunk: " + chunkString);
+
+            int testIndex = size;
+            while (testIndex < stepsInCents.size())
             {
-                int index = i;
-                auto ratio = frequencyTable[index] / rootFrequency;
-                auto cents = ratioToCents(ratio);
-                centsScale.add(cents);
-            }
-        }
-        else
-        {
-            // Scale appears to not use 2/1.
-            // Parse remaining table as cents to try next method
-            juce::Array<double> centsSteps;
-            for (int i = 1; i < maxSize; i++)
-            {
-                int index = i + rootIndex;
-                auto ratio = frequencyTable[index] / frequencyTable[index - 1];
-                auto cents = roundN(6, ratioToCents(ratio));
-                centsSteps.add(cents);
-            }
-
-            // Test chunks of the cents steps pattern, with incrementing sizes,
-            // and figure out at what size the pattern appears to repeat
-
-            int successfulSize = 0;
-            for (int size = 1; size < centsSteps.size(); size++)
-            {
-                bool sizeFailed = false;
-                int numChunks = (centsSteps.size() / size);
-
-                juce::String chunkString;
-                for (int i = 0; i < size; i++)
-                    chunkString += juce::String(centsSteps[i]) + ", ";
-                DBG("Testing chunk: " + chunkString);
-
-                for (int chunk = 0; chunk < numChunks; chunk++)
+                int patternIndex = testIndex % size;
+                
+                double patternStep = stepsInCents[patternIndex];
+                double testStep = stepsInCents[testIndex];
+                if (patternStep != testStep)
                 {
-                    int chunkOffset = (size + 1) * chunk;
-
-                    for (int index = 0; index < size; index++)
-                    {
-                        int testIndex = chunkOffset + index;
-                        if (testIndex > centsSteps.size())
-                            break;
-
-                        double chunkPattern = centsSteps[index];
-                        double chunkTest = centsSteps[testIndex];
-                        if (chunkPattern != chunkTest)
-                        {
-                            sizeFailed = true;
-                            break;
-                        }
-                    }
-
-                    if (sizeFailed)
-                        break;
-                }
-
-                if (!sizeFailed && successfulSize < 1)
-                {
-                    successfulSize = size;
+                    sizeFailed = true;
                     break;
                 }
+
+                testIndex++;
             }
 
-            if (successfulSize == 0)
-                return CentsDefinition({});
+            if (sizeFailed)
+                continue;
 
-            centsSteps.resize(successfulSize);
-            DBG("Selected: " + arrayToString(centsSteps.data(), centsSteps.size()));
-
-            centsScale.add(0.0);
-            for (int i = 0; i < successfulSize; i++)
-            {
-                auto interval = centsSteps[i] + centsScale[i - 1];
-                centsScale.add(interval);
-            }
-            centsScale.remove(0);
+            successfulSize = size;
+            break;
         }
 
+        if (successfulSize == 0)
+            return CentsDefinition({}); // Couldn't find a repeating pattern - should this return the whole table?
 
-        DBG("Scale: " + arrayToString(centsScale.data(), centsScale.size()));
+        stepsInCents.resize(successfulSize);
+        DBG("Step pattern result: " + arrayToString(stepsInCents.data(), stepsInCents.size()));
+
+        juce::Array<double> centsScale(0.0);
+        for (int i = 1; i < successfulSize + 1; i++)
+        {
+            auto interval = stepsInCents[i - 1] + centsScale[i - 1];
+            centsScale.add(interval);
+        }
+        centsScale.remove(0);
+
+        DBG("Scale:\n" + arrayToString(centsScale.data(), centsScale.size()));
 
         CentsDefinition definition =
         {
