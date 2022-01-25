@@ -50,6 +50,24 @@ OptionsPanel::OptionsPanel(Everytone::Options options)
     //addAndMakeVisible(*channelRulesBoxLabel);
 
 
+    notePriorityBox = std::make_unique<juce::ComboBox>("notePriorityBox");
+    notePriorityBox->addItem("Lowest", (int)Everytone::NotePriority::Lowest);
+    notePriorityBox->addItem("Highest", (int)Everytone::NotePriority::Highest);
+    notePriorityBox->addItem("Last", (int)Everytone::NotePriority::Last);
+    notePriorityBox->onChange = [&]()
+    {
+        auto priorityMode = Everytone::NotePriority(notePriorityBox->getSelectedId());
+        notePriorityBox->setTooltip(Everytone::getTooltip(priorityMode));
+        optionsWatchers.call(&OptionsWatcher::notePriorityChanged, priorityMode);
+    };
+    notePriorityBox->setSelectedId((int)options.notePriority);
+    addAndMakeVisible(*notePriorityBox);
+
+    auto notePriorityLabel = labels.add(new juce::Label("NotePriorityLabel", "Note Priority:"));
+    notePriorityLabel->attachToComponent(notePriorityBox.get(), false);
+    addAndMakeVisible(*notePriorityBox);
+
+
     bendModeBox = std::make_unique<juce::ComboBox>("bendModeBox");
     bendModeBox->addItem("Static", (int)Everytone::BendMode::Static);
     bendModeBox->addItem("Persistent", (int)Everytone::BendMode::Persistent);
@@ -135,6 +153,7 @@ OptionsPanel::~OptionsPanel()
 
     pitchbendRangeValue = nullptr;
     mpeZoneBox = nullptr;
+    notePriorityBox = nullptr;
     channelRulesBox = nullptr;
     channelModeBox = nullptr;
 }
@@ -162,14 +181,20 @@ void OptionsPanel::resized()
     for (auto label : labels)
         label->setSize(controlWidth, labelHeight);
     
-    auto controlMargin = juce::FlexItem::Margin(margin);
-    controlMargin.top += labelHeight;
+    auto controlMargin = juce::FlexItem::Margin(margin + labelHeight, margin, 0, margin);
 
     juce::FlexBox leftHalf;
     leftHalf.flexDirection = juce::FlexBox::Direction::column;
     leftHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *channelModeBox).withMargin(controlMargin));
     //leftHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *channelRulesBox).withMargin(controlMargin));
+    leftHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *notePriorityBox).withMargin(controlMargin));
     leftHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *bendModeBox).withMargin(controlMargin));
+
+    auto pitchbendWidth = pitchbendRangeValue->getFont().getStringWidth(pitchbendRangeValue->getText()) + margin;
+    auto pitchbendLabelWidth = pitchbendRangeLabel->getFont().getStringWidth(pitchbendRangeLabel->getText());
+    auto pitchbendItemMargin = juce::FlexItem::Margin(margin, margin, margin, pitchbendLabelWidth + margin);
+    leftHalf.items.add(juce::FlexItem(pitchbendWidth, controlHeight, *pitchbendRangeValue).withMargin(pitchbendItemMargin));
+
 
     juce::FlexBox rightHalf;
     rightHalf.flexDirection = juce::FlexBox::Direction::column;
@@ -177,12 +202,6 @@ void OptionsPanel::resized()
     rightHalf.items.add(juce::FlexItem(controlWidth, controlHeight, *mpeZoneBox).withMargin(controlMargin));
 
     rightHalf.items.add(juce::FlexItem(controlWidth, controlHeight * 2, *channelComponent).withMargin(controlMargin));
-
-    auto pitchbendWidth = pitchbendRangeValue->getFont().getStringWidth(pitchbendRangeValue->getText()) + margin;
-    auto pitchbendLabelWidth = pitchbendRangeLabel->getFont().getStringWidth(pitchbendRangeLabel->getText());
-    auto pitchbendItemMargin = controlMargin;
-    pitchbendItemMargin.left = pitchbendLabelWidth + margin;
-    rightHalf.items.add(juce::FlexItem(pitchbendWidth, controlHeight, *pitchbendRangeValue).withMargin(pitchbendItemMargin));
 
 
     auto layoutMargin = juce::FlexItem::Margin(0, margin, 0, margin);

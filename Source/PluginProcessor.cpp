@@ -508,6 +508,11 @@ void MultimapperAudioProcessor::pitchbendRange(int pitchbendRange)
     tunerController->setPitchbendRange(pitchbendRange);
 }
 
+void MultimapperAudioProcessor::notePriority(Everytone::NotePriority priority)
+{
+    voiceController->setNotePriority(priority);
+}
+
 void MultimapperAudioProcessor::bendMode(Everytone::BendMode bendMode)
 {
     voiceInterpolator->setBendMode(bendMode);

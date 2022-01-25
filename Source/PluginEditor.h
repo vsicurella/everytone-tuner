@@ -68,6 +68,7 @@ public:
     void mpeZoneChanged(Everytone::MpeZone zone) override;
     void midiModeChanged(Everytone::MidiMode newMidiMode) override;
     void pitchbendRangeChanged(int pitchbendRange) override;
+    void notePriorityChanged(Everytone::NotePriority notePriority) override;
     void bendModeChanged(Everytone::BendMode newBendMode) override;
     void disabledChannelsChanged(juce::Array<bool> channelsDisabled) override;
 

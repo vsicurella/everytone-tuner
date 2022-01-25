@@ -184,7 +184,7 @@ namespace Everytone
 
     enum class NotePriority
     {
-        Lowest,     // Create note-ons for the lowest held notes
+        Lowest = 1, // Create note-ons for the lowest held notes
         Highest,    // Create note-ons for the highest held notes
         Last,       // Create note-ons for each played note, and when voice becomes available, retrigger previous note
     };
@@ -321,6 +321,7 @@ public:
     virtual void channelModeChanged(Everytone::ChannelMode newChannelMode) {};
     virtual void mpeZoneChanged(Everytone::MpeZone zone) {};
     virtual void midiModeChanged(Everytone::MidiMode newMidiMode) {};
+    virtual void notePriorityChanged(Everytone::NotePriority notePriority) {};
     virtual void bendModeChanged(Everytone::BendMode newBendMode) {};
     virtual void pitchbendRangeChanged(int newPitchbendRange) {};
     virtual void disabledChannelsChanged(juce::Array<bool> disabledChannels) {};

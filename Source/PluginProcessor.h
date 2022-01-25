@@ -122,6 +122,9 @@ public:
     int pitchbendRange() const { return tunerController->getPitchbendRange(); }
     void pitchbendRange(int pitchbendRange);
 
+    Everytone::NotePriority notePriority() const { return voiceController->getNotePriority(); }
+    void notePriority(Everytone::NotePriority priority);
+
     Everytone::BendMode bendMode() const { return voiceInterpolator->getBendMode(); }
     void bendMode(Everytone::BendMode bendMode);
 

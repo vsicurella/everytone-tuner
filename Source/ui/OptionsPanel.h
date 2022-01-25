@@ -36,6 +36,7 @@ private:
 
     std::unique_ptr<juce::ComboBox> channelModeBox;
     std::unique_ptr<juce::ComboBox> channelRulesBox;
+    std::unique_ptr<juce::ComboBox> notePriorityBox;
     std::unique_ptr<juce::ComboBox> bendModeBox;
     std::unique_ptr<juce::ComboBox> mpeZoneBox;
 

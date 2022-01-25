@@ -182,6 +182,11 @@ void MultimapperAudioProcessorEditor::pitchbendRangeChanged(int pitchbendRange)
     optionsPanel->setPitchbendRangeText(audioProcessor.pitchbendRange());
 }
 
+void MultimapperAudioProcessorEditor::notePriorityChanged(Everytone::NotePriority notePriority)
+{
+    audioProcessor.notePriority(notePriority);
+}
+
 void MultimapperAudioProcessorEditor::bendModeChanged(Everytone::BendMode newBendMode)
 {
     audioProcessor.bendMode(newBendMode);
