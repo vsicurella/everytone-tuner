@@ -7,50 +7,6 @@
   <MAINGROUP id="H8zE4n" name="Everytone Tuner">
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
       <FILE id="oMI0GT" name="Common.h" compile="0" resource="0" file="Source/Common.h"/>
-      <GROUP id="{8F20C895-5CD0-9DC5-DE0F-7EB9C81F6A67}" name="ui">
-        <FILE id="UMIQIZ" name="NewListTuningInterface.h" compile="0" resource="0"
-              file="Source/ui/NewListTuningInterface.h"/>
-        <FILE id="xcZSj4" name="MappingTableModel.cpp" compile="1" resource="0"
-              file="Source/ui/MappingTableModel.cpp"/>
-        <FILE id="fFKDXj" name="ChannelComponent.h" compile="0" resource="0"
-              file="Source/ui/ChannelComponent.h"/>
-        <FILE id="fM2iVc" name="ChannelComponent.cpp" compile="1" resource="0"
-              file="Source/ui/ChannelComponent.cpp"/>
-        <FILE id="E1h8UT" name="MappingTableModel.h" compile="0" resource="0"
-              file="Source/ui/MappingTableModel.h"/>
-        <FILE id="BKMfF7" name="TuningTableViewer.cpp" compile="1" resource="0"
-              file="Source/ui/TuningTableViewer.cpp"/>
-        <FILE id="WQOl3W" name="TuningTableViewer.h" compile="0" resource="0"
-              file="Source/ui/TuningTableViewer.h"/>
-        <FILE id="tv2q6E" name="TuningTableViewerModel.cpp" compile="1" resource="0"
-              file="Source/ui/TuningTableViewerModel.cpp"/>
-        <FILE id="CMLqaR" name="TuningTableViewerModel.h" compile="0" resource="0"
-              file="Source/ui/TuningTableViewerModel.h"/>
-        <FILE id="O0B4rW" name="MappingPanel.cpp" compile="1" resource="0"
-              file="Source/UI/MappingPanel.cpp"/>
-        <FILE id="dLTTCc" name="MappingPanel.h" compile="0" resource="0" file="Source/UI/MappingPanel.h"/>
-        <FILE id="UPS8Yi" name="IntervalListEditor.cpp" compile="1" resource="0"
-              file="Source/UI/IntervalListEditor.cpp"/>
-        <FILE id="zLQVWq" name="IntervalListEditor.h" compile="0" resource="0"
-              file="Source/UI/IntervalListEditor.h"/>
-        <FILE id="kMYrL4" name="InfoBar.h" compile="0" resource="0" file="Source/ui/InfoBar.h"/>
-        <FILE id="lonJVi" name="MenuPanel.cpp" compile="1" resource="0" file="Source/ui/MenuPanel.cpp"/>
-        <FILE id="kduc6g" name="MenuPanel.h" compile="0" resource="0" file="Source/ui/MenuPanel.h"/>
-        <FILE id="DXxR6P" name="OptionsPanel.cpp" compile="1" resource="0"
-              file="Source/ui/OptionsPanel.cpp"/>
-        <FILE id="oLdiNj" name="OptionsPanel.h" compile="0" resource="0" file="Source/ui/OptionsPanel.h"/>
-        <FILE id="whyaXp" name="EqualTemperamentInterface.h" compile="0" resource="0"
-              file="Source/UI/EqualTemperamentInterface.h"/>
-        <FILE id="L2UxsU" name="OverviewPanel.cpp" compile="1" resource="0"
-              file="Source/UI/OverviewPanel.cpp"/>
-        <FILE id="D4fDVq" name="OverviewPanel.h" compile="0" resource="0" file="Source/UI/OverviewPanel.h"/>
-        <FILE id="hGuq5c" name="NewTuningPanel.cpp" compile="1" resource="0"
-              file="Source/UI/NewTuningPanel.cpp"/>
-        <FILE id="c1KNVt" name="NewTuningPanel.h" compile="0" resource="0"
-              file="Source/UI/NewTuningPanel.h"/>
-        <FILE id="VziKHW" name="ToneCircle.h" compile="0" resource="0" file="Source/ui/ToneCircle.h"/>
-        <FILE id="garUZT" name="ToneCircle.cpp" compile="1" resource="0" file="Source/ui/ToneCircle.cpp"/>
-      </GROUP>
       <GROUP id="{79A5D062-8ED3-30D7-15DF-F01D07F22E53}" name="tests">
         <FILE id="OeS2f9" name="MidiNoteTuner_tests.h" compile="0" resource="0"
               file="Source/tests/MidiNoteTuner_tests.h"/>
@@ -64,6 +20,50 @@
               file="Source/tests/MultichannelMap_Test.h"/>
         <FILE id="oAajsz" name="SingleChannelMap_Test.h" compile="0" resource="0"
               file="Source/tests/SingleChannelMap_Test.h"/>
+      </GROUP>
+      <GROUP id="{1E05BBA7-E844-7FB2-5F73-4ED75F9F5439}" name="ui">
+        <FILE id="rQ5dBg" name="ChannelComponent.cpp" compile="1" resource="0"
+              file="Source/ui/ChannelComponent.cpp"/>
+        <FILE id="mADHVR" name="ChannelComponent.h" compile="0" resource="0"
+              file="Source/ui/ChannelComponent.h"/>
+        <FILE id="AqNFXT" name="EqualTemperamentInterface.h" compile="0" resource="0"
+              file="Source/ui/EqualTemperamentInterface.h"/>
+        <FILE id="mK2E2f" name="InfoBar.h" compile="0" resource="0" file="Source/ui/InfoBar.h"/>
+        <FILE id="thEdtk" name="IntervalListEditor.cpp" compile="1" resource="0"
+              file="Source/ui/IntervalListEditor.cpp"/>
+        <FILE id="UeUWzA" name="IntervalListEditor.h" compile="0" resource="0"
+              file="Source/ui/IntervalListEditor.h"/>
+        <FILE id="nV80Fe" name="MappingPanel.cpp" compile="1" resource="0"
+              file="Source/ui/MappingPanel.cpp"/>
+        <FILE id="RpkPf1" name="MappingPanel.h" compile="0" resource="0" file="Source/ui/MappingPanel.h"/>
+        <FILE id="WTnENH" name="MappingTableModel.cpp" compile="1" resource="0"
+              file="Source/ui/MappingTableModel.cpp"/>
+        <FILE id="Ul293U" name="MappingTableModel.h" compile="0" resource="0"
+              file="Source/ui/MappingTableModel.h"/>
+        <FILE id="FXlkC3" name="MenuPanel.cpp" compile="1" resource="0" file="Source/ui/MenuPanel.cpp"/>
+        <FILE id="iOsGgb" name="MenuPanel.h" compile="0" resource="0" file="Source/ui/MenuPanel.h"/>
+        <FILE id="RqiVRQ" name="NewListTuningInterface.h" compile="0" resource="0"
+              file="Source/ui/NewListTuningInterface.h"/>
+        <FILE id="Ij3tt8" name="NewTuningPanel.cpp" compile="1" resource="0"
+              file="Source/ui/NewTuningPanel.cpp"/>
+        <FILE id="mTGR46" name="NewTuningPanel.h" compile="0" resource="0"
+              file="Source/ui/NewTuningPanel.h"/>
+        <FILE id="PTuyQJ" name="OptionsPanel.cpp" compile="1" resource="0"
+              file="Source/ui/OptionsPanel.cpp"/>
+        <FILE id="BIdwr4" name="OptionsPanel.h" compile="0" resource="0" file="Source/ui/OptionsPanel.h"/>
+        <FILE id="J1HQBk" name="OverviewPanel.cpp" compile="1" resource="0"
+              file="Source/ui/OverviewPanel.cpp"/>
+        <FILE id="gYojVh" name="OverviewPanel.h" compile="0" resource="0" file="Source/ui/OverviewPanel.h"/>
+        <FILE id="IoyYdM" name="ToneCircle.cpp" compile="1" resource="0" file="Source/ui/ToneCircle.cpp"/>
+        <FILE id="d892rG" name="ToneCircle.h" compile="0" resource="0" file="Source/ui/ToneCircle.h"/>
+        <FILE id="hJm0We" name="TuningTableViewer.cpp" compile="1" resource="0"
+              file="Source/ui/TuningTableViewer.cpp"/>
+        <FILE id="Zi4Box" name="TuningTableViewer.h" compile="0" resource="0"
+              file="Source/ui/TuningTableViewer.h"/>
+        <FILE id="iEuLXa" name="TuningTableViewerModel.cpp" compile="1" resource="0"
+              file="Source/ui/TuningTableViewerModel.cpp"/>
+        <FILE id="Ufa4ln" name="TuningTableViewerModel.h" compile="0" resource="0"
+              file="Source/ui/TuningTableViewerModel.h"/>
       </GROUP>
       <GROUP id="{8B807919-2EE7-BE69-09B0-6C440054EDAD}" name="io">
         <GROUP id="{A3277773-B40D-C9A4-C1A3-50104F0A9FFF}" name="TUN_V2">
@@ -147,7 +147,8 @@
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>
-    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraCompilerFlags="-I/usr/local/include"
+                extraLinkerFlags="-L/usr/local/lib">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="Multimapper"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="Multimapper"/>
