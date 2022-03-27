@@ -22,7 +22,7 @@ jobs:
           DOWNLOAD_URL=$( \
             curl -s https://api.github.com/repos/juce-framework/juce/releases/latest \
             | grep "browser_download_url.*linux" \
-            | cut -d : -f 2,3  
+            | cut -d : -f 2,3 \
             | tr -d \" \
             )
           echo downloading $DOWNLOAD_URL
@@ -30,7 +30,6 @@ jobs:
           unzip -d ~ juce.zip
       - name: Build Everytone Tuner
         run: |
-          unzip -d ~ juce.zip
           ~/JUCE/Projucer --resave everytone-tuner.jucer
           cd Builds/LinuxMakefile
           make CONFIG=Release
