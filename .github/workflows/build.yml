@@ -27,7 +27,7 @@ jobs:
             )
           echo downloading $DOWNLOAD_URL
           wget $DOWNLOAD_URL -O juce.zip
-          unzip -d ~ juce.zip
+          unzip -d ~ juce.zip &>/dev/null
       - name: Build Everytone Tuner
         run: |
           ~/JUCE/Projucer --resave everytone-tuner.jucer
