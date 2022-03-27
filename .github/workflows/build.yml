@@ -26,7 +26,7 @@ jobs:
             | tr -d \" \
             )
           echo downloading $DOWNLOAD_URL
-          wget $DOWNLOAD_URL -O juce.zip
+          wget $DOWNLOAD_URL -O juce.zip &>/dev/null
           unzip -d ~ juce.zip &>/dev/null
       - name: Build Everytone Tuner
         run: |
