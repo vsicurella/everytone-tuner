@@ -9,18 +9,18 @@
 */
 
 #pragma once
-#include "MidiNoteTuner.h"
+#include "../MidiNoteTuner.h"
 
-struct LinkedController
-{
-    int number = -1;
-    juce::uint8 value;
-};
+//struct LinkedController
+//{
+//    int number = -1;
+//    juce::uint8 value;
+//};
 
 class MidiVoice
 {
-    const int midiChannel = -1;
-    const int midiNote = -1;
+    int midiChannel = -1;
+    int midiNote = -1;
 
     juce::uint8 velocity = 0;
     juce::uint8 aftertouch = 0;
@@ -30,7 +30,7 @@ class MidiVoice
     // 1 through 16 are active voices
     int assignedChannel = -1;
 
-    juce::Array<LinkedController> controllers;
+    //juce::Array<LinkedController> controllers;
 
     std::shared_ptr<MidiNoteTuner> tuner;
 
@@ -49,6 +49,8 @@ public:
     MidiVoice(int midiChannel, int midiNote, juce::uint8 velocity, int assignedChannel, std::shared_ptr<MidiNoteTuner> tuner);
     
     ~MidiVoice() {}
+
+    void operator=(const MidiVoice& voice);
 
     bool operator==(const MidiVoice& voice) const
     {

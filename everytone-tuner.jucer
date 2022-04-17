@@ -116,12 +116,20 @@
         <FILE id="npzOFm" name="TuningTableMap.h" compile="0" resource="0"
               file="Source/mapping/TuningTableMap.h"/>
       </GROUP>
-      <FILE id="TlWn9G" name="MidiVoice.cpp" compile="1" resource="0" file="Source/MidiVoice.cpp"/>
-      <FILE id="cdGlcX" name="MidiVoice.h" compile="0" resource="0" file="Source/MidiVoice.h"/>
-      <FILE id="Q52jed" name="MidiVoiceInterpolator.h" compile="0" resource="0"
-            file="Source/MidiVoiceInterpolator.h"/>
-      <FILE id="NkK0pj" name="MidiVoiceInterpolator.cpp" compile="1" resource="0"
-            file="Source/MidiVoiceInterpolator.cpp"/>
+      <GROUP id="{64846663-77A3-A241-E28B-79C3B2D5B93B}" name="voices">
+        <FILE id="uqdOwv" name="MidiVoice.cpp" compile="1" resource="0" file="Source/voices/MidiVoice.cpp"/>
+        <FILE id="t1DpYd" name="MidiVoice.h" compile="0" resource="0" file="Source/voices/MidiVoice.h"/>
+        <FILE id="FCK8uE" name="MidiVoiceController.cpp" compile="1" resource="0"
+              file="Source/voices/MidiVoiceController.cpp"/>
+        <FILE id="Pb9Kt4" name="MidiVoiceController.h" compile="0" resource="0"
+              file="Source/voices/MidiVoiceController.h"/>
+        <FILE id="s7Iw7A" name="MidiVoiceInterpolator.cpp" compile="1" resource="0"
+              file="Source/voices/MidiVoiceInterpolator.cpp"/>
+        <FILE id="TcvWXC" name="MidiVoiceInterpolator.h" compile="0" resource="0"
+              file="Source/voices/MidiVoiceInterpolator.h"/>
+        <FILE id="ORX4bP" name="VoiceBank.cpp" compile="1" resource="0" file="Source/voices/VoiceBank.cpp"/>
+        <FILE id="pEdvZ6" name="VoiceBank.h" compile="0" resource="0" file="Source/voices/VoiceBank.h"/>
+      </GROUP>
       <FILE id="h3R26G" name="TunerController.h" compile="0" resource="0"
             file="Source/TunerController.h"/>
       <FILE id="QKYQ2p" name="TunerController.cpp" compile="1" resource="0"
@@ -135,10 +143,6 @@
       <FILE id="wh7Cnn" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="mXqLfq" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-      <FILE id="x5beT5" name="MidiVoiceController.cpp" compile="1" resource="0"
-            file="Source/MidiVoiceController.cpp"/>
-      <FILE id="MmJg1Z" name="MidiVoiceController.h" compile="0" resource="0"
-            file="Source/MidiVoiceController.h"/>
       <FILE id="HcnY7X" name="MidiNoteTuner.h" compile="0" resource="0" file="Source/MidiNoteTuner.h"/>
       <FILE id="ff6htV" name="MidiNoteTuner.cpp" compile="1" resource="0"
             file="Source/MidiNoteTuner.cpp"/>

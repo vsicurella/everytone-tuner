@@ -21,6 +21,18 @@ MidiVoice::MidiVoice(int channelIn, int noteIn, juce::uint8 velocityIn, int assi
     update();
 }
 
+void MidiVoice::operator=(const MidiVoice& voice)
+{
+    midiChannel = voice.midiChannel;
+    midiNote = voice.midiNote;
+    velocity = voice.velocity;
+    aftertouch = voice.aftertouch;
+    assignedChannel = voice.assignedChannel;
+    tuner = voice.tuner;
+    currentTuningIndex = voice.currentTuningIndex;
+    currentPitch = voice.currentPitch;
+}
+
 void MidiVoice::updatePitch()
 {
     auto previousPitch = currentPitch;
@@ -58,29 +70,29 @@ void MidiVoice::updateAftertouch(juce::uint8 aftertouchIn)
     aftertouch = aftertouchIn;
 }
 
-int MidiVoice::findControllerIndex(int number)
-{
-    for (int i = 0; i < controllers.size(); i++)
-        if (controllers[i].number == number)
-            return i;
-    
-    return -1;
-}
-
-void MidiVoice::updateController(int number, juce::uint8 value)
-{
-    auto index = findControllerIndex(number);
-    if (index >= 0)
-        controllers.getReference(index).value = value;
-}
-
-juce::uint8 MidiVoice::getControllerValue(int number)
-{
-    auto index = findControllerIndex(number);
-    if (index >= 0)
-        return controllers[index].value;
-    return 0;
-}
+//int MidiVoice::findControllerIndex(int number)
+//{
+//    for (int i = 0; i < controllers.size(); i++)
+//        if (controllers[i].number == number)
+//            return i;
+//    
+//    return -1;
+//}
+//
+//void MidiVoice::updateController(int number, juce::uint8 value)
+//{
+//    auto index = findControllerIndex(number);
+//    if (index >= 0)
+//        controllers.getReference(index).value = value;
+//}
+//
+//juce::uint8 MidiVoice::getControllerValue(int number)
+//{
+//    auto index = findControllerIndex(number);
+//    if (index >= 0)
+//        return controllers[index].value;
+//    return 0;
+//}
 
 juce::MidiMessage MidiVoice::getNoteOn() const
 {

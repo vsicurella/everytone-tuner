@@ -15,40 +15,22 @@ MidiVoiceController::MidiVoiceController(TunerController& tuningControllerIn,
                                          Everytone::MpeZone zoneIn)
     : tuningController(tuningControllerIn),
       channelMode(channelModeIn),
-      mpeZone(zoneIn)
+      mpeZone(zoneIn),
+      voiceBank(channelMode, mpeZone)
 {
-    resetVoicesPerChannel();
-    midiChannelDisabled.resize(16);
-    midiChannelDisabled.fill(false);
+    
 }
 
 MidiVoiceController::~MidiVoiceController()
 {
-    voices.clear();
-}
 
-void MidiVoiceController::resetVoicesPerChannel()
-{
-    for (int i = 0; i <= 16; i++)
-        voicesPerChannel.add(juce::Array<MidiVoice*>());
-}
-
-MidiVoiceController::NewVoiceState MidiVoiceController::getNewVoiceState() const
-{
-    if (channelMode == Everytone::ChannelMode::Monophonic)
-        return MidiVoiceController::NewVoiceState::Monophonic;
-        
-    if (numVoicesAvailable() < 1)
-        return MidiVoiceController::NewVoiceState::Overflow;
-
-    return MidiVoiceController::NewVoiceState::Normal;
 }
 
 juce::Array<MidiVoice> MidiVoiceController::getAllVoices() const
 {
     juce::Array<MidiVoice> activeVoicesCopy;
     for (auto voice : voices)
-        activeVoicesCopy.add(*voice);
+        activeVoicesCopy.add(voice);
     return activeVoicesCopy;
 }
 
@@ -65,35 +47,11 @@ int MidiVoiceController::numActiveVoices() const
     return activeVoices.size();
 }
 
-int MidiVoiceController::channelOfVoice(MidiVoice* voice) const
-{
-    return channelOfVoice(voice->getMidiChannel(), voice->getMidiNote());
-}
-
-int MidiVoiceController::channelOfVoice(int midiChannel, int midiNote) const
-{
-    for (int ch = 0; ch < voicesPerChannel.size(); ch++)
-    {
-        auto channel = voicesPerChannel.getReference(ch);
-        for (auto voice : channel)
-            if (voice->getMidiChannel() == midiChannel && voice->getMidiNote() == midiNote)
-                return ch;
-    }
-
-    return -1;
-}
-
-int MidiVoiceController::channelOfVoice(const juce::MidiMessage& msg) const
-{
-    auto channel = msg.getChannel();
-    auto note = msg.getNoteNumber();
-    return channelOfVoice(channel, note);
-}
 
 const MidiVoice* MidiVoiceController::getExistingVoice(int index) const
 {
     if (index >= 0 && index < voices.size())
-        return voices[index];
+        return &voices.getReference(index);
     return nullptr;
 }
 
@@ -126,46 +84,46 @@ void MidiVoiceController::queueVoiceNoteOn(MidiVoice* voice, bool sameChunk, boo
     else
         nextChunkPriorityQueue.addEvent(noteOn, nextChunkSample++);
 }
-
-void MidiVoiceController::stealExistingVoice(int index)
-{
-    if (index < 0 || index >= voices.size())
-    {
-        return;
-    }
-
-    auto voice = voices[index];
-    if (voice->isActive())
-    {
-        auto channel = voice->getAssignedChannel();
-        removeVoiceFromChannel(channel, voice);
-
-        if (channelMode != Everytone::ChannelMode::Monophonic)
-            queueVoiceNoteOff(voice, true);
-
-        addVoiceToChannel(0, voice);
-
-        voiceWatchers.call(&MidiVoiceController::Watcher::voiceChanged, *voice);
-    }
-}
-
-void MidiVoiceController::retriggerExistingVoice(int index, int midiChannel)
-{
-    if (index >= 0)
-    {
-        auto retriggerVoice = voices[index];
-        if (retriggerVoice->isValid())
-        {
-            removeVoiceFromChannel(0, retriggerVoice);
-            addVoiceToChannel(midiChannel, retriggerVoice);
-
-            voiceWatchers.call(&MidiVoiceController::Watcher::voiceChanged, *retriggerVoice);
-
-            // In Monophonic mode we just have to send a new pitchbend message
-            queueVoiceNoteOn(retriggerVoice, false, channelMode == Everytone::ChannelMode::Monophonic);
-        }
-    }
-}
+//
+//void MidiVoiceController::stealExistingVoice(int index)
+//{
+//    if (index < 0 || index >= voices.size())
+//    {
+//        return;
+//    }
+//
+//    auto voice = &voices.getReference(index);
+//    if (voice->isActive())
+//    {
+//        auto channel = voice->getAssignedChannel();
+//        removeVoiceFromChannel(channel, voice);
+//
+//        if (channelMode != Everytone::ChannelMode::Monophonic)
+//            queueVoiceNoteOff(voice, true);
+//
+//        addVoiceToChannel(0, voice);
+//
+//        voiceWatchers.call(&MidiVoiceController::Watcher::voiceChanged, *voice);
+//    }
+//}
+//
+//void MidiVoiceController::retriggerExistingVoice(int index, int midiChannel)
+//{
+//    if (index >= 0)
+//    {
+//        auto retriggerVoice = &voices.getReference(index);
+//        if (retriggerVoice->isValid())
+//        {
+//            removeVoiceFromChannel(0, retriggerVoice);
+//            addVoiceToChannel(midiChannel, retriggerVoice);
+//
+//            voiceWatchers.call(&MidiVoiceController::Watcher::voiceChanged, *retriggerVoice);
+//
+//            // In Monophonic mode we just have to send a new pitchbend message
+//            queueVoiceNoteOn(retriggerVoice, false, channelMode == Everytone::ChannelMode::Monophonic);
+//        }
+//    }
+//}
 
 void MidiVoiceController::addVoiceToChannel(int midiChannel, MidiVoice* voice)
 {
@@ -196,17 +154,15 @@ void MidiVoiceController::removeVoiceFromChannel(int midiChannel, MidiVoice* voi
     }
 }
 
-const MidiVoice* MidiVoiceController::findChannelAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity)
+const MidiVoice* MidiVoiceController::createAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity)
 {
-    auto newVoice = new MidiVoice(midiChannel, midiNote, velocity, 0, tuningController.getTuner());
+    auto newVoice = MidiVoice(midiChannel, midiNote, velocity, 0, tuningController.getTuner());
 
+    auto result = voiceBank.getVoice()
     int newChannel = findNextVoiceChannel();
 
     if (ChannelInMidiRange(newChannel))
     {
-        if (newVoice == nullptr)
-            return nullptr;
-
         lastChannelAssigned = newChannel;
 
         // See if channel is occupied
@@ -218,7 +174,9 @@ const MidiVoice* MidiVoiceController::findChannelAndAddVoice(int midiChannel, in
             stealExistingVoice(voiceIndex);
         }
 
-        voices.add(newVoice);
+
+        voices.set(nextVoiceIndex, newVoice);
+        auto voicePointer = &voices.getReference(nextVoiceIndex);
         addVoiceToChannel(newChannel, newVoice);
 
         voiceWatchers.call(&MidiVoiceController::Watcher::voiceAdded, *newVoice);
@@ -234,7 +192,7 @@ MidiVoice MidiVoiceController::removeVoice(int index)
     jassert(index >= 0 && index < maxVoiceLimit);
     if (index >= 0 && index < maxVoiceLimit)
     {
-        auto voice = voices[index];
+        auto voice = &voices.getReference(index);
         removeVoiceFromChannel(voice->getAssignedChannel(), voice);
 
         // Only retrigger if an active voice was removed
@@ -264,7 +222,7 @@ const MidiVoice* MidiVoiceController::getVoice(int midiChannel, int midiNote, ju
     if (voiceIndex >= 0 && voiceIndex < maxVoiceLimit)
         return getExistingVoice(voiceIndex);
 
-    return findChannelAndAddVoice(midiChannel, midiNote, velocity);
+    return createAndAddVoice(midiChannel, midiNote, velocity);
 }
 
 const MidiVoice* MidiVoiceController::getVoice(const juce::MidiMessage& msg)
@@ -277,7 +235,7 @@ const MidiVoice* MidiVoiceController::getVoice(const juce::MidiMessage& msg)
 
 int MidiVoiceController::numAllVoices() const
 {
-    return voices.size();
+    return numVoices;
 }
 
 MidiVoice MidiVoiceController::removeVoice(int midiChannel, int midiNote)

@@ -1,0 +1,146 @@
+/*
+  ==============================================================================
+
+    MidiVoiceController.h
+    Created: 12 Dec 2021 2:14:00pm
+    Author:  Vincenzo
+
+  ==============================================================================
+*/
+
+#pragma once
+
+#include "../TunerController.h"
+#include "VoiceBank.h"
+
+#define EVERYTONE_LOG_VOICES 0
+
+#define MAX_CHANNELS 16
+#define MAX_VOICES_PER_CHANNEL 128
+
+class MidiVoiceController
+{
+public:
+
+    class Watcher
+    {
+    public:
+
+        virtual void voiceAdded(MidiVoice voice) {}
+        virtual void voiceChanged(MidiVoice voice) {}
+        virtual void voiceRemoved(MidiVoice voice) {}
+    };
+
+private:
+
+    juce::ListenerList<MidiVoiceController::Watcher> voiceWatchers;
+    
+public:
+    void addVoiceWatcher(MidiVoiceController::Watcher* watcherIn) { voiceWatchers.add(watcherIn); }
+    void removeVoiceWatcher(MidiVoiceController::Watcher* watcherIn) { voiceWatchers.remove(watcherIn); }
+
+private:
+
+    enum class NewVoiceState
+    {
+        Normal = 0, // Not all voices are used - get next channel
+        Overflow,   // All voices are used, determine action via NotePriority
+        Monophonic  // One voice at a time - continue using same channel
+    };
+
+
+private:
+
+    TunerController& tuningController;
+
+    Everytone::ChannelMode channelMode = Everytone::ChannelMode::FirstAvailable;
+    Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower;
+    Everytone::NotePriority notePriority = Everytone::NotePriority::Last;
+
+    int maxVoiceLimit = 16;
+    int voiceLimit = maxVoiceLimit;
+
+    juce::Array<bool> midiChannelDisabled;
+
+    // Does all voice handling
+    VoiceBank voiceBank;
+
+    // For messages that need to be in the same chunk
+    MidiBuffer sameChunkPriorityQueue;
+    int sameChunkSample = 0;
+
+    // For messages that need to be in the next chunk
+    MidiBuffer nextChunkPriorityQueue;
+    int nextChunkSample = 0;
+
+
+    int numVoices = 0;
+
+private:
+
+    int effectiveVoiceLimit() const;
+    void updateVoiceLimitCache();
+    int numVoicesAvailable() const;
+
+    const MidiVoice* getExistingVoice(int index) const;
+
+    void queueVoiceNoteOff(MidiVoice* voice, bool sameChunk);
+    void queueVoiceNoteOn(MidiVoice* voice, bool sameChunk, bool pitchbendOnly=false);
+    
+    void addVoiceToChannel(int midiChannel, MidiVoice* voice);
+    void removeVoiceFromChannel(int midiChannel, MidiVoice* voice);
+    
+    const MidiVoice* createAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity);    
+    MidiVoice removeVoice(int index);
+
+public:
+
+    MidiVoiceController(TunerController& tuningController, 
+                        Everytone::ChannelMode channelmodeIn = Everytone::ChannelMode::FirstAvailable,
+                        Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower);
+    ~MidiVoiceController();
+
+    Everytone::ChannelMode getChannelMode() const { return channelMode; }
+    Everytone::MpeZone getMpeZone() const { return mpeZone; }
+    Everytone::NotePriority getNotePriority() const { return notePriority; }
+    juce::Array<bool> getChannelsDisabled() const { return midiChannelDisabled; }
+
+    int getVoiceLimit() const { return voiceLimit; }
+
+    // Number of all voices held, regardless if they are active
+    int numAllVoices() const;
+
+    // Array of all voices held, regardless if they are active
+    juce::Array<MidiVoice> getAllVoices() const;
+
+    // Returns a copy of the array of pointers to MidiVoices that are in the given channel
+    juce::Array<MidiVoice*> getVoicesInChannel(int midiChannel) const;
+
+    int numActiveVoices() const;
+
+    const MidiVoice* getVoice(int midiChannel, int midiNote, juce::uint8 velocity = 0);
+    const MidiVoice* getVoice(const juce::MidiMessage& msg);
+
+    MidiVoice removeVoice(int midiChannel, int midiNote);
+    MidiVoice removeVoice(const juce::MidiMessage& msg);
+    MidiVoice removeVoice(const MidiVoice* voice);
+
+    void clearAllVoices();
+
+    // Get messages queued for NotePriority settings, returns size of buffer
+    int serveSameChunkPriorityBuffer(MidiBuffer& queueOut);
+    int serveNextChunkPriorityBuffer(MidiBuffer& queueOut);
+
+    //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;
+
+    int channelOfVoice(int midiChannel, int midiNote) const;
+    int channelOfVoice(MidiVoice* voice) const;
+    int channelOfVoice(const juce::MidiMessage& msg) const;
+
+    bool channelIsFree(int midiChannel, MidiPitch pitchToAssign = MidiPitch()) const;
+
+    void setChannelMode(Everytone::ChannelMode mode);
+    void setMpeZone(Everytone::MpeZone zone);
+    void setNotePriority(Everytone::NotePriority notePriorityIn);
+    void setChannelsDisabled(juce::Array<bool> channelsDisabledIn);
+};
