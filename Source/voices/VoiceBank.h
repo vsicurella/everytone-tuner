@@ -87,7 +87,7 @@ private:
     // Sorted by input note number, then midi channel (0 being stolen)
     int noteMapSize = 0;
     int mapIndicesPerNote = 0;
-    VoicePtr* inputNoteMap[MAX_VOICES + MAX_VOICES_PER_CHANNEL];
+    int inputNoteVoiceIndexMap[MAX_VOICES + MAX_VOICES_PER_CHANNEL];
 
     Everytone::ChannelMode channelMode = Everytone::ChannelMode::FirstAvailable;
     Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower;
@@ -119,6 +119,7 @@ private:
     int midiNoteIndex(int midiChannel, int midiNote) const;
 
     int getMapNoteIndex(int midiNote) const;
+    int getVoiceIndexFromInputMap(int midiChannel, int midiNote) const;
 
     int indexOfVoice(int midiChannel, int midiNote) const;
     int indexOfVoice(const MidiVoice* voice) const;
@@ -140,8 +141,9 @@ private:
     int removeVoiceFromChannel(ChannelInfo& chInfo, MidiVoice& voice);
     int removeVoiceFromChannel(int midiChannel, MidiVoice& voice);
 
-    void stealExistingVoice(int index);
-    void retriggerExistingVoice(int index, int midiChannel);
+    // Returns the channel the stolen voice was assigned to
+    int stealExistingVoice(int index);
+    void retriggerExistingVoice(int index, int assignChannel);
 
     MidiVoice removeVoice(int index);
 
@@ -172,7 +174,7 @@ public:
 
     const MidiVoice* findVoice(MidiVoice& voiceToFind);
 
-    const MidiVoice* findChannelAndAddVoice(MidiVoice& newVoice);
+    const MidiVoice* findChannelAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity);
 
 
     const MidiVoice* getVoice(MidiVoice& voice);
@@ -182,6 +184,7 @@ public:
     MidiVoice removeVoice(const juce::MidiMessage& msg);
     MidiVoice removeVoice(const MidiVoice* voice);
 
+    void clearVoices(juce::Array <MidiVoice>& voiceArray);
     void clearAllVoices();
 
     //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;
