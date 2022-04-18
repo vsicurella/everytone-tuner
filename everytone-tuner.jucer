@@ -129,6 +129,7 @@
               file="Source/voices/MidiVoiceInterpolator.h"/>
         <FILE id="ORX4bP" name="VoiceBank.cpp" compile="1" resource="0" file="Source/voices/VoiceBank.cpp"/>
         <FILE id="pEdvZ6" name="VoiceBank.h" compile="0" resource="0" file="Source/voices/VoiceBank.h"/>
+        <FILE id="tvRhsP" name="VoiceWatcher.h" compile="0" resource="0" file="Source/voices/VoiceWatcher.h"/>
       </GROUP>
       <FILE id="h3R26G" name="TunerController.h" compile="0" resource="0"
             file="Source/TunerController.h"/>

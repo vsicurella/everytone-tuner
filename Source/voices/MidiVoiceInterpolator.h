@@ -9,13 +9,12 @@
 */
 
 #pragma once
-#include "TunerController.h"
-#include "MidiVoiceController.h"
+#include "../Common.h"
+#include "../TunerController.h"
+#include "VoiceWatcher.h"
 
-class MidiVoiceInterpolator : public juce::Timer, public MidiVoiceController::Watcher
+class MidiVoiceInterpolator : public juce::Timer, public VoiceWatcher
 {
-    const MidiVoiceController& voiceController;
-
     Everytone::BendMode bendMode = Everytone::BendMode::Static;
 
     // Voices that are held, changed by MidiVoiceController::Watcher implementation
@@ -30,7 +29,7 @@ class MidiVoiceInterpolator : public juce::Timer, public MidiVoiceController::Wa
 
 public:
 
-    MidiVoiceInterpolator(MidiVoiceController& voiceController, Everytone::BendMode bendMode = Everytone::BendMode::Static);
+    MidiVoiceInterpolator(Everytone::BendMode bendMode = Everytone::BendMode::Static);
     ~MidiVoiceInterpolator();
 
     Everytone::BendMode getBendMode() const { return bendMode; }

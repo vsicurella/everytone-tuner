@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../TunerController.h"
+#include "VoiceWatcher.h"
 #include "VoiceBank.h"
 
 #define EVERYTONE_LOG_VOICES 0
@@ -18,27 +19,8 @@
 #define MAX_CHANNELS 16
 #define MAX_VOICES_PER_CHANNEL 128
 
-class MidiVoiceController
+class MidiVoiceController : public VoiceChanger
 {
-public:
-
-    class Watcher
-    {
-    public:
-
-        virtual void voiceAdded(MidiVoice voice) {}
-        virtual void voiceChanged(MidiVoice voice) {}
-        virtual void voiceRemoved(MidiVoice voice) {}
-    };
-
-private:
-
-    juce::ListenerList<MidiVoiceController::Watcher> voiceWatchers;
-    
-public:
-    void addVoiceWatcher(MidiVoiceController::Watcher* watcherIn) { voiceWatchers.add(watcherIn); }
-    void removeVoiceWatcher(MidiVoiceController::Watcher* watcherIn) { voiceWatchers.remove(watcherIn); }
-
 private:
 
     enum class NewVoiceState
@@ -78,19 +60,19 @@ private:
 
 private:
 
-    int effectiveVoiceLimit() const;
-    void updateVoiceLimitCache();
-    int numVoicesAvailable() const;
+    //int effectiveVoiceLimit() const;
+    //void updateVoiceLimitCache();
+    //int numVoicesAvailable() const;
 
-    const MidiVoice* getExistingVoice(int index) const;
+    //const MidiVoice* getExistingVoice(int index) const;
 
-    void queueVoiceNoteOff(MidiVoice* voice, bool sameChunk);
-    void queueVoiceNoteOn(MidiVoice* voice, bool sameChunk, bool pitchbendOnly=false);
+    void queueVoiceNoteOff(MidiVoice& voice, bool sameChunk);
+    void queueVoiceNoteOn(MidiVoice& voice, bool sameChunk, bool pitchbendOnly=false);
     
     void addVoiceToChannel(int midiChannel, MidiVoice* voice);
     void removeVoiceFromChannel(int midiChannel, MidiVoice* voice);
     
-    const MidiVoice* createAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity);    
+    //const MidiVoice* createAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity);    
     MidiVoice removeVoice(int index);
 
 public:
@@ -114,16 +96,12 @@ public:
     juce::Array<MidiVoice> getAllVoices() const;
 
     // Returns a copy of the array of pointers to MidiVoices that are in the given channel
-    juce::Array<MidiVoice*> getVoicesInChannel(int midiChannel) const;
+    juce::Array<MidiVoice> getVoicesInChannel(int midiChannel) const;
 
     int numActiveVoices() const;
 
-    const MidiVoice* getVoice(int midiChannel, int midiNote, juce::uint8 velocity = 0);
     const MidiVoice* getVoice(const juce::MidiMessage& msg);
-
-    MidiVoice removeVoice(int midiChannel, int midiNote);
     MidiVoice removeVoice(const juce::MidiMessage& msg);
-    MidiVoice removeVoice(const MidiVoice* voice);
 
     void clearAllVoices();
 
@@ -131,13 +109,7 @@ public:
     int serveSameChunkPriorityBuffer(MidiBuffer& queueOut);
     int serveNextChunkPriorityBuffer(MidiBuffer& queueOut);
 
-    //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;
-
-    int channelOfVoice(int midiChannel, int midiNote) const;
-    int channelOfVoice(MidiVoice* voice) const;
     int channelOfVoice(const juce::MidiMessage& msg) const;
-
-    bool channelIsFree(int midiChannel, MidiPitch pitchToAssign = MidiPitch()) const;
 
     void setChannelMode(Everytone::ChannelMode mode);
     void setMpeZone(Everytone::MpeZone zone);

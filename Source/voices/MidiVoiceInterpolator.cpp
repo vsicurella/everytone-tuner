@@ -10,8 +10,7 @@
 
 #include "MidiVoiceInterpolator.h"
 
-MidiVoiceInterpolator::MidiVoiceInterpolator(MidiVoiceController& voiceControllerIn, Everytone::BendMode bendModeIn)
-    : voiceController(voiceControllerIn)
+MidiVoiceInterpolator::MidiVoiceInterpolator(Everytone::BendMode bendModeIn)
 {
     setBendMode(bendModeIn);
 }
