@@ -548,20 +548,23 @@ bool VoiceBank::channelIsFree(int midiChannel, MidiPitch pitchToAssign) const
     }
 
     auto chInfo = channelInfo[midiChannel - 1];
-    bool notAvailable = (chInfo.disabled || chInfo.numVoices >= MAX_VOICES_PER_CHANNEL);
+    if (chInfo.disabled)
+        return false;
 
     switch (mpeZone)
     {
     case Everytone::MpeZone::Lower:
-        notAvailable |= midiChannel == 1;
+        if (midiChannel == 1)
+            return false;
         break;
 
     case Everytone::MpeZone::Upper:
-        notAvailable |= midiChannel == 16;
+        if (midiChannel == 16)
+            return false;
         break;
     }
 
-    return !notAvailable;
+    return chInfo.numVoices == 0; // TODO poly channels
 }
 
 void VoiceBank::setChannelsDisabled(juce::Array<bool> channelsDisabled)
