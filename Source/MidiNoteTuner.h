@@ -102,6 +102,8 @@ public:
     
     void setPitchbendRange(int pitchBendMaxIn);
 
+	juce::String getDescription() const { return sourceTuning->getName() + " to " + targetTuning->getName(); }
+
 	//MappedNote getNoteMapping(int midiChannel, int midiNote) const;
 	//MappedNote getNoteMapping(const juce::MidiMessage& msg) const;
 

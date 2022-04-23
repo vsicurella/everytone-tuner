@@ -103,6 +103,8 @@ private:
 
     juce::Array<ChannelInfo> channelInfo;
 
+    std::shared_ptr<MidiNoteTuner> tuner;
+
     // Sorted by input note number, then midi channel (0 being stolen)
     int noteMapSize = 0;
     int mapIndicesPerNote = 0;
@@ -193,11 +195,11 @@ public:
 
     int numActiveVoices() const;
 
+    void setMidiNoteTuner(std::shared_ptr<MidiNoteTuner>& newTuner);
 
     ChannelVoicePtr findVoice(const MidiVoice& voiceToFind) const;
 
     const MidiVoice* findChannelAndAddVoice(NewVoiceState state, int midiChannel, int midiNote, juce::uint8 velocity);
-
 
     //const MidiVoice* getVoice(MidiVoice& voice);
     const MidiVoice* getVoice(const juce::MidiMessage& msg);

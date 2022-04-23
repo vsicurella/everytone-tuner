@@ -54,7 +54,7 @@ void VoiceBank::reset()
         }
     }
 
-    voicesSize = voiceIndex + 1;
+    voicesSize = voiceIndex;
 
     noteMapSize = voicesSize;
     mapIndicesPerNote = MAX_CHANNELS;
@@ -127,6 +127,11 @@ int VoiceBank::numActiveVoices() const
     return num;
 }
 
+void VoiceBank::setMidiNoteTuner(std::shared_ptr<MidiNoteTuner>& newTuner)
+{
+    tuner = newTuner;
+}
+
 int VoiceBank::channelOfVoice(MidiVoice* voice) const
 {
     if (voice->isInvalid())
@@ -155,34 +160,6 @@ int VoiceBank::channelOfVoice(MidiVoice* voice) const
 
 int VoiceBank::channelOfVoice(int midiChannel, int midiNote) const
 {
-    //if (midiChannel <= 0 || midiChannel > 16 || midiNote < 0 || midiNote >= 128)
-    //    return -1;
-
-//    int vi = midiChannel * MAX_VOICES_PER_CHANNEL + midiNote;
-//    auto voice = &voices[vi].voice;
-//    if (voice->isInvalid())
-//    {
-//#if JUCE_DEBUG
-//        for (int i = 0; i < voicesSize; i++)
-//        {
-//            if (voices[i].voice.getMidiNote() == midiNote
-//             && voices[i].voice.getMidiChannel() == midiChannel
-//             && voices[i].voice.isValid());
-//            {
-//                DBG("Did not expect voice to actually be present. ");
-//                jassertfalse;
-//            }
-//
-//        }
-//#endif
-//        return -1;
-//    }
-
-    //auto voiceIndex = indexOfVoice(midiChannel, midiNote);
-    //jassert(voiceIndex >= 0);
-    //return voiceIndex;
-
-
     auto mapIndex = getMapNoteIndex(midiNote);
     for (int i = 0; i < mapIndicesPerNote; i++)
     {
@@ -394,7 +371,7 @@ const MidiVoice* VoiceBank::findChannelAndAddVoice(NewVoiceState state, int midi
 
         jassert(newChannelNum >= 1);
 
-        auto newVoice = MidiVoice(midiChannel, midiNote, velocity, newChannelNum, nullptr); // tuner
+        auto newVoice = MidiVoice(midiChannel, midiNote, velocity, newChannelNum, tuner);
         voices[voiceIndex] = VoicePtr{ newVoice };
         return getExistingVoice(voiceIndex);
     }
@@ -408,7 +385,7 @@ const MidiVoice* VoiceBank::findChannelAndAddVoice(NewVoiceState state, int midi
     if (newChannel->isValid())
     {
         lastChannelAssigned = newChannel->id;
-        auto newVoice = MidiVoice(midiChannel, midiNote, velocity, newChannel->id, nullptr); // tuner
+        auto newVoice = MidiVoice(midiChannel, midiNote, velocity, newChannel->id, tuner);
         auto channelIndex = addVoiceToChannel(*newChannel, newVoice);
         return &(newChannel->getVoicePtr(channelIndex)->voice);
     }
@@ -546,7 +523,7 @@ void VoiceBank::clearAllVoices()
             removeVoiceFromChannel(voice->getAssignedChannel(), *voice);
         }
         
-        voices[v] = emptyVoice;
+        voices[v].voice = MidiVoice();
     }
 
     for (int s = 0; s < stolenChannelInfo.voiceLimit; s++)
