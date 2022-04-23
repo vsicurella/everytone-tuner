@@ -19,7 +19,7 @@
 #define MAX_CHANNELS 16
 #define MAX_VOICES_PER_CHANNEL 128
 
-class MidiVoiceController : public VoiceChanger
+class MidiVoiceController : public VoiceChanger, private TunerController::Watcher, private juce::Timer
 {
 private:
 
@@ -35,6 +35,8 @@ private:
 
     TunerController& tuningController;
 
+    juce::Array<std::shared_ptr<MidiNoteTuner>> usedTuners;
+
     Everytone::ChannelMode channelMode = Everytone::ChannelMode::FirstAvailable;
     Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower;
     Everytone::NotePriority notePriority = Everytone::NotePriority::Last;
@@ -48,11 +50,11 @@ private:
     VoiceBank voiceBank;
 
     // For messages that need to be in the same chunk
-    MidiBuffer sameChunkPriorityQueue;
+    juce::MidiBuffer sameChunkPriorityQueue;
     int sameChunkSample = 0;
 
     // For messages that need to be in the next chunk
-    MidiBuffer nextChunkPriorityQueue;
+    juce::MidiBuffer nextChunkPriorityQueue;
     int nextChunkSample = 0;
 
 
@@ -72,8 +74,17 @@ private:
     void addVoiceToChannel(int midiChannel, MidiVoice* voice);
     void removeVoiceFromChannel(int midiChannel, MidiVoice* voice);
     
-    //const MidiVoice* createAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity);    
     MidiVoice removeVoice(int index);
+
+    void updateVoiceBankTuner();
+    int cleanUnusedTuners();
+
+private:
+
+    void sourceTuningChanged(const std::shared_ptr<MappedTuningTable>& source) override;
+    void targetTuningChanged(const std::shared_ptr<MappedTuningTable>& target) override;
+
+    void timerCallback() override;
 
 public:
 

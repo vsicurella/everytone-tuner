@@ -18,12 +18,62 @@ MidiVoiceController::MidiVoiceController(TunerController& tuningControllerIn,
       mpeZone(zoneIn),
       voiceBank(channelMode, mpeZone)
 {
-    
+    tuningController.addWatcher(this);
+    startTimer(5000);
 }
 
 MidiVoiceController::~MidiVoiceController()
 {
+    tuningController.removeWatcher(this);
+    voiceBank.clearAllVoices();
+    usedTuners.clear();
+}
 
+void MidiVoiceController::updateVoiceBankTuner()
+{
+    std::shared_ptr<MidiNoteTuner>& newTuner = tuningController.getTuner();
+    usedTuners.addIfNotAlreadyThere(newTuner);
+    voiceBank.setMidiNoteTuner(newTuner);
+}
+
+int MidiVoiceController::cleanUnusedTuners()
+{
+    int deleted = 0;
+    auto actuallyUsedTuners = juce::Array <std::shared_ptr<MidiNoteTuner>>();
+    for (int i = 0; i < usedTuners.size(); i++)
+    {
+        std::shared_ptr<MidiNoteTuner>& tuner = usedTuners.getReference(i);
+        int uses = tuner.use_count();
+        //DBG("Tuner " + tuner->getDescription() + " has use count of " + juce::String(uses));
+        if (uses > 1)
+        {
+            actuallyUsedTuners.add(tuner);
+            continue;
+        }
+
+        deleted++;
+    }
+
+    usedTuners = actuallyUsedTuners;
+
+    return deleted;
+}
+
+void MidiVoiceController::sourceTuningChanged(const std::shared_ptr<MappedTuningTable>& source)
+{
+    updateVoiceBankTuner();
+}
+
+void MidiVoiceController::targetTuningChanged(const std::shared_ptr<MappedTuningTable>& target)
+{
+    updateVoiceBankTuner();
+}
+
+void MidiVoiceController::timerCallback()
+{
+    int deleted = cleanUnusedTuners();
+    if (deleted > 0)
+        juce::Logger::writeToLog("Deleted " + String(deleted) + " unused tuners.");
 }
 
 juce::Array<MidiVoice> MidiVoiceController::getAllVoices() const
