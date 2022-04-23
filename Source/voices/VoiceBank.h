@@ -46,7 +46,9 @@ public:
 
         bool isFull() const { return voiceLimit == numVoices; }
 
-        VoicePtr* getVoicePtr(int index) 
+        bool isValid() const { return channelPtr != nullptr; }
+
+        VoicePtr* getVoicePtr(int index) const
         { 
             jassert(channelPtr != nullptr);
             jassert(index >= 0);
@@ -59,6 +61,23 @@ public:
         Normal = 0, // Not all voices are used - get next channel
         Overflow,   // All voices are used, determine action via NotePriority
         Monophonic  // One voice at a time - continue using same channel
+    };
+
+    struct ChannelVoicePtr
+    {
+        const VoicePtr* voicePtr = nullptr;
+        const ChannelInfo* channel = nullptr;
+        int indexInChannel = -1;
+
+        bool isValid() const { return voicePtr != nullptr && channel != nullptr; }
+        bool isInvalid() const { return voicePtr == nullptr || channel == nullptr; }
+
+        int getVoiceIndex() const
+        {
+            if (channel->isValid())
+                return (channel->id - 1) * MAX_VOICES_PER_CHANNEL + indexInChannel;
+            return -1;
+        }
     };
 
 private:
@@ -87,7 +106,7 @@ private:
     // Sorted by input note number, then midi channel (0 being stolen)
     int noteMapSize = 0;
     int mapIndicesPerNote = 0;
-    int inputNoteVoiceIndexMap[MAX_VOICES + MAX_VOICES_PER_CHANNEL];
+    ChannelVoicePtr inputNoteVoiceIndexMap[MAX_VOICES];
 
     Everytone::ChannelMode channelMode = Everytone::ChannelMode::FirstAvailable;
     Everytone::MpeZone mpeZone = Everytone::MpeZone::Lower;
@@ -103,34 +122,36 @@ private:
 
     NewVoiceState getNewVoiceState() const;
 
-    int findLowestVoiceIndex(bool active) const;
-    int findHighestVoiceIndex(bool active) const;
-    int findOldestVoiceIndex(bool active) const;
-    int findMostRecentVoiceIndex(bool active) const;
+    ChannelVoicePtr findLowestVoiceIndex(bool active) const;
+    ChannelVoicePtr findHighestVoiceIndex(bool active) const;
+    ChannelVoicePtr findOldestVoiceIndex(bool active) const;
+    ChannelVoicePtr findMostRecentVoiceIndex(bool active) const;
 
     int nextAvailableChannel() const;
     int nextRoundRobinChannel() const;
 
-    int getNextVoiceIndexToSteal() const;
-    int getNextVoiceToRetrigger() const;
+    ChannelVoicePtr findNextVoiceToSteal() const;
+    ChannelVoicePtr findNextVoiceToRetrigger() const;
 
-    int findNextVoiceChannel(MidiPitch pitchOfVoice = MidiPitch()) const;
+    int findNextVoiceChannel(NewVoiceState state, MidiPitch pitchOfVoice = MidiPitch()) const;
 
     int midiNoteIndex(int midiChannel, int midiNote) const;
 
     int getMapNoteIndex(int midiNote) const;
-    int getVoiceIndexFromInputMap(int midiChannel, int midiNote) const;
+    ChannelVoicePtr getVoiceFromInputMap(int midiChannel, int midiNote) const;
+    void setInputMapVoice(const ChannelVoicePtr& chVoicePtr);
 
-    int indexOfVoice(int midiChannel, int midiNote) const;
-    int indexOfVoice(const MidiVoice* voice) const;
+    //int indexOfVoice(int midiChannel, int midiNote) const;
+    //int indexOfVoice(const MidiVoice* voice) const;
 
     int effectiveVoiceLimit() const;
     void updateVoiceLimitCache();
     int numVoicesAvailable() const;
 
-    const VoicePtr* getExistingVoice(int index) const;
+    const MidiVoice* getExistingVoice(int index) const;
+    const VoicePtr*  getExistingVoicePtr(int index) const;
 
-    void setVoiceInChannel(ChannelInfo chInfo, int index, MidiVoice& voice);
+    void setVoiceInChannel(ChannelInfo& chInfo, int index, MidiVoice& voice);
     void setVoiceInChannel(int midiChannel, int index, MidiVoice& voice);
 
     // Returns the index in the channel
@@ -138,8 +159,9 @@ private:
     int addVoiceToChannel(int midiChannel, MidiVoice& voice);
 
     // Returns the index the voice was in
-    int removeVoiceFromChannel(ChannelInfo& chInfo, MidiVoice& voice);
-    int removeVoiceFromChannel(int midiChannel, MidiVoice& voice);
+    int removeVoiceFromChannel(ChannelInfo& chInfo, const  MidiVoice& voice);
+    int removeVoiceFromChannel(int midiChannel, const MidiVoice& voice);
+    int removeVoiceFromChannel(ChannelVoicePtr& chVoicePtr);
 
     // Returns the channel the stolen voice was assigned to
     int stealExistingVoice(int index);
@@ -172,19 +194,19 @@ public:
     int numActiveVoices() const;
 
 
-    const MidiVoice* findVoice(MidiVoice& voiceToFind);
+    ChannelVoicePtr findVoice(const MidiVoice& voiceToFind) const;
 
-    const MidiVoice* findChannelAndAddVoice(int midiChannel, int midiNote, juce::uint8 velocity);
+    const MidiVoice* findChannelAndAddVoice(NewVoiceState state, int midiChannel, int midiNote, juce::uint8 velocity);
 
 
-    const MidiVoice* getVoice(MidiVoice& voice);
+    //const MidiVoice* getVoice(MidiVoice& voice);
     const MidiVoice* getVoice(const juce::MidiMessage& msg);
 
     MidiVoice removeVoice(int midiChannel, int midiNote);
     MidiVoice removeVoice(const juce::MidiMessage& msg);
-    MidiVoice removeVoice(const MidiVoice* voice);
+    //MidiVoice removeVoice(const MidiVoice* voice);
 
-    void clearVoices(juce::Array <MidiVoice>& voiceArray);
+    //void clearVoices(juce::Array <MidiVoice>& voiceArray);
     void clearAllVoices();
 
     //const MidiVoice* getVoiceWithPitch(MidiPitch pitch) const;

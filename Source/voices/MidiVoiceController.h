@@ -64,7 +64,7 @@ private:
     //void updateVoiceLimitCache();
     //int numVoicesAvailable() const;
 
-    //const MidiVoice* getExistingVoice(int index) const;
+    //const MidiVoice* getExistingVoicePtr(int index) const;
 
     void queueVoiceNoteOff(MidiVoice& voice, bool sameChunk);
     void queueVoiceNoteOn(MidiVoice& voice, bool sameChunk, bool pitchbendOnly=false);

@@ -156,7 +156,7 @@ void MidiVoiceController::queueVoiceNoteOn(MidiVoice& voice, bool sameChunk, boo
 //        auto channelVoices = getVoicesInChannel(newChannel);
 //        if (channelVoices.size() > 0)
 //        {
-//            auto voiceIndex = getNextVoiceIndexToSteal();
+//            auto voiceIndex = findNextVoiceToSteal();
 //            stealExistingVoice(voiceIndex);
 //        }
 //
