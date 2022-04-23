@@ -244,6 +244,7 @@ namespace Everytone
         Lowest = 1, // Create note-ons for the lowest held notes
         Highest,    // Create note-ons for the highest held notes
         Last,       // Create note-ons for each played note, and when voice becomes available, retrigger previous note
+        Ignore,     // Create note-ons until voice limit is reached
     };
 
     static juce::String getName(NotePriority mode)
@@ -277,6 +278,9 @@ namespace Everytone
 
         case NotePriority::Last:
             return juce::String("After all voices are used, allow a new note to be triggered by stealing the oldest held note.");
+
+        case NotePriority::Ignore:
+            return juce::String("After all voices are used, ignore all note-ons.");
 
         default:
             jassertfalse;
