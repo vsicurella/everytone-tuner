@@ -18,6 +18,7 @@ MidiVoice::MidiVoice(int channelIn, int noteIn, juce::uint8 velocityIn, int assi
       assignedChannel(assignedChannelIn),
       tuner(tunerIn)
 {
+    currentPitch.coarse = noteIn;
     update();
 }
 
@@ -36,7 +37,10 @@ void MidiVoice::operator=(const MidiVoice& voice)
 void MidiVoice::updatePitch()
 {
     auto previousPitch = currentPitch;
-    currentPitch = tuner->getMidiPitch(midiChannel, midiNote);
+
+    jassert(tuner != nullptr);
+    if (tuner != nullptr)
+        currentPitch = tuner->getMidiPitch(midiChannel, midiNote);
 
 #if JUCE_DEBUG && 0
     auto ch = juce::String(midiChannel);
