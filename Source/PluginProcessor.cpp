@@ -22,7 +22,7 @@
 MultimapperAudioProcessor::MultimapperAudioProcessor()
     : tunerController(std::make_unique<TunerController>()),
       voiceController(std::make_unique<MidiVoiceController>(*tunerController)),
-      voiceInterpolator(std::make_unique<MidiVoiceInterpolator>(*voiceController, Everytone::BendMode::Persistent)),
+      voiceInterpolator(std::make_unique<MidiVoiceInterpolator>(Everytone::BendMode::Persistent)),
 
 #ifndef JucePlugin_PreferredChannelConfigurations
      AudioProcessor (BusesProperties()

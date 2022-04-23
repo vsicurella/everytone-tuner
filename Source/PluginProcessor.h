@@ -10,8 +10,8 @@
 
 #include "TuningChanger.h"
 #include "TunerController.h"
-#include "MidiVoiceController.h"
-#include "MidiVoiceInterpolator.h"
+#include "./voices/MidiVoiceController.h"
+#include "./voices/MidiVoiceInterpolator.h"
 
 class MultimapperLog : public juce::Logger
 {
