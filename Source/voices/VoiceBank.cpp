@@ -422,29 +422,10 @@ MidiVoice VoiceBank::removeVoice(int index)
         if (voiceCopy.getAssignedChannel() == 0 && channelMode == Everytone::ChannelMode::Monophonic)
             voiceCopy.reassignChannel(lastChannelAssigned);
 
-        //voiceWatchers.call(&VoiceBank::Watcher::voiceRemoved, voiceCopy);
-
         return voiceCopy;
     }
     return MidiVoice();
 }
-//
-//const MidiVoice* VoiceBank::getVoice(MidiVoice& voice)
-//{
-//    auto channel = voice.getMidiChannel();
-//    auto note = voice.getMidiNote();
-//
-//    auto voiceIndex = indexOfVoice(voice.getMidiChannel(), voice.getMidiNote());
-//    if (voiceIndex >= 0 && voiceIndex < maxVoiceLimit)
-//    {
-//        auto voicePtr = getExistingVoicePtr(voiceIndex);
-//        if (voicePtr == nullptr)
-//            return nullptr;
-//        return &voicePtr->voice;
-//    }
-//        
-//    return nullptr;
-//}
 
 const MidiVoice* VoiceBank::getVoice(const juce::MidiMessage& msg)
 {
@@ -485,9 +466,6 @@ MidiVoice VoiceBank::removeVoice(int midiChannel, int midiNote)
     auto voice = chVoicePtr.voicePtr->voice;
     removeVoiceFromChannel(chVoicePtr);
     return voice;
-    
-    //auto index = indexOfVoice(midiChannel, midiNote);
-    //return removeVoice(voicePtr->voice);
 }
 
 MidiVoice VoiceBank::removeVoice(const juce::MidiMessage& msg)
@@ -496,20 +474,6 @@ MidiVoice VoiceBank::removeVoice(const juce::MidiMessage& msg)
     auto note = msg.getNoteNumber();
     return removeVoice(channel, note);
 }
-
-//MidiVoice VoiceBank::removeVoice(const MidiVoice* voice)
-//{
-//    auto index = indexOfVoice(voice);
-//    return removeVoice(index);
-//}
-//
-//void VoiceBank::clearVoices(juce::Array<MidiVoice>& voiceArray)
-//{
-//    for (auto voice : voiceArray)
-//    {
-//        removeVoice(&voice);
-//    }
-//}
 
 void VoiceBank::clearAllVoices()
 {
@@ -854,35 +818,6 @@ void VoiceBank::setInputMapVoice(const ChannelVoicePtr& chVoicePtr)
     auto mapIndex = getMapNoteIndex(midiNote) + midiChannel - 1;
     inputNoteVoiceIndexMap[mapIndex] = chVoicePtr;
 }
-
-//int VoiceBank::indexOfVoice(int midiChannel, int midiNote) const
-//{
-//    //auto midiIndex = midiNoteIndex(midiChannel, midiNote);
-//    //for (int i = 0; i < voicesSize; i++)
-//    //{
-//    //    auto voice = getExistingVoicePtr(i);
-//    //    if (voice == nullptr || !voice->voice.isValid())
-//    //        continue;
-//
-//    //    if (voice->voice.getMidiNoteIndex() == midiIndex)
-//    //        return i;
-//    //}
-//    //return -1;
-//    auto voice = getVoiceFromInputMap(midiChannel, midiNote);
-//    if (voice->voice.isValid() && voice->voice.getAssignedChannel() > 0)
-//    auto ch = channelI
-//    return 
-//}
-
-//int VoiceBank::indexOfVoice(const MidiVoice* voice) const
-//{
-//    //for (int i = 0; i < voicesSize; i++)
-//    //    if (getExistingVoicePtr(i) == voice)
-//    //        return i;
-//    //return -1;
-//
-//    return indexOfVoice(voice->getMidiChannel(), voice->getMidiNote());
-//}
 
 int VoiceBank::effectiveVoiceLimit() const
 {
