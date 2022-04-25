@@ -195,6 +195,8 @@ public:
 
     int numActiveVoices() const;
 
+    int getLastAssignedChannel() const { return lastChannelAssigned; }
+
     void setMidiNoteTuner(std::shared_ptr<MidiNoteTuner>& newTuner);
 
     ChannelVoicePtr findVoice(const MidiVoice& voiceToFind) const;
@@ -203,6 +205,7 @@ public:
 
     //const MidiVoice* getVoice(MidiVoice& voice);
     const MidiVoice* getVoice(const juce::MidiMessage& msg);
+    const MidiVoice* readVoice(const juce::MidiMessage& msg) const;
 
     MidiVoice removeVoice(int midiChannel, int midiNote);
     MidiVoice removeVoice(const juce::MidiMessage& msg);

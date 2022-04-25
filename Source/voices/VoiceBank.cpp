@@ -170,7 +170,7 @@ int VoiceBank::channelOfVoice(int midiChannel, int midiNote) const
         auto voicePtr = chVoicePtr.voicePtr;
         if (voicePtr->voice.isInvalid())
         {
-            DBG("Did not expect mapped voice to exist; Note " + String(midiNote) + " Channel " + String(midiChannel));
+            DBG("Did not expect mapped voice to exist; Note " + juce::String(midiNote) + " Channel " + juce::String(midiChannel));
             continue;
         }
 
@@ -179,7 +179,7 @@ int VoiceBank::channelOfVoice(int midiChannel, int midiNote) const
             return assignedChannel;
 
         jassertfalse;
-        DBG("Did not expect valid voice to have an invalid assigned channel; Note " + String(midiNote) + " Channel " + String(midiChannel));
+        DBG("Did not expect valid voice to have an invalid assigned channel; Note " + juce::String(midiNote) + " Channel " + juce::String(midiChannel));
         break;
     }
 
@@ -318,8 +318,8 @@ int VoiceBank::removeVoiceFromChannel(ChannelInfo& chInfo, const MidiVoice& voic
 int VoiceBank::removeVoiceFromChannel(int midiChannel, const MidiVoice& voice)
 {
     jassert(midiChannel == 0 || ChannelInMidiRange(midiChannel));
-    auto chInfo = ChannelInMidiRange(midiChannel) ? channelInfo[midiChannel - 1]
-                                                  : stolenChannelInfo;
+    ChannelInfo& chInfo = ChannelInMidiRange(midiChannel) ? channelInfo.getReference(midiChannel - 1)
+                                                          : stolenChannelInfo;
     
     return removeVoiceFromChannel(chInfo, voice);
 }
@@ -377,7 +377,14 @@ const MidiVoice* VoiceBank::findChannelAndAddVoice(NewVoiceState state, int midi
     }
 
     auto newChannelNum = findNextVoiceChannel(state);
-    jassert(newChannelNum != 0);
+#if JUCE_DEBUG
+    if (newChannelNum <= 0)
+    {
+        jassertfalse; // Stolen notes should have already been handled by the previous block
+        findNextVoiceChannel(state);
+    }
+#endif
+
     if (newChannelNum < 0)
         return nullptr;
 
@@ -447,6 +454,19 @@ const MidiVoice* VoiceBank::getVoice(const juce::MidiMessage& msg)
     // Add to a channel or steal voice
     auto velocity = msg.getVelocity();
     return findChannelAndAddVoice(voiceState, channel, note, velocity);
+}
+
+const MidiVoice* VoiceBank::readVoice(const juce::MidiMessage& msg) const
+{
+    auto channel = msg.getChannel();
+    auto note = msg.getNoteNumber();
+
+    // See if voice exists
+    auto voiceChPtr = getVoiceFromInputMap(channel, note);
+    if (voiceChPtr.isValid())
+        return &voiceChPtr.voicePtr->voice;
+
+    return nullptr;
 }
 
 int VoiceBank::numAllVoices() const
@@ -652,7 +672,7 @@ int VoiceBank::nextAvailableChannel() const
 {
     // TODO Poly channel mode
 
-    for (int ch = 1; ch < MAX_CHANNELS; ch++)
+    for (int ch = 1; ch <= MAX_CHANNELS; ch++)
     {
         if (channelIsFree(ch))
             return ch;
@@ -664,16 +684,18 @@ int VoiceBank::nextRoundRobinChannel() const
 {
     // TODO Poly channel mode
 
-    auto i = (lastChannelAssigned + 1) % 16;
+    auto ch = lastChannelAssigned;
 
-    int channelsChecked = 1;
+    int channelsChecked = 0;
     while (channelsChecked < MAX_CHANNELS)
     {
-        auto ch = i + 1;
+        ch += 1;
+        if (ch > 16)
+            ch = 1;
+
         if (channelIsFree(ch))
             return ch;
 
-        i = ch % 16;
         channelsChecked++;
     }
 
@@ -828,7 +850,8 @@ int VoiceBank::effectiveVoiceLimit() const
     for (int i = 0; i < channelInfo.size(); i++)
         numDisabled += (channelInfo[i].disabled) ? 1 : 0;
 
-    int limit = maxVoiceLimit - numDisabled;
+    // TODO poly channel mode;
+    int limit = MAX_CHANNELS - numDisabled;
     limit -= (mpeZone == Everytone::MpeZone::Omnichannel) ? 0 : 1;
     return limit;
 }
@@ -860,7 +883,7 @@ int VoiceBank::numVoicesAvailable() const
             chVoices += ch.numVoices;
         }
 
-        num = maxVoiceLimit - chVoices;
+        num = effectiveVoiceLimit() - chVoices;
         break;
     }
     }
