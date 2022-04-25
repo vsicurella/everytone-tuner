@@ -8,6 +8,8 @@
     <GROUP id="{C93208E7-DAB1-83EF-2D21-CE78B32DCE10}" name="Source">
       <FILE id="oMI0GT" name="Common.h" compile="0" resource="0" file="Source/Common.h"/>
       <GROUP id="{79A5D062-8ED3-30D7-15DF-F01D07F22E53}" name="tests">
+        <FILE id="NykCFu" name="VoiceBank_tests.h" compile="0" resource="0"
+              file="Source/tests/VoiceBank_tests.h"/>
         <FILE id="OeS2f9" name="MidiNoteTuner_tests.h" compile="0" resource="0"
               file="Source/tests/MidiNoteTuner_tests.h"/>
         <FILE id="Onui4N" name="TestsCommon.h" compile="0" resource="0" file="Source/tests/TestsCommon.h"/>

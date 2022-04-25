@@ -38,7 +38,7 @@ void MidiVoice::updatePitch()
 {
     auto previousPitch = currentPitch;
 
-    jassert(tuner != nullptr);
+    //jassert(tuner != nullptr);
     if (tuner != nullptr)
         currentPitch = tuner->getMidiPitch(midiChannel, midiNote);
 

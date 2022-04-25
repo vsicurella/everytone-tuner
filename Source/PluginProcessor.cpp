@@ -15,6 +15,7 @@
     #include "./tests/MultichannelMap_Test.h"
     #include "./tests/Tuning_tests.h"
     #include "./tests/MidiNoteTuner_tests.h"
+    #include "./tests/VoiceBank_tests.h"
 #endif
 
 
@@ -49,12 +50,14 @@ MultimapperAudioProcessor::MultimapperAudioProcessor()
     MultichannelMap_Test multichannelMapTest;
     FunctionalTuning_Test tuningTest;
     MidiNoteTuner_Test midiNoteTunerTest;
+    VoiceBank_Test voiceBankTest;
 
     auto tests = juce::Array<juce::UnitTest*>();
     mapTests.addToTests(tests);
     tests.add(&multichannelMapTest);
     tests.add(&tuningTest);
     tests.add(&midiNoteTunerTest);
+    tests.add(&voiceBankTest);
 
     juce::UnitTestRunner tester;
     tester.runTests(tests);
@@ -333,7 +336,7 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
             jassertfalse;
     }
 
-    MidiBuffer previousChunkPriority;
+    juce::MidiBuffer previousChunkPriority;
     int previousPrioritySize = voiceController->serveNextChunkPriorityBuffer(previousChunkPriority);
 
     // Process new messages
@@ -387,12 +390,12 @@ void MultimapperAudioProcessor::tuneMidiBuffer(juce::MidiBuffer& buffer)
         processedBuffer.addEvent(msg, processedSample++);
     }
 
-    MidiBuffer sameChunkPriority;
+    juce::MidiBuffer sameChunkPriority;
     int sameChunkPrioritySize = voiceController->serveSameChunkPriorityBuffer(sameChunkPriority);
     
     // Insert in order: Interpolation buffer, PreviousChunkPriorityBuffer, SameChunkPriorityBuffer, Processed buffer
 
-    MidiBuffer combinedBuffer;
+    juce::MidiBuffer combinedBuffer;
     combinedBuffer.addEvents(interpolationMessages, 0, interpolationSample, 0);
     combinedBuffer.addEvents(previousChunkPriority, 0, previousPrioritySize, interpolationSample);
     combinedBuffer.addEvents(sameChunkPriority, 0, sameChunkPrioritySize, interpolationSample + previousPrioritySize);
