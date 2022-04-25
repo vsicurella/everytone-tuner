@@ -17,24 +17,24 @@ class Map_Test : public EverytoneTunerUnitTest
 {
 private:
 
-    void testMap(int size, int start, const T* expected, const Map<T>* map, String name)
+    void testMap(int size, int start, const T* expected, const Map<T>* map, juce::String name)
     {
         int end = start + size;
         for (int i = start; i < end; i++)
         {
             T e = expected[i - start];
-            expect_exact<T>(e, map->at(i), name + " map at " + String(i));
+            expect_exact<T>(e, map->at(i), name + " map at " + juce::String(i));
         }
     };
 
-    String MapDefToString(typename Map<T>::Definition def)
+    juce::String MapDefToString(typename Map<T>::Definition def)
     {
-        String str = "Size: " + String(def.mapSize);
+        juce::String str = "Size: " + juce::String(def.mapSize);
         str += "\nPattern   : " + vecToString<T>(def.pattern, def.mapSize, false);
-        str += "\nBase      : " + String(def.patternBase);
-        str += "\nPat. Root : " + String(def.patternRootIndex);
-        str += "\nMap Root  : " + String(def.mapRootIndex);
-        str += "\nTranspose : " + String(def.transpose);
+        str += "\nBase      : " + juce::String(def.patternBase);
+        str += "\nPat. Root : " + juce::String(def.patternRootIndex);
+        str += "\nMap Root  : " + juce::String(def.mapRootIndex);
+        str += "\nTranspose : " + juce::String(def.transpose);
         return str;
     }
 
@@ -42,7 +42,7 @@ public:
 
     struct Parameters
     {
-        String testName;
+        juce::String testName;
         typename Map<T>::Definition definition;
         Map<T>* map;
 
@@ -67,7 +67,7 @@ private:
 
 public:
 
-    Map_Test(String nameOfType, Parameters testParams) 
+    Map_Test(juce::String nameOfType, Parameters testParams) 
         : EverytoneTunerUnitTest("Map " + nameOfType),
           params(testParams) {}
 
@@ -132,7 +132,7 @@ public:
 
         beginTest("Setters");
         T newBase = 0;
-        Array<T> base0Table;
+        juce::Array<T> base0Table;
         base0Table.resize(params.testTableSize);
         for (int i = 0; i < params.testTableSize; i++)
             base0Table.set(i, definition.pattern[i % definition.mapSize]);
@@ -145,7 +145,7 @@ public:
         testMap(params.testTableSize, params.testTableStart, params.expectedTable, map, params.testName + "base reset");
 
         T transposeTest = 3;
-        Array<T> mapTransposed;
+        juce::Array<T> mapTransposed;
         mapTransposed.resize(params.testTableSize);
         for (int i = 0; i < params.testTableSize; i++)
             mapTransposed.set(i, params.expectedTable[i] + transposeTest);

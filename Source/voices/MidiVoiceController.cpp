@@ -73,7 +73,7 @@ void MidiVoiceController::timerCallback()
 {
     int deleted = cleanUnusedTuners();
     if (deleted > 0)
-        juce::Logger::writeToLog("Deleted " + String(deleted) + " unused tuners.");
+        juce::Logger::writeToLog("Deleted " + juce::String(deleted) + " unused tuners.");
 }
 
 juce::Array<MidiVoice> MidiVoiceController::getAllVoices() const
@@ -253,9 +253,9 @@ void MidiVoiceController::clearAllVoices()
     voiceBank.clearAllVoices();
 }
 
-int MidiVoiceController::serveSameChunkPriorityBuffer(MidiBuffer& queueOut)
+int MidiVoiceController::serveSameChunkPriorityBuffer(juce::MidiBuffer& queueOut)
 {
-    MidiBuffer tempBuffer;
+    juce::MidiBuffer tempBuffer;
 
     sameChunkPriorityQueue.swapWith(tempBuffer);
     queueOut.swapWith(tempBuffer);
@@ -265,9 +265,9 @@ int MidiVoiceController::serveSameChunkPriorityBuffer(MidiBuffer& queueOut)
     return bufferSize;
 }
 
-int MidiVoiceController::serveNextChunkPriorityBuffer(MidiBuffer& queueOut)
+int MidiVoiceController::serveNextChunkPriorityBuffer(juce::MidiBuffer& queueOut)
 {
-    MidiBuffer tempBuffer;
+    juce::MidiBuffer tempBuffer;
 
     nextChunkPriorityQueue.swapWith(tempBuffer);
     queueOut.swapWith(tempBuffer);

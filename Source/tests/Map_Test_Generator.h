@@ -13,7 +13,7 @@
 
 class Map_Test_Generator
 {
-    OwnedArray<Map_Test<int>> generatedTests;
+    juce::OwnedArray<Map_Test<int>> generatedTests;
 
 public:
 
@@ -24,10 +24,10 @@ public:
 
     }
 
-    void addToTests(Array<UnitTest*>& tests)
+    void addToTests(juce::Array<juce::UnitTest*>& tests)
     {
         for (int i = 0; i < generatedTests.size(); i++)
-            tests.add(dynamic_cast<UnitTest*>(generatedTests[i]));
+            tests.add(dynamic_cast<juce::UnitTest*>(generatedTests[i]));
     }
 
 private:

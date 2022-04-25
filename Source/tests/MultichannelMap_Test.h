@@ -75,7 +75,7 @@ static bool testTable(const MultichannelMap& multimap, int* expectedIndices)
                 int expectedTableNum = expectedIndex / 128;
 
                 auto mapped = stdMap.getMappedNote(ch, note);
-                String tableAt = " @ " + String(midiNoteIndex);
+                juce::String tableAt = " @ " + juce::String(midiNoteIndex);
                 expect_exact(ch, mapped.inputChannel, "inputChannel" + tableAt);
                 expect_exact(note, mapped.inputNote, "inputNote" + tableAt);
                 expect_exact(expectedTableNum, mapped.tableIndex, "tableIndex" + tableAt);

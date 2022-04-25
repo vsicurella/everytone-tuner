@@ -29,7 +29,7 @@ class MappingPanel  : public juce::Component, public TuningChanger, public Optio
 
     std::unique_ptr<juce::Label> mappingRootFrequencyLabel;
 
-    std::unique_ptr<TextButton> lockReferenceButton;
+    std::unique_ptr<juce::TextButton> lockReferenceButton;
 
     std::unique_ptr<LabelMouseHighlight> rootFrequencyBox;
     std::unique_ptr<juce::GroupComponent> frequencyGroup;
@@ -74,7 +74,7 @@ private:
 
     juce::String getFrequencyGroupTitle() const;
 
-    static Point<float> getComponentMidPointEdge(juce::Component& component, bool leftEdge);
+    static juce::Point<float> getComponentMidPointEdge(juce::Component& component, bool leftEdge);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MappingPanel)
 };

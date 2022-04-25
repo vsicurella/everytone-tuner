@@ -27,7 +27,7 @@ public:
     NewListTuningInterface(juce::String name = juce::String())
         : listModel(true)
     {
-        intervalTable = std::make_unique<TableListBox>("IntervalTable", &listModel);
+        intervalTable = std::make_unique<juce::TableListBox>("IntervalTable", &listModel);
         intervalTable->setHeader(std::make_unique<IntervalListHeader>(true));
         addAndMakeVisible(*intervalTable);
 

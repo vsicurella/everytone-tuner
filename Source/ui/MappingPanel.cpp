@@ -133,7 +133,7 @@ MappingPanel::MappingPanel(Everytone::Options options, MappedTuningTable* tuning
     mtsNoteLabel->setJustificationType(juce::Justification::centred);
     mtsNoteLabel->attachToComponent(mtsNoteSlider.get(), true);
 
-    mtsSnapButton = std::make_unique<TextButton>("MtsSnapButton", "Snap frequency to selected MTS note");
+    mtsSnapButton = std::make_unique<juce::TextButton>("MtsSnapButton", "Snap frequency to selected MTS note");
     addAndMakeVisible(*mtsSnapButton);
     mtsSnapButton->setButtonText("Snap!");
     mtsSnapButton->onClick = [this]() { snapButtonClicked(); };
@@ -162,7 +162,7 @@ MappingPanel::~MappingPanel()
     referenceMidiChannelBox = nullptr;
 }
 
-Point<float> MappingPanel::getComponentMidPointEdge(juce::Component& component, bool leftEdge)
+juce::Point<float> MappingPanel::getComponentMidPointEdge(juce::Component& component, bool leftEdge)
 {
     return component.getBounds()
                     .getCentre()
@@ -437,7 +437,7 @@ void MappingPanel::snapButtonClicked()
 {
     auto mtsNote = (int)mtsNoteSlider->getValue();
     auto frequency = mtsToFrequency(mtsNote);
-    rootFrequencyBox->setText(juce::String(frequency) + " Hz", juce::NotificationType(sendNotification));
+    rootFrequencyBox->setText(juce::String(frequency) + " Hz", juce::NotificationType(juce::NotificationType::sendNotification));
 }
 
 juce::String MappingPanel::getFrequencyGroupTitle() const

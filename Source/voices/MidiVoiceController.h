@@ -117,8 +117,8 @@ public:
     void clearAllVoices();
 
     // Get messages queued for NotePriority settings, returns size of buffer
-    int serveSameChunkPriorityBuffer(MidiBuffer& queueOut);
-    int serveNextChunkPriorityBuffer(MidiBuffer& queueOut);
+    int serveSameChunkPriorityBuffer(juce::MidiBuffer& queueOut);
+    int serveNextChunkPriorityBuffer(juce::MidiBuffer& queueOut);
 
     int channelOfVoice(const juce::MidiMessage& msg) const;
 
